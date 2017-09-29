@@ -6,6 +6,10 @@
 <link href='https://api.mapbox.com/mapbox-gl-js/v0.40.1/mapbox-gl.css' rel='stylesheet' />
 </head>
 <body style='margin:0 !important; padding:0 !important'>
+	<script
+			  src="https://code.jquery.com/jquery-3.2.1.min.js"
+			  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			  crossorigin="anonymous"></script>
 	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
 	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.js'></script>
 <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.css' type='text/css'/>
@@ -15,9 +19,26 @@
 	
 
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
-
-	<div id='map' style='height: 100vw'></div>
-	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<link rel="stylesheet" href="style.css" />	
+	<div id='map' style='height: 100vw; '></div>
+	<div style="position: absolute; top:0px;lef:0px;  z-index: 100000">
+	  <ul class="collapsible" data-collapsible="accordion">
+	    <li>
+	      <div class="collapsible-header active">Select the area </div>
+	      <div class="collapsible-body"><span> <button id="calculate"> Calculate </button> <div id='calculated-area'></div></span></div>
+	    </li>
+	    <li>
+	      <div class="collapsible-header">Refine the area</div>
+	      <div class="collapsible-body"><span> Search your area of interest and chose the area</span></div>
+	    </li>
+	    <li>
+	      <div class="collapsible-header">Checkout </div>
+	      <div class="collapsible-body"><span>Proceed to checkout </span></div>
+	    </li>
+	  </ul>
+      </div>
 
 	<script>
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
@@ -48,6 +69,19 @@ map.on('load',function(){
 	});
 })
 
+var calcButton = document.getElementById('calculate');
+calcButton.onclick = function() {
+    var data = draw.getAll();
+    if (data.features.length > 0) {
+        var area = turf.area(data);
+        // restrict to area to 2 decimal points
+        var rounded_area = Math.round(area*100)/100;
+        var answer = document.getElementById('calculated-area');
+        answer.innerHTML = '<p><strong>' + rounded_area + '</strong></p><p>square meters</p>';
+    } else {
+        alert("Use the draw tools to draw a polygon!");
+    }
+};
 
 
 </script>
