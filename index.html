@@ -35,13 +35,15 @@
 	    </li>
 	    <li>
 	      <div class="collapsible-header">Checkout </div>
-	      <div class="collapsible-body"><span>Proceed to checkout </span></div>
+	      <div class="collapsible-body"><span>Proceed to checkout <button id="submit"> Order </button> </span></div>
 	    </li>
 	  </ul>
       </div>
 
 	<script>
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
+var price_api = 'http://ocean.dataraft.in/download/price/?';
+var order_api = ''
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
@@ -69,15 +71,32 @@ map.on('load',function(){
 	});
 })
 
+//request params 
+
+var method = "POST";
+var async = true;
+var request = new XMLHttpRequest();
+request.onload = function(){
+	var status = request.status;
+	var data = request.responseText;
+	console.log(data,status);
+}
+
+
 var calcButton = document.getElementById('calculate');
 calcButton.onclick = function() {
     var data = draw.getAll();
     if (data.features.length > 0) {
         var area = turf.area(data);
+        var geo_json_data = data.features[data.features.length-1].geometry;
         // restrict to area to 2 decimal points
         var rounded_area = Math.round(area*100)/100;
         var answer = document.getElementById('calculated-area');
         answer.innerHTML = '<p><strong>' + rounded_area + '</strong></p><p>square meters</p>';
+
+        request.open(method,price_api+'data=wave&polygon='+JSON.stringify(geo_json_data,async));
+		request.setRequestHeader("Content-type","application/json;charset=UTF-8");
+		request.send();
     } else {
         alert("Use the draw tools to draw a polygon!");
     }
