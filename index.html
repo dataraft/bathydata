@@ -26,24 +26,41 @@
 	<div style="position: absolute; top:0px;lef:0px;  z-index: 100000">
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
-	      <div class="collapsible-header active">Select the area </div>
-	      <div class="collapsible-body"><span> <button id="calculate"> Calculate </button> <div id='calculated-area'></div></span></div>
+	      <div class="collapsible-header active">Choose Data type </div>
+	      <div class="collapsible-body"><div class="input-field col s6"><select multiple id="sel-data-type"> <option value="wave">Wave</option> <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> <option value="bathymetry">Bathymetry </option>	 </select> <label> Data types </label> </div></div>
 	    </li>
 	    <li>
-	      <div class="collapsible-header">Refine the area</div>
-	      <div class="collapsible-body"><span> Search your area of interest and chose the area</span></div>
+	      <div class="collapsible-header">Select your area</div>
+	      <div class="collapsible-body"><span> <button id="calculate"> Calculate </button> <div id='calculated-area'></div></span> </div>
 	    </li>
 	    <li>
 	      <div class="collapsible-header">Checkout </div>
-	      <div class="collapsible-body"><span>Proceed to checkout <button id="submit"> Order </button> </span></div>
+	      <div class="collapsible-body"> <div class="row">
+    <form class="col s12">
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="email" type="email" class="validate">
+          <label class="active" for="email" data-error="wrong" data-success="right">Email</label>
+        </div>
+      </div>
+      <div class="input-field col s12">
+      <input value="dataraft" id="organisation" type="text" class="validate">
+      <label  for="organisation">Organisation</label>
+    </div>
+    </form>
+  </div><span>Proceed to checkout <button id="submit"> Order </button> </span></div>
 	    </li>
 	  </ul>
       </div>
 
 	<script>
+		 $(document).ready(function() {
+    $('select').material_select();
+  });
+
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
 var price_api = 'http://ocean.dataraft.in/download/price/?';
-var order_api = ''
+var order_api = 'http://ocean.dataraft.in/download/order/?';
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
@@ -73,34 +90,55 @@ map.on('load',function(){
 
 //request params 
 
-var method = "POST";
+var method = "GET";
 var async = true;
 var request = new XMLHttpRequest();
-request.onload = function(){
-	var status = request.status;
-	var data = request.responseText;
-	console.log(data,status);
-}
-
-
+var datatype;
+var email;
+var organisation;
+var geo_json_data
 var calcButton = document.getElementById('calculate');
 calcButton.onclick = function() {
-    var data = draw.getAll();
+    data = draw.getAll();
     if (data.features.length > 0) {
         var area = turf.area(data);
-        var geo_json_data = data.features[data.features.length-1].geometry;
+        geo_json_data = data.features[data.features.length-1].geometry;
         // restrict to area to 2 decimal points
         var rounded_area = Math.round(area*100)/100;
         var answer = document.getElementById('calculated-area');
-        answer.innerHTML = '<p><strong>' + rounded_area + '</strong></p><p>square meters</p>';
+        datatype = $('#sel-data-type').val();
+        console.log(datatype);
+        answer.innerHTML = '<p><strong>' + rounded_area + 'sq mts </strong></p>';
 
-        request.open(method,price_api+'data=wave&polygon='+JSON.stringify(geo_json_data,async));
+        request.open(method,price_api+'data=wave&polygon='+JSON.stringify(geo_json_data),async);
 		request.setRequestHeader("Content-type","application/json;charset=UTF-8");
 		request.send();
+		request.onload = function(){
+			var status = request.status;
+			var data = JSON.parse(request.responseText);
+			console.log(data.price,status);
+			answer.innerHTML += '<p> Price '+ data.price + '</p>';
+		}
+
     } else {
         alert("Use the draw tools to draw a polygon!");
     }
 };
+
+var orderButton = document.getElementById('submit');
+orderButton.onclick = function(){
+	calcButton.click();
+	var email = $("#email").val();
+	var organisation = $("#organisation").val();
+	request.open(method,order_api+'email='+email+'&organization='+organisation+'&data=wave&polygon='+JSON.stringify(geo_json_data),async);
+	request.send();
+	request.onload = function(){
+		var status = request.status;
+		var	data = JSON.parse(request.responseText);
+			console.log(data,status);
+	}
+
+}
 
 
 </script>
