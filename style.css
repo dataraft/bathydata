@@ -5,3 +5,11 @@
 .collapsible-body {
 	background-color: rgb(248, 251, 236);
 }
+
+.button {
+	background-color: #1bbf1b;
+}
+
+.nav {
+	background-color: rgb(248, 251, 236) !important;
+}
