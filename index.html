@@ -10,6 +10,9 @@
 			  src="https://code.jquery.com/jquery-3.2.1.min.js"
 			  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
 			  crossorigin="anonymous"></script>
+	
+	<script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js" > </script>
+
 	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
 	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.js'></script>
 <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.css' type='text/css'/>
@@ -17,6 +20,7 @@
 <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.min.js'></script>
 <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.css' type='text/css' />
 	
+
 
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
@@ -117,11 +121,11 @@ calcButton.onclick = function(val) {
         var area = turf.area(data);
         geo_json_data = data.features[data.features.length-1].geometry;
         // restrict to area to 2 decimal points
-        var rounded_area = Math.round(area*100)/100;
+        var rounded_area = Math.round(area*100/1000000)/100;
         var answer = document.getElementById('calculated-area');
         datatype = $('#sel-data-type').val();
         console.log(datatype);
-        answer.innerHTML = '<p><strong>' + rounded_area + 'sq mts </strong></p>';
+        answer.innerHTML = '<p><strong>' + rounded_area + 'sq kms </strong></p>';
         if(val != 1) {
         request.open(method,price_api+'data=wave&polygon='+JSON.stringify(geo_json_data),async);
 		request.setRequestHeader("Content-type","application/json;charset=UTF-8");
