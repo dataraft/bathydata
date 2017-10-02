@@ -29,7 +29,8 @@
 
 	<nav style="background-color: #00517f;">
     <div class="nav-wrapper">
-      <a href="#" class="brand-logo">Dataraft</a>
+      <a href="#" class="brand-logo">Dataraft  </a>  
+
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="aboutus.html">About Us</a></li>
         <li><a href="badges.html">Contact Us</a></li>
@@ -37,19 +38,25 @@
       </ul>
     </div>
   </nav>
-	<div id='map' style='height: 100vw; '></div>
-	<div style="position: absolute; top:64px;lef:0px;  z-index: 100000">
+	<div id='map' style='height: 100vh; '></div>
+	<div style="position: absolute; top:64px;lef:0px; width:20vw;  z-index: 100000">
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
-	      <div class="collapsible-header active">Choose Data type </div>
-	      <div class="collapsible-body"><div class="input-field col s6"><select multiple id="sel-data-type"> <option value="wave">Wave</option> <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> <option value="bathymetry">Bathymetry </option>	 </select> <label> Data types </label> </div></div>
+	      <div class="collapsible-header active">1. Choose Data type </div>
+	      <div class="collapsible-body"><div class="input-field col s6"><select multiple id="sel-data-type"> <option value="wave">Wave</option> <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> <option value="bathymetry">Bathymetry </option>	 </select> <label> Data types </label> </div>
+	      <label for="datefrom">From</label>
+	      <input type="date" id="datefrom" class="datepicker col s6 m2"> 
+	      <label for="dateto">To </label>
+	      <input type="date" id="dateto" class="datepicker col s6 m2">
+	      
+	  </div>
 	    </li>
 	    <li>
-	      <div class="collapsible-header">Select your area</div>
-	      <div class="collapsible-body"><span> <button id="calculate"> Calculate </button> <div id='calculated-area'></div></span> </div>
+	      <div class="collapsible-header">2. Select your area</div>
+	      <div class="collapsible-body"><span> <p> Draw a polygon in the box </p> <button id="calculate"> Get Price </button> <div id='calculated-area'></div></span> </div>
 	    </li>
 	    <li>
-	      <div class="collapsible-header">Checkout </div>
+	      <div class="collapsible-header">3. Checkout </div>
 	      <div class="collapsible-body"> <div class="row">
     <form class="col s12">
       <div class="row">
@@ -74,6 +81,15 @@
     $(".button-collapse").sideNav();
   });
 
+		 $('.datepicker').pickadate({
+    selectMonths: true, // Creates a dropdown to control month
+    selectYears: 15, // Creates a dropdown of 15 years to control year,
+    today: 'Today',
+    clear: 'Clear',
+    close: 'Ok',
+    closeOnSelect: false // Close upon selecting a date,
+  });
+
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
 var price_api = 'http://ocean.dataraft.in/download/price/?';
 var order_api = 'http://ocean.dataraft.in/download/order/?';
@@ -81,7 +97,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
     center:[70,5],
-    zoom: 4
+    zoom: 1
 });
 
 var draw = new MapboxDraw({
@@ -104,6 +120,67 @@ map.on('load',function(){
 	});
 })
 
+map.on('load', function () {
+
+    map.addLayer({
+        'id': 'maine',
+        'type': 'fill',
+        'source': {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[30, 30],
+                        [120,30],
+                        [120,-50],
+                        [ 30,-50],
+                        [30, 30]
+                        ]]
+                }
+            }
+        },
+        'layout': {},
+        'paint': {
+            'fill-color': '#088',
+            'fill-opacity': 0.2
+        }
+    });
+});
+
+map.on('load', function () {
+
+    map.addLayer({
+        "id": "route",
+        "type": "line",
+        "source": {
+            "type": "geojson",
+            "data": {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                        [30, 30],
+                        [120,30],
+                        [120,-50],
+                        [ 30,-50],
+                        [30, 30]
+                        
+                    ]
+                }
+            }
+        },
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "#888",
+            "line-width": 3
+        }
+    });
+});
 //request params 
 
 var method = "GET";
@@ -114,7 +191,8 @@ var email;
 var organisation;
 var geo_json_data
 var calcButton = document.getElementById('calculate');
-
+var datefrom;
+var dateto;
 calcButton.onclick = function(val) {
     data = draw.getAll();
     if (data.features.length > 0) {
@@ -124,10 +202,15 @@ calcButton.onclick = function(val) {
         var rounded_area = Math.round(area*100/1000000)/100;
         var answer = document.getElementById('calculated-area');
         datatype = $('#sel-data-type').val();
+        datefrom = document.getElementById('datefrom').value;
+        dateto = document.getElementById('dateto').value;
         console.log(datatype);
+        datefrom = new Date(datefrom).toISOString();
+        dateto = new Date(dateto).toISOString();
         answer.innerHTML = '<p><strong>' + rounded_area + 'sq kms </strong></p>';
+
         if(val != 1) {
-        request.open(method,price_api+'data=wave&polygon='+JSON.stringify(geo_json_data),async);
+        request.open(method,price_api+'data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
 		request.setRequestHeader("Content-type","application/json;charset=UTF-8");
 		request.send();
 		request.onload = function(){
@@ -148,7 +231,7 @@ orderButton.onclick = function(){
 	calcButton.click(1);
 	var email = $("#email").val();
 	var organisation = $("#organisation").val();
-	request.open(method,order_api+'email='+email+'&organization='+organisation+'&data=wave&polygon='+JSON.stringify(geo_json_data),async);
+	request.open(method,order_api+'email='+email+'&organization='+organisation+'&data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
 	request.send();
 	request.onload = function(){
 		var status = request.status;

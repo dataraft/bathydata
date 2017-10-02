@@ -1,5 +1,6 @@
 .collapsible-header {
 	background-color: #00517f;
+	color: white;
 }
 
 .collapsible-body {
@@ -11,5 +12,5 @@
 }
 
 .nav {
-	background-color: rgb(248, 251, 236) !important;
+	
 }
