@@ -14,3 +14,14 @@
 .nav {
 	
 }
+
+.leaflet-verticalcenter {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-top: 10px;
+}
+
+.leaflet-verticalcenter .leaflet-control {
+    margin-bottom: 10px;
+}

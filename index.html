@@ -2,8 +2,11 @@
 <html lang="en">
 <head >
 	<meta charset=utf-8 />
-	<script src='https://api.mapbox.com/mapbox-gl-js/v0.40.1/mapbox-gl.js'></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v0.40.1/mapbox-gl.css' rel='stylesheet' />
+
+<script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
+
+
 </head>
 <body style='margin:0 !important; padding:0 !important'>
 	<script
@@ -14,12 +17,9 @@
 	<script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js" > </script>
 
 	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
-	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.js'></script>
-<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.css' type='text/css'/>
-
-<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.min.js'></script>
-<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.css' type='text/css' />
-	
+	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.css' rel='stylesheet' />
+	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
+	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
 
 
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
@@ -27,7 +27,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 	<link rel="stylesheet" href="style.css" />	
 
-	<nav style="background-color: #00517f;">
+	<nav style="background-color: #00517f; position: absolute; z-index: 1000000">
     <div class="nav-wrapper">
       <a href="#" class="brand-logo">Dataraft  </a>  
 
@@ -38,7 +38,7 @@
       </ul>
     </div>
   </nav>
-	<div id='map' style='height: 100vh; '></div>
+	<div id='map' style='position:absolute; top:0; bottom:0; width: 100%;'></div>
 	<div style="position: absolute; top:64px;lef:0px; width:20vw;  z-index: 100000">
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
@@ -53,7 +53,7 @@
 	    </li>
 	    <li>
 	      <div class="collapsible-header">2. Select your area</div>
-	      <div class="collapsible-body"><span> <p> Draw a polygon in the box </p> <button id="calculate"> Get Price </button> <div id='calculated-area'></div></span> </div>
+	      <div class="collapsible-body"><span> <p> Draw a polygon in the box </p> <button id="draw"> Draw</button> <!-- <button id="calculate"> Get Price </button> --> <div id='calculated-area'></div></span> </div>
 	    </li>
 	    <li>
 	      <div class="collapsible-header">3. Checkout </div>
@@ -90,29 +90,57 @@
     closeOnSelect: false // Close upon selecting a date,
   });
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
+	
+
+L.mapbox.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
 var price_api = 'http://ocean.dataraft.in/download/price/?';
 var order_api = 'http://ocean.dataraft.in/download/order/?';
-var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v9',
-    center:[70,5],
-    zoom: 1
-});
+var map = L.mapbox.map('map','mapbox.streets').setView([5,70],2);
 
-var draw = new MapboxDraw({
-    displayControlsDefault: false,
-    controls: {
-        polygon: true,
-        trash: true
+function addControlPlaceholders(map) {
+	var corners = map._controlCorners,
+        l = 'leaflet-',
+        container = map._controlContainer;
 
+    function createCorner(vSide, hSide) {
+        var className = l + vSide + ' ' + l + hSide;
+
+        corners[vSide + hSide] = L.DomUtil.create('div', className, container);
     }
-});
-map.addControl(draw);
 
-// map.addControl(new MapboxGeocoder({
-//     accessToken: mapboxgl.accessToken
-// }));
+    createCorner('verticalcenter', 'left');
+    createCorner('verticalcenter', 'right');
+}
+addControlPlaceholders(map);
+map.zoomControl.setPosition('verticalcenterright');
+
+
+var featureGroup = L.featureGroup().addTo(map);
+var drawControl = new L.Control.Draw({
+	position:'verticalcenterright',
+	draw:{
+		polyline:false,
+		circle:false,
+		rectangle:false,
+		marker:false
+	},
+    edit: {
+      featureGroup: featureGroup
+    }
+  }).addTo(map);
+ 
+var button_draw = document.getElementById('draw');
+button_draw.onclick = function(){
+	new L.Draw.Polygon(map,drawControl.options.polygon).enable();
+}
+	
+
+  map.on('draw:created', function(e) {
+      featureGroup.addLayer(e.layer);
+      
+      getprice(e.layer);
+      
+  });
 
 
 
@@ -189,23 +217,25 @@ var geo_json_data
 var calcButton = document.getElementById('calculate');
 var datefrom;
 var dateto;
-calcButton.onclick = function(val) {
-    data = draw.getAll();
-    if (data.features.length > 0) {
-        var area = turf.area(data);
-        geo_json_data = data.features[data.features.length-1].geometry;
+var plygon_check = false;
+getprice = function(layer) {
+	console.log(layer);
+    if (layer._latlngs[0].length>2 ) {
+    	plygon_check=true;
+    	var area = (LGeo.area(layer) / 1000000).toFixed(2);
+      
         // restrict to area to 2 decimal points
-        var rounded_area = Math.round(area*100/1000000)/100;
+       
         var answer = document.getElementById('calculated-area');
+        answer.innerHTML = '<p><strong>' + area + 'kms<sup>2</sup> </strong></p>';
         datatype = $('#sel-data-type').val();
         datefrom = document.getElementById('datefrom').value;
         dateto = document.getElementById('dateto').value;
         console.log(datatype);
         datefrom = new Date(datefrom).toISOString();
         dateto = new Date(dateto).toISOString();
-        answer.innerHTML = '<p><strong>' + rounded_area + 'sq kms </strong></p>';
 
-        if(val != 1) {
+        
         request.open(method,price_api+'data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
 		request.setRequestHeader("Content-type","application/json;charset=UTF-8");
 		request.send();
@@ -216,7 +246,7 @@ calcButton.onclick = function(val) {
 			answer.innerHTML += '<p> Price '+ data.price + '</p>';
 		}
 
-	 }
+	 
     } else {
         alert("Use the draw tools to draw a polygon!");
     }
@@ -224,7 +254,7 @@ calcButton.onclick = function(val) {
 
 var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
-	calcButton.click(1);
+	if(polygon_check) {
 	var email = $("#email").val();
 	var organisation = $("#organisation").val();
 	request.open(method,order_api+'email='+email+'&organization='+organisation+'&data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
@@ -233,8 +263,13 @@ orderButton.onclick = function(){
 		var status = request.status;
 		var	data = JSON.parse(request.responseText);
 			console.log(data,status);
+
 	}
 
+}
+else {
+	alert("Use the draw tools to draw a polygon!");
+}
 }
 
 
