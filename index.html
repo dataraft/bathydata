@@ -34,7 +34,7 @@
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="aboutus.html">About Us</a></li>
         <li><a href="badges.html">Contact Us</a></li>
-        <li><a href="collapsible.html">Checkout</a></li>
+        <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
     </div>
   </nav>
@@ -105,20 +105,16 @@ var draw = new MapboxDraw({
     controls: {
         polygon: true,
         trash: true
+
     }
 });
 map.addControl(draw);
 
-map.addControl(new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken
-}));
+// map.addControl(new MapboxGeocoder({
+//     accessToken: mapboxgl.accessToken
+// }));
 
-map.on('load',function(){
-	map.addSource('markers',{
-		type:'geojson',
-		data:'https://gist.githubusercontent.com/wavded/1200773/raw/e122cf709898c09758aecfef349964a8d73a83f3/sample.json'
-	});
-})
+
 
 map.on('load', function () {
 
