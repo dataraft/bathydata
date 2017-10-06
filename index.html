@@ -144,67 +144,7 @@ button_draw.onclick = function(){
 
 
 
-map.on('load', function () {
 
-    map.addLayer({
-        'id': 'maine',
-        'type': 'fill',
-        'source': {
-            'type': 'geojson',
-            'data': {
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'Polygon',
-                    'coordinates': [[[30, 30],
-                        [120,30],
-                        [120,-50],
-                        [ 30,-50],
-                        [30, 30]
-                        ]]
-                }
-            }
-        },
-        'layout': {},
-        'paint': {
-            'fill-color': '#088',
-            'fill-opacity': 0.2
-        }
-    });
-});
-
-map.on('load', function () {
-
-    map.addLayer({
-        "id": "route",
-        "type": "line",
-        "source": {
-            "type": "geojson",
-            "data": {
-                "type": "Feature",
-                "properties": {},
-                "geometry": {
-                    "type": "LineString",
-                    "coordinates": [
-                        [30, 30],
-                        [120,30],
-                        [120,-50],
-                        [ 30,-50],
-                        [30, 30]
-                        
-                    ]
-                }
-            }
-        },
-        "layout": {
-            "line-join": "round",
-            "line-cap": "round"
-        },
-        "paint": {
-            "line-color": "#888",
-            "line-width": 3
-        }
-    });
-});
 //request params
 
 var heatmap_data;
@@ -241,17 +181,30 @@ var request = new XMLHttpRequest();
 var datatype;
 var email;
 var organisation;
-var geo_json_data
+var geo_json_data = {};
 var calcButton = document.getElementById('calculate');
 var datefrom;
 var dateto;
 var plygon_check = false;
+getcord = function(data) {
+    var c=[];
+
+    for(i=0;i<data.length;i++) {
+        var item = [];
+        item[0] = data[i]['lng'];
+        item[1] = data[i]['lat'];
+        c[i] = item;
+    }
+    return c;
+}
 getprice = function(layer) {
 	console.log(layer);
     if (layer._latlngs[0].length>2 ) {
+        var cordinates = getcord(layer._latlngs[0]);
     	plygon_check=true;
     	var area = (LGeo.area(layer) / 1000000).toFixed(2);
-      
+        geo_json_data = {'type':'Polygon'};
+        geo_json_data['coordinates'] = JSON.stringify(cordinates);
         // restrict to area to 2 decimal points
        
         var answer = document.getElementById('calculated-area');
