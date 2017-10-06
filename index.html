@@ -53,7 +53,7 @@
 	    </li>
 	    <li>
 	      <div class="collapsible-header">2. Select your area</div>
-	      <div class="collapsible-body"><span> <p> Draw a polygon in the box </p> <button id="draw"> Draw</button> <!-- <button id="calculate"> Get Price </button> --> <div id='calculated-area'></div></span> </div>
+	      <div class="collapsible-body"><span> <p> Draw a polygon in the box </p> <button id="draw"> Draw</button> <!-- <button id="edit"> Edit </button> --> <div id='calculated-area'></div></span> </div>
 	    </li>
 	    <li>
 	      <div class="collapsible-header">3. Checkout </div>
@@ -134,13 +134,20 @@ button_draw.onclick = function(){
 	new L.Draw.Polygon(map,drawControl.options.polygon).enable();
 }
 	
-
+// var button_edit = document.getElementById('edit');
+// button_edit.onclick = function(){
+//     new L.EditToolbar.Edit(map, drawControl.options.polygon).enable();
+// }
   map.on('draw:created', function(e) {
       featureGroup.addLayer(e.layer);
       
       getprice(e.layer);
       
   });
+
+  map.on('draw:edited',function(e){
+    getprice(e.layer);
+  })
 
 
 
@@ -155,7 +162,7 @@ client.onreadystatechange = function() {
  	heatmap_data.data = make_heat_format(heatmap_data.data);
  	if(heatmap_data.status){
  		console.log(heatmap_data.data)
- 	var heat = L.heatLayer(heatmap_data.data,{maxZoom:18,max:1,gradient:{0:'blue',0.5:'yellow',1:'red'},minOpacity:0.2}).addTo(map);
+ 	var heat = L.heatLayer(heatmap_data.data,{maxZoom:32,max:1,gradient:{0:'blue',0.5:'yellow',1:'red'},minOpacity:0.2,radius:12,blur:5}).addTo(map);
  	}
 }
 client.send();
@@ -185,7 +192,7 @@ var geo_json_data = {};
 var calcButton = document.getElementById('calculate');
 var datefrom;
 var dateto;
-var plygon_check = false;
+var polygon_check = false;
 getcord = function(data) {
     var c=[];
 
@@ -197,11 +204,12 @@ getcord = function(data) {
     }
     return c;
 }
+
 getprice = function(layer) {
 	console.log(layer);
     if (layer._latlngs[0].length>2 ) {
         var cordinates = getcord(layer._latlngs[0]);
-    	plygon_check=true;
+    	polygon_check=true;
     	var area = (LGeo.area(layer) / 1000000).toFixed(2);
         geo_json_data = {'type':'Polygon'};
         geo_json_data['coordinates'] = JSON.stringify(cordinates);
@@ -224,8 +232,11 @@ getprice = function(layer) {
 			var status = request.status;
 			var data = JSON.parse(request.responseText);
 			console.log(data.price,status);
+            if(data.status) {
 			answer.innerHTML += '<p> Price '+ data.price + '</p>';
-		}
+		    }
+            else { alert('Hi, Please ensure you select the dates')}  
+        }
 
 	 
     } else {
@@ -233,9 +244,15 @@ getprice = function(layer) {
     }
 };
 
+form_reset = function(){
+    document.getElementById('sel-data-type').reset();
+    document.getElementById('datefrom').reset();
+    document.getElementById('dateto').reset();
+}
 var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
 	if(polygon_check) {
+        console.log('clicked');
 	var email = $("#email").val();
 	var organisation = $("#organisation").val();
 	request.open(method,order_api+'email='+email+'&organization='+organisation+'&data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
@@ -244,7 +261,10 @@ orderButton.onclick = function(){
 		var status = request.status;
 		var	data = JSON.parse(request.responseText);
 			console.log(data,status);
-
+            if(data.status){
+                alert('Thank you. your order has been placed. A mail with the download link has been sent to you');
+                form_reset();
+            }
 	}
 
 }
