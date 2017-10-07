@@ -6,7 +6,8 @@
 <script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script>
 <link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
 
-
+ <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+ <title>Oceanograhpic database</title>
 </head>
 <body style='margin:0 !important; padding:0 !important'>
 	<script
@@ -33,7 +34,7 @@
 
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="aboutus.html">About Us</a></li>
-        <li><a href="badges.html">Contact Us</a></li>
+        <li><a href="http://dataraft.in/#/dashboard/0" target="_blank">Real time</a></li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
     </div>
@@ -95,7 +96,7 @@
 L.mapbox.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
 var price_api = 'http://ocean.dataraft.in/download/price/?';
 var order_api = 'http://ocean.dataraft.in/download/order/?';
-var map = L.mapbox.map('map','mapbox.streets').setView([5,70],2);
+var map = L.mapbox.map('map','mapbox.streets').setView([3,70],3);
 
 function addControlPlaceholders(map) {
 	var corners = map._controlCorners,
@@ -158,11 +159,12 @@ var heatmap_data;
 var client = new XMLHttpRequest();
 client.open('GET', 'http://ocean.dataraft.in/download/heatmap/');
 client.onreadystatechange = function() {  
- 	heatmap_data = JSON.parse(client.responseText);
+ 	heatmap_data = client.responseText;
+    heatmap_data = JSON.parse(heatmap_data);
  	heatmap_data.data = make_heat_format(heatmap_data.data);
  	if(heatmap_data.status){
  		console.log(heatmap_data.data)
- 	var heat = L.heatLayer(heatmap_data.data,{maxZoom:32,max:1,gradient:{0:'blue',0.5:'yellow',1:'red'},minOpacity:0.2,radius:12,blur:5}).addTo(map);
+ 	var heat = L.heatLayer(heatmap_data.data,{maxZoom:12,gradient:{0:'blue',0.5:'#64F0FA',1:'#F1F743'},minOpacity:0.2,radius:15,blur:10}).addTo(map);
  	}
 }
 client.send();
@@ -208,11 +210,12 @@ getcord = function(data) {
 getprice = function(layer) {
 	console.log(layer);
     if (layer._latlngs[0].length>2 ) {
-        var cordinates = getcord(layer._latlngs[0]);
+        var cordinates = [];
+        cordinates[0] = getcord(layer._latlngs[0]);
     	polygon_check=true;
     	var area = (LGeo.area(layer) / 1000000).toFixed(2);
-        geo_json_data = {'type':'Polygon'};
-        geo_json_data['coordinates'] = JSON.stringify(cordinates);
+        geo_json_data = {"type":"Polygon"};
+        geo_json_data["coordinates"] = cordinates;
         // restrict to area to 2 decimal points
        
         var answer = document.getElementById('calculated-area');
@@ -264,6 +267,9 @@ orderButton.onclick = function(){
             if(data.status){
                 alert('Thank you. your order has been placed. A mail with the download link has been sent to you');
                 form_reset();
+            }
+            else {
+                alert('Please fill all the fields');
             }
 	}
 
