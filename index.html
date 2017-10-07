@@ -197,13 +197,14 @@ var dateto;
 var polygon_check = false;
 getcord = function(data) {
     var c=[];
-
     for(i=0;i<data.length;i++) {
+
         var item = [];
         item[0] = data[i]['lng'];
         item[1] = data[i]['lat'];
         c[i] = item;
     }
+    c.push(c[0]);
     return c;
 }
 
