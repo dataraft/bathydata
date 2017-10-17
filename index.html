@@ -22,8 +22,7 @@
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
 
-
-	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+   <link href="css/materialdesignicons.min.css" media="all" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 	<link rel="stylesheet" href="style.css" />	
@@ -39,6 +38,7 @@
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="aboutus.html"><button class="btn"> About Us </button>   </a></li>
         <li><a href="#"  > <button data-target="pricing" class="btn modal-trigger">Pricing </button></a></li>
+        <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li>
         <li><a href="#"  > <button data-target="login" class="btn modal-trigger">  Login </button> </a></li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
@@ -74,7 +74,10 @@
     <div class="modal-content" style="height: 400px"> 
     <div id='map2' style=" width: 100%; height: 100%"></div>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer">        
+        <label style="float: left;">Enter the Zone id below to select your area </label>
+          <div class="chips chips-initial "></div>
+          
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Proceed</a>
     </div>
   </div>    
@@ -87,7 +90,7 @@
                                 <div class="col-xs-12 col-sm-6 col-md-3" style="float:left; width: 50%!important;">
                                         <ul class="pricing p-green">
                                             <li>
-                                                <img src="http://bread.pp.ua/n/settings_g.svg" alt="">
+                                                <img src="" alt="">
                                                 <big>Plan A</big>
                                             </li>
                                             <li>Basic Resolution Data</li>
@@ -99,7 +102,7 @@
                                                 <span>per month</span>
                                             </li>
                                             <li>
-                                                <button>Join Now</button>
+                                                <button onclick="plan_option('A')">Join Now</button>
                                             </li>
                                         </ul>
                                 </div>
@@ -107,7 +110,7 @@
                                 <div class="col-xs-12 col-sm-6 col-md-3" style="float: right; width: 50% !important;">
                                         <ul class="pricing p-blue">
                                             <li>
-                                                <img src="http://bread.pp.ua/n/settings_b.svg" alt="">
+                                                
                                                 <big>Plan B</big>
                                             </li>
                                             <li>High Resolution Data</li>
@@ -119,7 +122,7 @@
                                                 <span>per month</span>
                                             </li>
                                             <li>
-                                                <button>Join Now</button>
+                                                <button onclick="plan_option('B')">Join Now</button>
                                             </li>
                                         </ul>
                                 </div>
@@ -184,7 +187,10 @@
       </div>
 
 	<script>
+        var zone; //zones the user needs to update
+        var plan_variable; //plan a or b
         var maps = {};
+        var boundary_layer;
         L.mapbox.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
         var login_api = 'http://ocean.dataraft.in/download/login/?email='
         maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],4);
@@ -201,11 +207,26 @@
             // }
             var geoJson = {type:"FeatureCollection", features:boundary_latlngs};
             console.log(geoJson);
-            var boundary_layer = L.mapbox.featureLayer(geoJson).addTo(maps.map2);
+             boundary_layer = L.mapbox.featureLayer(geoJson).addTo(maps.map2)
+             boundary_layer.eachLayer(function(layer){
+                console.log(layer.feature.properties);
+                layer.bindPopup('The Zone Id is ' + layer.feature.properties.name);
+                // layer.on('mouseover',function(e){
+                //     layer.openPopup();
+                // })
+                // layer.on('mouseout',function(e){
+                //     layer.closePopup();
+                // })
+
+                // layer.on('click',function(e){
+                //     console.log(e.target.feature.properties.name);
+
+                // })
+             })
         };  
         boundary_client.send();
 
-
+    
         
         
         
@@ -223,9 +244,28 @@
         },
         complete:function(){
             $('#pricing').modal('open');
+            zone = $('.chips-initial').material_chip('data');
         }
     })
   });
+
+    
+  $('.chips-initial').material_chip({
+    data: [{
+      zone: '1',
+    }, {
+      zone: '2',
+    }, {
+      zone: '3',
+    }],
+    placeholder: 'Enter a tag',
+    secondaryPlaceholder: '+Tag',
+  });
+  
+
+plan_option = function(val){
+    plan_variable = val;
+}
 
 login = function(){
     var inputs = document.getElementById('login-form').elements;
