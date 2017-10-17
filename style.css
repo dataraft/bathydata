@@ -19,6 +19,7 @@
 
 html {
 	line-height: 0.5 !important;
+    font-family: GillSans, Calibri, Trebuchet, sans-serif;
 }
 
 .leaflet-verticalcenter {
@@ -37,7 +38,7 @@ html {
 }
 
 .btn {
-	line-height: 20px!important;
+
 	height: 28px !important;
 	border: 1px !important;
 	font-size: 0.7rem !important;

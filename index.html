@@ -36,10 +36,10 @@
       <a href="#" class="brand-logo">Dataraft  </a>  
 
       <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="aboutus.html"><button class="btn"> About Us </button>   </a></li>
-        <li><a href="#"  > <button data-target="pricing" class="btn modal-trigger">Pricing </button></a></li>
-        <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li>
-        <li><a href="#"  > <button data-target="login" class="btn modal-trigger">  Login </button> </a></li>
+        <li><a href="#aboutus" class="btn modal-trigger" > About Us    </a></li>
+        <li><a href="#pricing"   class="btn modal-trigger" >Pricing </a></li>
+        <!-- <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
+        <li><a href="#login"    class="btn modal-trigger">  Login  </a></li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
     </div>
@@ -49,11 +49,11 @@
       <div class="login-page">
                   <div class="form">
                     <form id="register-form" class="register-form">
+                        <button onclick="choose_area()">Choose your plan </button>
                       <input type="text" placeholder="name"/>
                       <input type="email" placeholder="email address"/>
                       <input type="number" placeholder="contact number"/>
                       <input type="text" placeholder="Organisation"/>
-                      <button onclick="choose_area()">Choose your plan </button>
                       <button>create</button>
                       <p class="message">Already registered? <a href="#">Sign In</a></p>
                     </form>
@@ -80,7 +80,100 @@
           
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Proceed</a>
     </div>
-  </div>    
+  </div> 
+  <div id="aboutus" class="modal bottom-sheet " style="background-color: #080101cc;">
+    <h1 style="color: #f6d20bb3 !important; font-family: 'Trocchi', serif; font-size: 45px; font-weight: normal; line-height: 48px; margin: 0; "> OUR TEAM </h1>
+            <div class="modal-content">
+            <div class="row">
+                <div class="col s6 m4">
+                <h3 class="header"></h3>
+                <div class="card horizontal">
+                  <div class="card-image">
+                    <img src="images/Prof_SUNDAR.jpg">
+                  </div>
+                  <div class="card-stacked">
+                    <div class="card-content">
+                      <p><strong> Prof.V.Sundar, IIT Madras </strong></p>
+                    </div>
+                    <div class="card-action">
+                      <a href="http://www.doe.iitm.ac.in/vsundar/" target="_blank">Visit Website</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col s6 m4">
+                <h2 class="header"></h2>
+                <div class="card horizontal">
+                  <div class="card-image">
+                    <img src="images/prof_murali.jpg">
+                  </div>
+                  <div class="card-stacked">
+                    <div class="card-content">
+                      <p><strong> Prof.K.Murali, IIT Madras </strong></p>
+                    </div>
+                    <div class="card-action">
+                      <a href="http://www.doe.iitm.ac.in/murali/" target="_blank">Visit Website</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+                <div class="col s6 m4">
+                <h2 class="header"></h2>
+                <div class="card horizontal">
+                  <div class="card-image">
+                    <img src="images/prof_Sannasiraj.jpg">
+                  </div>
+                  <div class="card-stacked">
+                    <div class="card-content">
+                      <p><strong> Prof.S.A.Sannasiraj, IIT Madras </strong> </p>
+                    </div>
+                    <div class="card-action">
+                      <a href="http://www.doe.iitm.ac.in/sasraj/" target="_blank">Visit Website</a>
+                    </div>
+                  </div>
+                </div>
+              </div> 
+              </div> 
+              <div class="row">
+              <div class="col s6 m4">
+                <h2 class="header"> </h2>
+                <div class="card horizontal">
+                  <div class="card-image">
+                    <img src="images/Assi_Prof_sriram.jpg">
+                  </div>
+                  <div class="card-stacked">
+                    <div class="card-content">
+                      <p><strong> Dr.V.Sriram </strong></p>
+                    </div>
+                    <div class="card-action">
+                      <a href="http://www.doe.iitm.ac.in/vsundar/" target="_blank">Visit Website</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col s6 m4">
+                <h2 class="header"> </h2>
+                <div class="card horizontal">
+                  <div class="card-image">
+                    <img src="images/dr.chitra.jpg">
+                  </div>
+                  <div class="card-stacked">
+                    <div class="card-content">
+                      <p><strong> Dr.K.Chitra </strong></p>
+                    </div>
+                    <div class="card-action">
+                      <a href="#" target="_blank"></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+            
+  </div>   
   <div id="pricing" class="modal modal-fixed-footer">
     <div class="modal-content">
       <section class="container">
@@ -138,7 +231,7 @@
     </div>
   </div>
 
-	<!-- <div id='map' style='position:absolute; top:0; bottom:0; width: 100%;'></div> -->
+	<div id='map' style='position:absolute; top:0; bottom:0; width: 100%;'></div>
 	<div style="position: absolute; top:64px;left:0px; width:20vw;  z-index: 100">
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
@@ -252,11 +345,11 @@
     
   $('.chips-initial').material_chip({
     data: [{
-      zone: '1',
+      tag: '1',
     }, {
-      zone: '2',
+      tag: '2',
     }, {
-      zone: '3',
+      tag: '3',
     }],
     placeholder: 'Enter a tag',
     secondaryPlaceholder: '+Tag',
