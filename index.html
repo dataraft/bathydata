@@ -40,7 +40,6 @@
         <li><a href="aboutus.html"><button class="btn"> About Us </button>   </a></li>
         <li><a href="#"  > <button data-target="pricing" class="btn modal-trigger">Pricing </button></a></li>
         <li><a href="#"  > <button data-target="login" class="btn modal-trigger">  Login </button> </a></li>
-        <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">  Select-area </button> </a></li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
     </div>
@@ -54,6 +53,7 @@
                       <input type="email" placeholder="email address"/>
                       <input type="number" placeholder="contact number"/>
                       <input type="text" placeholder="Organisation"/>
+                      <button onclick="choose_area()">Choose your plan </button>
                       <button>create</button>
                       <p class="message">Already registered? <a href="#">Sign In</a></p>
                     </form>
@@ -187,7 +187,7 @@
         var maps = {};
         L.mapbox.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
         var login_api = 'http://ocean.dataraft.in/download/login/?email='
-        maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],5);
+        maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],4);
         var boundary_client = new XMLHttpRequest();
         var boundary_latlngs = [];
         boundary_client.open('GET','http://ocean.dataraft.in/download/zone/',async)
@@ -220,6 +220,9 @@
         ready:function(){
             maps.map2.invalidateSize();
             
+        },
+        complete:function(){
+            $('#pricing').modal('open');
         }
     })
   });
@@ -235,6 +238,11 @@ login = function(){
         }
         client.send();
 }
+choose_area = function(){
+    $('#login').modal('close');
+    $('#select-area').modal('open');
+}
+
 // login js
     $('.message a').click(function(){
        $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
