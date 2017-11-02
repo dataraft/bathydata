@@ -285,6 +285,10 @@
       </div>
 
 	<script>
+
+        //****************************************************Global varaibles*************************************************//
+
+
         var zone; //zones the user needs to update
         var zone_array=[];
         var pricing_flag ;
@@ -292,9 +296,28 @@
         var plan_variable; //plan a or b
         var maps = {};
         var boundary_layer;
+        var login_api = 'http://ocean.dataraft.in/download/login/?email=';
+        var signup_api = 'http://ocean.dataraft.in/download/signup/?email=';
+        var price_api = 'http://ocean.dataraft.in/download/price/?';
+        var order_api = 'http://ocean.dataraft.in/download/order/?';
+
+                                        //map related//
+        var heatmap_data;
+        var method = "GET";
+        var async = true;
+        var request = new XMLHttpRequest();
+        var datatype;
+        var email;
+        var organisation;
+        var geo_json_data = {};
+        var calcButton = document.getElementById('calculate');
+        var datefrom;
+        var dateto;
+        var polygon_check = false;
+        //*********************************************Loading Map2**********************************************//
+
         L.mapbox.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
-        var login_api = 'http://ocean.dataraft.in/download/login/?email='
-        var signup_api = 'http://ocean.dataraft.in/download/signup/?email='
+        
         maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],4);
         var boundary_client = new XMLHttpRequest();
         var boundary_latlngs = [];
@@ -332,61 +355,112 @@
                 // })
              })
         };  
-        boundary_client.send();
+        boundary_client.send();      
+        
+        
+  //***************************************************************jquery document.ready initializations*******************//      
+    	$(document).ready(function() {
+        $('select').material_select();
+        $(".button-collapse").sideNav();
+        $('.modal').modal({
+            inDuration:0,
+            outDuration:0  
+        });
+        $('#select-area').modal({
+            ready:function(){
+                maps.map2.invalidateSize();        
+            },
+            complete:function(){
+                
+            }
+        })
 
-    
-        
-        
-        
-	$(document).ready(function() {
-    $('select').material_select();
-    $(".button-collapse").sideNav();
-    $('.modal').modal({
-        inDuration:0,
-        outDuration:0  
-    });
-    $('#select-area').modal({
-        ready:function(){
-            maps.map2.invalidateSize();        
-        },
-        complete:function(){
+            $('#pricing').modal({
+                complete:function(){
+                    if(pricing_flag) { pricing_flag = false; return};
+                    $('#planid').empty().html('');
+                    register();
+                    pricing_flag = false;
+                }
+            })
+        });
+
+   ///************************************************************material chips ****************************//
+
+        $('.chips-initial').on('chip.delete',function(e,chip){
+            var index = zone_array.findIndex(x=> x.tag==chip.tag);
+            if(index>-1){
+                zone_array.splice(index,1);
+            }
+        });
+        $('.chips-initial').on('chip.add',function(e,chip){
+            zone_array.push(chip);        
+        })
+        $('.chips-initial').material_chip({
+            data:[],
+            placeholder: 'Enter a tag',
+            secondaryPlaceholder: '+Tag',
+            minLength:1
+        });
+  
+  //*******************************************************ui functions & setting global variables*********************************//
+
+        plan_option = function(val){
+            plan_variable = val;
+            $('#planid').empty().html('You have chosen Plan'+val);
             
         }
-    })
 
-        $('#pricing').modal({
-        complete:function(){
-            if(pricing_flag) { pricing_flag = false; return};
-            $('#planid').empty().html('');
-            register();
-            pricing_flag = false;
+        signup = function() {
+            inputs_register = document.getElementById('register-form').elements;
+            choose_area();
+            
         }
-    })
-  });
 
 
-    $('.chips-initial').on('chip.delete',function(e,chip){
-        var index = zone_array.findIndex(x=> x.tag==chip.tag);
-        if(index>-1){
-            zone_array.splice(index,1);
+        pricing = function(){
+            pricing_flag = true;
         }
+        form_reset = function(){
+            document.getElementById('register-form').reset();
+            document.getElementById('login-form').reset();
+            $('.chips-initial').material_chip({'data':[]});
+        }
+        select_area_next = function(){
+                    $('#pricing').modal('open');
+                    zone = $('.chips-initial').material_chip('data');
+        }
+        choose_area = function(){
+            $('#login').modal('close');
+            $('#select-area').modal('open');
+        }
+
+        form_reset = function(){
+            document.getElementById('sel-data-type').reset();
+            document.getElementById('datefrom').reset();
+            document.getElementById('dateto').reset();
+        }
+
+// login js
+    $('.message a').click(function(){
+       $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
     });
-    $('.chips-initial').on('chip.add',function(e,chip){
-        zone_array.push(chip);        
-    })
-  $('.chips-initial').material_chip({
-    data:[],
-    placeholder: 'Enter a tag',
-    secondaryPlaceholder: '+Tag',
-    minLength:1
+         $('.datepicker').pickadate({
+    selectMonths: true, // Creates a dropdown to control month
+    selectYears: 15, // Creates a dropdown of 15 years to control year,
+    today: 'Today',
+    clear: 'Clear',
+    close: 'Ok',
+    closeOnSelect: false // Close upon selecting a date
   });
-  
 
-plan_option = function(val){
-    plan_variable = val;
-    $('#planid').empty().html('You have chosen Plan'+val);
-    
-}
+    function changeFunc($i){
+        console.log($i);
+    }
+
+
+
+//**************************************************************register & login******************************//
 
 login = function(){
     var inputs = document.getElementById('login-form').elements;
@@ -400,12 +474,6 @@ login = function(){
         client.send();
 }
 
-signup = function() {
-    inputs_register = document.getElementById('register-form').elements;
-    choose_area();
-    
-}
-
 register = function(){
     var url = signup_api+inputs_register[1].value+'&password='+inputs_register[2].value+'&organization='+inputs_register[4].value+'&phone='+inputs_register[3].value+'&first_name='+inputs_register[0].value+'&zone='+zone_array+'&plan='+plan_variable;
     var client = new XMLHttpRequest();
@@ -417,42 +485,11 @@ register = function(){
     }
     client.send();
 }
-pricing = function(){
-    pricing_flag = true;
-}
-form_reset = function(){
-    document.getElementById('register-form').reset();
-    document.getElementById('login-form').reset();
-    $('.chips-initial').material_chip({'data':[]});
-}
-select_area_next = function(){
-            $('#pricing').modal('open');
-            zone = $('.chips-initial').material_chip('data');
-}
-choose_area = function(){
-    $('#login').modal('close');
-    $('#select-area').modal('open');
-}
 
-// login js
-    $('.message a').click(function(){
-       $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
-    });
-		 $('.datepicker').pickadate({
-    selectMonths: true, // Creates a dropdown to control month
-    selectYears: 15, // Creates a dropdown of 15 years to control year,
-    today: 'Today',
-    clear: 'Clear',
-    close: 'Ok',
-    closeOnSelect: false // Close upon selecting a date
-  });
 
-	function changeFunc($i){
-        console.log($i);
-    }
 
-var price_api = 'http://ocean.dataraft.in/download/price/?';
-var order_api = 'http://ocean.dataraft.in/download/order/?';
+//****************************************************       map           **************************************//
+
 var map = L.mapbox.map('map','mapbox.streets').setView([3,70],3);
 
 function addControlPlaceholders(map) {
@@ -516,7 +553,7 @@ button_draw.onclick = function(){
 
 //request params
 
-var heatmap_data;
+
 var client = new XMLHttpRequest();
 client.open('GET', 'http://ocean.dataraft.in/download/heatmap/');
 client.onreadystatechange = function() {  
@@ -545,17 +582,7 @@ make_heat_format = function(data){
 
 }
 
-var method = "GET";
-var async = true;
-var request = new XMLHttpRequest();
-var datatype;
-var email;
-var organisation;
-var geo_json_data = {};
-var calcButton = document.getElementById('calculate');
-var datefrom;
-var dateto;
-var polygon_check = false;
+
 getcord = function(data) {
     var c=[];
     for(i=0;i<data.length;i++) {
@@ -609,11 +636,7 @@ getprice = function(layer) {
     }
 };
 
-form_reset = function(){
-    document.getElementById('sel-data-type').reset();
-    document.getElementById('datefrom').reset();
-    document.getElementById('dateto').reset();
-}
+
 var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
 	if(polygon_check) {
