@@ -22,7 +22,8 @@
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
 
-   <link href="css/materialdesignicons.min.css" media="all" rel="stylesheet" type="text/css" />
+   
+   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 	<link rel="stylesheet" href="style.css" />	
@@ -38,7 +39,7 @@
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="#aboutus" class="btn modal-trigger" > About Us    </a></li>
         <li><a href="#pricing"   class="btn modal-trigger" >Pricing </a></li>
-        <!-- <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
+       <!--  <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
         <li><a href="#login"    class="btn modal-trigger">  Login  </a></li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
@@ -49,12 +50,13 @@
       <div class="login-page">
                   <div class="form">
                     <form id="register-form" class="register-form">
-                        <button onclick="choose_area()">Choose your plan </button>
-                      <input type="text" placeholder="name"/>
-                      <input type="email" placeholder="email address"/>
-                      <input type="number" placeholder="contact number"/>
-                      <input type="text" placeholder="Organisation"/>
-                      <button>create</button>
+                        <!-- <button onclick="choose_area()">Choose your plan </button> -->
+                      <input type="text" required placeholder="name"/>
+                      <input type="email" required placeholder="email address"/>
+                      <input type="password" required placeholder="password"/>
+                      <input type="number" required placeholder="contact number"/>
+                      <input type="text" required placeholder="Organisation"/>
+                      <button onclick="signup()">NEXT</button>
                       <p class="message">Already registered? <a href="#">Sign In</a></p>
                     </form>
                     <form id="login-form" class="login-form">
@@ -71,14 +73,16 @@
     </div>
   </div>
   <div id="select-area" class="modal">
+                  
     <div class="modal-content" style="height: 400px"> 
     <div id='map2' style=" width: 100%; height: 100%"></div>
+    
     </div>
     <div class="modal-footer">        
-        <label style="float: left;">Enter the Zone id below to select your area </label>
+        <label style="float: left;">Click on the highlighted regions to choose the zone </label>
           <div class="chips chips-initial "></div>
           
-      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Proceed</a>
+      <a href="#!" class="modal-action modal-close waves-effect waves-green btn "> Proceed</a>
     </div>
   </div> 
   <div id="aboutus" class="modal bottom-sheet " style="background-color: #080101cc;">
@@ -227,7 +231,8 @@
 
     </div>
     <div class="modal-footer">
-      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Next</a>
+        <span style="float:left;" id="planid"></span>    
+      <a href="#!" class="modal-action modal-close waves-effect waves-green btn ">Submit</a>
     </div>
   </div>
 
@@ -281,11 +286,14 @@
 
 	<script>
         var zone; //zones the user needs to update
+        var zone_array=[];
+        var inputs_register ;
         var plan_variable; //plan a or b
         var maps = {};
         var boundary_layer;
         L.mapbox.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
         var login_api = 'http://ocean.dataraft.in/download/login/?email='
+        var signup_api = 'http://ocean.dataraft.in/download/signup/?email='
         maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],4);
         var boundary_client = new XMLHttpRequest();
         var boundary_latlngs = [];
@@ -304,12 +312,18 @@
              boundary_layer.eachLayer(function(layer){
                 console.log(layer.feature.properties);
                 layer.bindPopup('The Zone Id is ' + layer.feature.properties.name);
-                // layer.on('mouseover',function(e){
-                //     layer.openPopup();
-                // })
-                // layer.on('mouseout',function(e){
-                //     layer.closePopup();
-                // })
+                layer.on('mouseover',function(){
+                    layer.openPopup();
+                })
+                layer.on('mouseout',function(){
+                    layer.closePopup();
+                })  
+                layer.on('click',function(){
+                    zone_array.push({'tag':layer.feature.properties.name});
+                    $('.chips-initial').material_chip({'data':zone_array});
+                    console.log($('.chips-initial').material_chip('data'));
+
+                })
 
                 // layer.on('click',function(e){
                 //     console.log(e.target.feature.properties.name);
@@ -332,37 +346,49 @@
     });
     $('#select-area').modal({
         ready:function(){
-            maps.map2.invalidateSize();
-            
+            maps.map2.invalidateSize();        
         },
         complete:function(){
             $('#pricing').modal('open');
             zone = $('.chips-initial').material_chip('data');
         }
     })
+
+        $('#pricing').modal({
+        complete:function(){
+            $('#planid').empty().html('');
+            register();
+        }
+    })
   });
 
-    
+
+    $('.chips-initial').on('chip.delete',function(e,chip){
+        var index = zone_array.findIndex(x=> x.tag==chip.tag);
+        if(index>-1){
+            zone_array.splice(index,1);
+        }
+    });
+    $('.chips-initial').on('chip.add',function(e,chip){
+        zone_array.push(chip);        
+    })
   $('.chips-initial').material_chip({
-    data: [{
-      tag: '1',
-    }, {
-      tag: '2',
-    }, {
-      tag: '3',
-    }],
+    data:[],
     placeholder: 'Enter a tag',
     secondaryPlaceholder: '+Tag',
+    minLength:1
   });
   
 
 plan_option = function(val){
     plan_variable = val;
+    $('#planid').empty().html('You have chosen Plan'+val);
+    
 }
 
 login = function(){
     var inputs = document.getElementById('login-form').elements;
-    var url = login_api + inputs[0].value + '&password='+inputs[1].value;
+    var url = login_api + inputs[0].value + '&password='+inputs[1].value;  //login fields are bound to the form change if changed in the form
     var client = new XMLHttpRequest();
         client.open('GET',url);
         client.onreadystatechange = function(){
@@ -370,6 +396,24 @@ login = function(){
             
         }
         client.send();
+}
+
+signup = function() {
+    inputs_register = document.getElementById('register-form').elements;
+    choose_area();
+    
+}
+
+register = function(){
+    var url = signup_api+inputs_register[1].value+'&password='+inputs_register[2].value+'&organization='+inputs_register[4].value+'&phone='+inputs_register[3].value+'&first_name='+inputs_register[0].value+'&zone='+zone_array+'&plan='+plan_variable;
+    var client = new XMLHttpRequest();
+    client.open('GET',url);
+    client.onreadystatechange = function(){
+        var r = JSON.parse(client.responseText);
+        console.log(r.status);
+        if(r.status=='success') alert('Your registration is successful. Please Login.');
+    }
+    client.send();
 }
 choose_area = function(){
     $('#login').modal('close');
