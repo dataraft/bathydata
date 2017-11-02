@@ -38,7 +38,7 @@
 
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="#aboutus" class="btn modal-trigger" > About Us    </a></li>
-        <li><a href="#pricing"   class="btn modal-trigger" >Pricing </a></li>
+        <li><a href="#pricing"   class="btn modal-trigger" onclick="pricing()" >Pricing </a></li>
        <!--  <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
         <li><a href="#login"    class="btn modal-trigger">  Login  </a></li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
@@ -82,7 +82,7 @@
         <label style="float: left;">Click on the highlighted regions to choose the zone </label>
           <div class="chips chips-initial "></div>
           
-      <a href="#!" class="modal-action modal-close waves-effect waves-green btn "> Proceed</a>
+      <a href="#!" class="modal-action modal-close waves-effect waves-green btn " onclick="select_area_next()"> Proceed</a>
     </div>
   </div> 
   <div id="aboutus" class="modal bottom-sheet " style="background-color: #080101cc;">
@@ -287,6 +287,7 @@
 	<script>
         var zone; //zones the user needs to update
         var zone_array=[];
+        var pricing_flag ;
         var inputs_register ;
         var plan_variable; //plan a or b
         var maps = {};
@@ -349,15 +350,16 @@
             maps.map2.invalidateSize();        
         },
         complete:function(){
-            $('#pricing').modal('open');
-            zone = $('.chips-initial').material_chip('data');
+            
         }
     })
 
         $('#pricing').modal({
         complete:function(){
+            if(pricing_flag) { pricing_flag = false; return};
             $('#planid').empty().html('');
             register();
+            pricing_flag = false;
         }
     })
   });
@@ -411,9 +413,21 @@ register = function(){
     client.onreadystatechange = function(){
         var r = JSON.parse(client.responseText);
         console.log(r.status);
-        if(r.status=='success') alert('Your registration is successful. Please Login.');
+        if(r.status=='success') { alert('Your registration is successful. Please Login.'); form_reset(); };
     }
     client.send();
+}
+pricing = function(){
+    pricing_flag = true;
+}
+form_reset = function(){
+    document.getElementById('register-form').reset();
+    document.getElementById('login-form').reset();
+    $('.chips-initial').material_chip({'data':[]});
+}
+select_area_next = function(){
+            $('#pricing').modal('open');
+            zone = $('.chips-initial').material_chip('data');
 }
 choose_area = function(){
     $('#login').modal('close');
