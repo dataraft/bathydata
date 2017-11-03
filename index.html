@@ -7,7 +7,7 @@
 <link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
 
  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
- <title>Oceanograhpic database</title>
+ <title>Oceanographic database</title>
 </head>
 <body style='margin:0 !important; padding:0 !important'>
 	<script
@@ -40,7 +40,8 @@
         <li><a href="#aboutus" class=" modal-trigger" > About Us    </a></li>
         <li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" >Pricing </a></li>
        <!--  <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
-        <li><a href="#login"    class=" modal-trigger">  Login  </a></li>
+        <li><a href="#login" id="login-btn"   class=" modal-trigger">  Login  </a></li>
+        <li><a href="#logout" id="logout-btn" style="display:none" onclick="logout()" > Logout</a> </li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
     </div>
@@ -63,7 +64,7 @@
                       <input type="text" placeholder="username"/>
                       <input type="password" placeholder="password"/>
                       <button onclick="login()">login</button>
-                      <p class="message">Not registered? <a href="#">Subscribe</a></p>
+                      <p class="message">Not registered? <a href="#">SignUp</a></p>
                     </form>
                   </div>
         </div>
@@ -245,7 +246,7 @@
 	      <input type="date" id="datefrom" class="datepicker col s6 m2"> 
 	      <label for="dateto">To </label>
 	      <input type="date" id="dateto" class="datepicker col s6 m2">
-          <label for="switch">Data Resolution </label>
+          <!-- <label for="switch">Data Resolution </label>
           <div id="switch" class="input-field col s12">
             <select onchange="changeFunc(value);">
               <optgroup label="Free Plan">
@@ -256,7 +257,7 @@
                 <option value="3" disabled>HIGH</option>
               </optgroup>
             </select>
-          </div>
+          </div> -->
 	  </div>
 	    </li>
 	    <li>
@@ -266,7 +267,7 @@
 	    <li>
 	      <div class="collapsible-header">3. Download </div>
 	      <div class="collapsible-body"> <div class="row">
-    <form class="col s12">
+    <!-- <form class="col s12">
       <div class="row">
         <div class="input-field col s12">
           <input id="email" type="email" class="validate">
@@ -277,7 +278,7 @@
       <input value="dataraft" id="organisation" type="text" class="validate">
       <label  for="organisation">Organisation</label>
     </div>
-    </form>
+    </form> -->
   </div> <div><button id="submit"> Download </button></div> 
 	    </li>
 	  </ul>
@@ -295,11 +296,13 @@
         var plan_variable; //plan a or b
         var maps = {};
         var boundary_layer;
+        var geoJson
         var login_api = 'http://ocean.dataraft.in/download/login/?email=';
         var signup_api = 'http://ocean.dataraft.in/download/signup/?email=';
         var price_api = 'http://ocean.dataraft.in/download/price/?';
         var order_api = 'http://ocean.dataraft.in/download/order/?';
-
+        var user_details;
+        var login_flag = false;
                                         //map related//
         var heatmap_data;
         var method = "GET";
@@ -329,7 +332,7 @@
             // for(i=0;i<boundary_latlngs.length;i++){
             //     boundary_latlngs[i].geometry.coordinates[0].splice(-1,1);
             // }
-            var geoJson = {type:"FeatureCollection", features:boundary_latlngs};
+            geoJson = {type:"FeatureCollection", features:boundary_latlngs};
             console.log(geoJson);
              boundary_layer = L.mapbox.featureLayer(geoJson).addTo(maps.map2)
              boundary_layer.eachLayer(function(layer){
@@ -353,6 +356,7 @@
 
                 // })
              })
+             addTomap();
         };  
         boundary_client.send();      
         
@@ -468,7 +472,10 @@ login = function(){
         client.open('GET',url);
         client.onreadystatechange = function(){
             console.log(client.responseText);
-            
+            user_details = JSON.parse(client.responseText);
+            login_flag = true;
+            login_flip();
+            $('#login').modal('close');
         }
         client.send();
 }
@@ -485,10 +492,23 @@ register = function(){
     client.send();
 }
 
-
+function login_flip() {
+    if(login_flag){
+    document.getElementById('login-btn').style.display = 'none';
+    document.getElementById('logout-btn').style.display = '';
+    }
+    else {
+        document.getElementById('login-btn').style.display = '';
+        document.getElementById('logout-btn').style.display = 'none';
+    }
+}
 
 //****************************************************       map           **************************************//
 
+function addTomap() {
+    var layer_zones = L.mapbox.featureLayer(geoJson).addTo(map);
+
+}
 var map = L.mapbox.map('map','mapbox.streets').setView([3,70],3);
 
 function addControlPlaceholders(map) {
@@ -640,9 +660,7 @@ var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
 	if(polygon_check) {
         console.log('clicked');
-	var email = $("#email").val();
-	var organisation = $("#organisation").val();
-	request.open(method,order_api+'email='+email+'&organization='+organisation+'&data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
+	request.open(method,order_api+'&data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
 	request.send();
 	request.onload = function(){
 		var status = request.status;
