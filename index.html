@@ -32,15 +32,15 @@
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
     <script type="text/javascript" src="bootstrap.min.js"></script>
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-heat/v0.1.3/leaflet-heat.js'></script>
-	<nav style="background-color: #00517f; position: absolute; z-index: 1000; height:7vh;">
+	<nav style="background-color: #fcfcfc; position: absolute; z-index: 1000; height:7vh; line-height: 7vh !important;">
     <div class="nav-wrapper">
-      <a href="#" class="brand-logo">Dataraft  </a>  
-
+      <a href="#" class="brand-logo" style="color:#00517f; padding-left: 20px; font-weight: 400;">   SAMUDRA   </a> 
+      <!-- <span> Oceanographic Database</span> -->    
       <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="#aboutus" class="btn modal-trigger" > About Us    </a></li>
-        <li><a href="#pricing"   class="btn modal-trigger" onclick="pricing()" >Pricing </a></li>
+        <li><a href="#aboutus" class=" modal-trigger" > About Us    </a></li>
+        <li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" >Pricing </a></li>
        <!--  <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
-        <li><a href="#login"    class="btn modal-trigger">  Login  </a></li>
+        <li><a href="#login"    class=" modal-trigger">  Login  </a></li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
     </div>
@@ -85,95 +85,94 @@
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn " onclick="select_area_next()"> Proceed</a>
     </div>
   </div> 
-  <div id="aboutus" class="modal bottom-sheet " style="background-color: #080101cc;">
-    <h1 style="color: #f6d20bb3 !important; font-family: 'Trocchi', serif; font-size: 45px; font-weight: normal; line-height: 48px; margin: 0; "> OUR TEAM </h1>
+  <div id="aboutus" class="modal" >
+    <span style="color:#00517f !important; font-family: 'Trocchi', serif; font-size: 25px; font-weight: normal; line-height: 48px; margin: 0; "> About Us </span>
             <div class="modal-content">
             <div class="row">
-                <div class="col s6 m4">
-                <h3 class="header"></h3>
-                <div class="card horizontal">
-                  <div class="card-image">
-                    <img src="images/Prof_SUNDAR.jpg">
-                  </div>
-                  <div class="card-stacked">
-                    <div class="card-content">
-                      <p><strong> Prof.V.Sundar, IIT Madras </strong></p>
-                    </div>
-                    <div class="card-action">
-                      <a href="http://www.doe.iitm.ac.in/vsundar/" target="_blank">Visit Website</a>
-                    </div>
-                  </div>
+                <div class="col s12 m4">
+                <div class="card">
+                <div class="card-image waves-effect waves-block waves-light">
+                  <img class="activator" src="images/Prof_SUNDAR.jpg">
+                </div>
+                <div class="card-content">
+                  <span class="card-title activator grey-text text-darken-4">Prof.V.Sundar, IIT Madras<i class="material-icons right">more_vert</i></span>
+                  <p><a href="http://www.doe.iitm.ac.in/vsundar/" target="_blank">Visit Website</a></p>
+                </div>
+                <div class="card-reveal">
+                  <span class="card-title grey-text text-darken-4">Prof.V.Sundar, IIT Madras<i class="material-icons right">close</i></span>
+                  <p>With over 40 years of expertise in ocean consultancy projects, has been the person behind many coastal projects and protection measures by the Indian Government. </p>
+                </div>
                 </div>
               </div>
 
-              <div class="col s6 m4">
-                <h2 class="header"></h2>
-                <div class="card horizontal">
-                  <div class="card-image">
-                    <img src="images/prof_murali.jpg">
-                  </div>
-                  <div class="card-stacked">
-                    <div class="card-content">
-                      <p><strong> Prof.K.Murali, IIT Madras </strong></p>
-                    </div>
-                    <div class="card-action">
-                      <a href="http://www.doe.iitm.ac.in/murali/" target="_blank">Visit Website</a>
-                    </div>
-                  </div>
+            <div class="col s12 m4">
+              <div class="card">
+                <div class="card-image waves-effect waves-block waves-light">
+                  <img class="activator" src="images/prof_murali.jpg">
+                </div>
+                <div class="card-content">
+                  <span class="card-title activator grey-text text-darken-4"> Prof.K.Murali, IIT Madras <i class="material-icons right">more_vert</i></span>
+                  <p><a href="http://www.doe.iitm.ac.in/murali/" target="_blank">Visit Website</a></p>
+                </div>
+                <div class="card-reveal">
+                  <span class="card-title grey-text text-darken-4">Prof.K.Murali, IIT Madras<i class="material-icons right">close</i></span>
+                  <p>With over 40 years of expertise in ocean consultancy projects, has been the person behind many coastal projects and protection measures by the Indian Government. </p>
+                </div>
                 </div>
               </div>
 
-                <div class="col s6 m4">
-                <h2 class="header"></h2>
-                <div class="card horizontal">
-                  <div class="card-image">
-                    <img src="images/prof_Sannasiraj.jpg">
-                  </div>
-                  <div class="card-stacked">
-                    <div class="card-content">
-                      <p><strong> Prof.S.A.Sannasiraj, IIT Madras </strong> </p>
-                    </div>
-                    <div class="card-action">
-                      <a href="http://www.doe.iitm.ac.in/sasraj/" target="_blank">Visit Website</a>
-                    </div>
-                  </div>
+              <div class="col s12 m4">
+              <div class="card">
+                <div class="card-image waves-effect waves-block waves-light">
+                  <img class="activator" src="images/prof_Sannasiraj.jpg">
                 </div>
-              </div> 
-              </div> 
-              <div class="row">
-              <div class="col s6 m4">
-                <h2 class="header"> </h2>
-                <div class="card horizontal">
-                  <div class="card-image">
-                    <img src="images/Assi_Prof_sriram.jpg">
-                  </div>
-                  <div class="card-stacked">
-                    <div class="card-content">
-                      <p><strong> Dr.V.Sriram </strong></p>
-                    </div>
-                    <div class="card-action">
-                      <a href="http://www.doe.iitm.ac.in/vsundar/" target="_blank">Visit Website</a>
-                    </div>
-                  </div>
+                <div class="card-content">
+                  <span class="card-title activator grey-text text-darken-4"> Prof.Sannasiraj, IIT Madras <i class="material-icons right">more_vert</i></span>
+                  <p><a href="http://www.doe.iitm.ac.in/sasraj/" target="_blank">Visit Website</a></p>
+                </div>
+                <div class="card-reveal">
+                  <span class="card-title grey-text text-darken-4">Prof.Sannasiraj, IIT Madras<i class="material-icons right">close</i></span>
+                  <p>With over 40 years of expertise in ocean consultancy projects, has been the person behind many coastal projects and protection measures by the Indian Government. </p>
+                </div>
                 </div>
               </div>
 
-              <div class="col s6 m4">
-                <h2 class="header"> </h2>
-                <div class="card horizontal">
-                  <div class="card-image">
-                    <img src="images/dr.chitra.jpg">
-                  </div>
-                  <div class="card-stacked">
-                    <div class="card-content">
-                      <p><strong> Dr.K.Chitra </strong></p>
-                    </div>
-                    <div class="card-action">
-                      <a href="#" target="_blank"></a>
-                    </div>
-                  </div>
+               
+          </div> 
+            <div class="row">
+
+                <div class="col s12 m4">
+                <div class="card">
+                <div class="card-image waves-effect waves-block waves-light">
+                  <img class="activator" src="images/Assi_Prof_sriram.jpg">
+                </div>
+                <div class="card-content">
+                  <span class="card-title activator grey-text text-darken-4"> Dr.V.Sriram <i class="material-icons right">more_vert</i></span>
+                  <p><a href="http://www.doe.iitm.ac.in/vsriram/" target="_blank">Visit Website</a></p>
+                </div>
+                <div class="card-reveal">
+                  <span class="card-title grey-text text-darken-4">Dr.V.Sriram<i class="material-icons right">close</i></span>
+                  <p>With over 40 years of expertise in ocean consultancy projects, has been the person behind many coastal projects and protection measures by the Indian Government. </p>
+                </div>
                 </div>
               </div>
+
+              <div class="col s12 m4">
+              <div class="card">
+                <div class="card-image waves-effect waves-block waves-light">
+                  <img class="activator" src="images/dr.chitra.jpg">
+                </div>
+                <div class="card-content">
+                  <span class="card-title activator grey-text text-darken-4"> Dr.K.Chitra <i class="material-icons right">more_vert</i></span>
+                  <p><a href="#" target="_blank">Visit Website</a></p>
+                </div>
+                <div class="card-reveal">
+                  <span class="card-title grey-text text-darken-4">Dr.K.Chitra<i class="material-icons right">close</i></span>
+                  <p>With over 40 years of expertise in ocean consultancy projects, has been the person behind many coastal projects and protection measures by the Indian Government. </p>
+                </div>
+                </div>
+              </div>
+
             </div>
             </div>
             
@@ -241,7 +240,7 @@
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
 	      <div class="collapsible-header active">1. Choose Data type </div>
-	      <div class="collapsible-body"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6"><select multiple id="sel-data-type"> <option value="wave">Wave</option> <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> <option value="bathymetry">Bathymetry </option>	 </select>  </div>
+	      <div class="collapsible-body"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6"><select multiple id="sel-data-type"> <option value="wave">Wave</option> <!-- <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> --> <option value="bathymetry">Bathymetry </option>	 </select>  </div>
 	      <label for="datefrom">From</label>
 	      <input type="date" id="datefrom" class="datepicker col s6 m2"> 
 	      <label for="dateto">To </label>
@@ -265,7 +264,7 @@
 	      <div class="collapsible-body"><span> <p> Draw a polygon in the box </p> <button id="draw"> Draw</button> <!-- <button id="edit"> Edit </button> --> <div id='calculated-area'></div></span> </div>
 	    </li>
 	    <li>
-	      <div class="collapsible-header">3. Checkout </div>
+	      <div class="collapsible-header">3. Download </div>
 	      <div class="collapsible-body"> <div class="row">
     <form class="col s12">
       <div class="row">

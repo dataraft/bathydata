@@ -18,7 +18,7 @@
 }
 
 html {
-	line-height: 0.5 !important;
+	
     font-family: GillSans, Calibri, Trebuchet, sans-serif;
 }
 
@@ -37,19 +37,29 @@ html {
 	color:black!important;
 }
 
-.btn {
+.nav-mobile li a {
 
 	height: 28px !important;
 	border: 1px !important;
 	font-size: 0.7rem !important;
 }
 
+nav ul a {
+color: #00517f !important;
+}
+
+.nav-wrapper span {
+	padding-left: 180px;
+	color: #00517f;
+	position: absolute;
+	top:1vh;
+}
 #login .modal-content {
-	background: #76b852;
-background: -webkit-linear-gradient(right, #76b852, #8DC26F);
-background: -moz-linear-gradient(right, #76b852, #8DC26F);
-background: -o-linear-gradient(right, #76b852, #8DC26F);
-background: linear-gradient(to left, #76b852, #00517f);
+	background: #f3f6f1;
+background: -webkit-linear-gradient(left, #f3f6f1, #00517f);
+background: -moz-linear-gradient(left, #f3f6f1, #00517f);
+background: -o-linear-gradient(left, #f3f6f1, #00517f);
+background: linear-gradient(to left, #f3f6f1, #00517f);
 font-family: "Roboto", sans-serif;
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
