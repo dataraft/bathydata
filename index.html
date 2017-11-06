@@ -41,7 +41,7 @@
         <li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" >Pricing </a></li>
        <!--  <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
         <li><a href="#login" id="login-btn"   class=" modal-trigger">  Login  </a></li>
-        <li><a href="#logout" id="logout-btn" style="display:none" onclick="logout()" > Logout</a> </li>
+        <li id="logout-btn" style="display:none"><a href="#logout"   onclick="logout()" > Logout</a> <span id="login-text"></span> </li>
         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
     </div>
@@ -61,8 +61,8 @@
                       <p class="message">Already registered? <a href="#">Sign In</a></p>
                     </form>
                     <form id="login-form" class="login-form">
-                      <input type="text" placeholder="username"/>
-                      <input type="password" placeholder="password"/>
+                      <input type="text" required placeholder="username"/>
+                      <input type="password" required placeholder="password"/>
                       <button onclick="login()">login</button>
                       <p class="message">Not registered? <a href="#">SignUp</a></p>
                     </form>
@@ -86,8 +86,11 @@
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn " onclick="select_area_next()"> Proceed</a>
     </div>
   </div> 
-  <div id="aboutus" class="modal" >
+  <div id="aboutus" class="modal" style="text-align: center;">
     <span style="color:#00517f !important; font-family: 'Trocchi', serif; font-size: 25px; font-weight: normal; line-height: 48px; margin: 0; "> About Us </span>
+    <button class="modal-close btn-flat" style="position:absolute;top:0;right:0;">
+      <i class="material-icons">close</i>
+            </button>
             <div class="modal-content">
             <div class="row">
                 <div class="col s12 m4">
@@ -179,6 +182,7 @@
             
   </div>   
   <div id="pricing" class="modal modal-fixed-footer">
+
     <div class="modal-content">
       <section class="container">
               <div class="row white">
@@ -230,6 +234,9 @@
              </section>
 
     </div>
+    <button class="modal-close btn-flat" style="position:absolute;top:0;right:0;">
+      <i class="small material-icons">close</i>
+            </button>
     <div class="modal-footer">
         <span style="float:left;" id="planid"></span>    
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn ">Submit</a>
@@ -241,11 +248,13 @@
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
 	      <div class="collapsible-header active">1. Choose Data type </div>
-	      <div class="collapsible-body"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6"><select multiple id="sel-data-type"> <option value="wave">Wave</option> <!-- <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> --> <option value="bathymetry">Bathymetry </option>	 </select>  </div>
-	      <label for="datefrom">From</label>
+	      <div class="collapsible-body" id="div-sel-data"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6"><select  id="sel-data-type"> <option value="wave" selected >Wave</option> <!-- <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> --> <option value="bathymetry">Bathymetry </option>	 </select>  </div>
+	      <div id="dates">
+          <label for="datefrom">From</label>
 	      <input type="date" id="datefrom" class="datepicker col s6 m2"> 
 	      <label for="dateto">To </label>
 	      <input type="date" id="dateto" class="datepicker col s6 m2">
+         </div>
           <!-- <label for="switch">Data Resolution </label>
           <div id="switch" class="input-field col s12">
             <select onchange="changeFunc(value);">
@@ -262,7 +271,7 @@
 	    </li>
 	    <li>
 	      <div class="collapsible-header">2. Select your area</div>
-	      <div class="collapsible-body"><span> <p> Draw a polygon in the box </p> <button id="draw"> Draw</button> <!-- <button id="edit"> Edit </button> --> <div id='calculated-area'></div></span> </div>
+	      <div class="collapsible-body"><span> <p> Draw a polygon in the colored regions </p> <button class="btn" id="draw"> Draw</button> <!-- <button id="edit"> Edit </button> --> <div id='calculated-area'></div></span> </div>
 	    </li>
 	    <li>
 	      <div class="collapsible-header">3. Download </div>
@@ -279,7 +288,7 @@
       <label  for="organisation">Organisation</label>
     </div>
     </form> -->
-  </div> <div><button id="submit"> Download </button></div> 
+  </div> <div><button class="btn" id="submit"> Download </button></div> 
 	    </li>
 	  </ul>
       </div>
@@ -288,9 +297,10 @@
 
         //****************************************************Global varaibles*************************************************//
 
-
+        var storage = window.localStorage;
         var zone; //zones the user needs to update
-        var zone_array=[];
+        var zone_local=[]; // store the zone names and ids in local.
+        var zone_array=[];  
         var pricing_flag ;
         var inputs_register ;
         var plan_variable; //plan a or b
@@ -303,7 +313,8 @@
         var order_api = 'http://ocean.dataraft.in/download/order/?';
         var user_details;
         var login_flag = false;
-                                        //map related//
+        var data_type = 'wave';
+                                  //map related//
         var heatmap_data;
         var method = "GET";
         var async = true;
@@ -327,6 +338,7 @@
         boundary_client.setRequestHeader("Content-type","application/json;charset=UTF-8");
         boundary_client.onreadystatechange = function(){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
+            storage.setItem('zone_layer_local', boundary_latlngs);
             console.log(boundary_latlngs);
             // var boundary_polygon = [];
             // for(i=0;i<boundary_latlngs.length;i++){
@@ -337,6 +349,7 @@
              boundary_layer = L.mapbox.featureLayer(geoJson).addTo(maps.map2)
              boundary_layer.eachLayer(function(layer){
                 console.log(layer.feature.properties);
+                zone_local.push(layer.feature.properties);
                 layer.bindPopup('The Zone Id is ' + layer.feature.properties.name);
                 layer.on('mouseover',function(){
                     layer.openPopup();
@@ -369,16 +382,22 @@
             inDuration:0,
             outDuration:0  
         });
+        if( $('#sel-data-type').val() == 'bathymetry' ) {document.getElementById("dates").style.display="none"; };
         $('#select-area').modal({
+            inDuration:0,
+            outDuration:0,
             ready:function(){
                 maps.map2.invalidateSize();        
             },
             complete:function(){
                 
             }
-        })
+        });
+
 
             $('#pricing').modal({
+                inDuration:0,
+                outDuration:0,
                 complete:function(){
                     if(pricing_flag) { pricing_flag = false; return};
                     $('#planid').empty().html('');
@@ -408,6 +427,13 @@
   
   //*******************************************************ui functions & setting global variables*********************************//
 
+        $("#sel-data-type").on('change',function(){
+            data_type = $('#sel-data-type').val();
+            var el = document.getElementById('dates');
+            if(data_type=='bathymetry') { el.style.display = 'none'}
+                else el.style.display='';
+            
+        });
         plan_option = function(val){
             plan_variable = val;
             $('#planid').empty().html('You have chosen Plan'+val);
@@ -444,6 +470,18 @@
             document.getElementById('dateto').reset();
         }
 
+        function load_zones() {
+            var load_layer;
+            var zones = JSON.parse(storage.getItem('zone_layer_local'));
+            var index = [];
+            var zids = JSON.parse(storage.getItem('user_details'));
+            zids = zids.subscription_zones;   
+            for(var i=0;i<zids.length;i++) {
+                var ind = zones.zones.findIndex(x => x.properties.zid == zids[i]);
+                index.push(ind);
+            }         
+            console.log(index);
+        }
 // login js
     $('.message a').click(function(){
        $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
@@ -466,42 +504,64 @@
 //**************************************************************register & login******************************//
 
 login = function(){
+    console.log('clicked');
     var inputs = document.getElementById('login-form').elements;
     var url = login_api + inputs[0].value + '&password='+inputs[1].value;  //login fields are bound to the form change if changed in the form
     var client = new XMLHttpRequest();
         client.open('GET',url);
         client.onreadystatechange = function(){
-            console.log(client.responseText);
-            user_details = JSON.parse(client.responseText);
-            login_flag = true;
+            var response = JSON.parse(client.responseText);
+            if(response.status){
+                user_details = response.data;
+                storage.setItem('user_details',user_details);
+                console.log(user_details);
+                       login_flag = true;
             login_flip();
+            load_zones();   
             $('#login').modal('close');
+            }
         }
         client.send();
 }
 
 register = function(){
-    var url = signup_api+inputs_register[1].value+'&password='+inputs_register[2].value+'&organization='+inputs_register[4].value+'&phone='+inputs_register[3].value+'&first_name='+inputs_register[0].value+'&zone='+zone_array+'&plan='+plan_variable;
+    var zone_list=[];
+    for(i=0;i<zone_array.length;i++){
+        var index = zone_local.findIndex(x=> x.name == zone_array[i].tag);
+        zone_list.push(zone_local[i].zid);
+    }
+    var url = signup_api+inputs_register[1].value+'&password='+inputs_register[2].value+'&organization='+inputs_register[4].value+'&phone='+inputs_register[3].value+'&first_name='+inputs_register[0].value+'&subscription_zones='+JSON.stringify(zone_list)+'&subscription_type='+plan_variable+'&last_name=xyz';
     var client = new XMLHttpRequest();
     client.open('GET',url);
     client.onreadystatechange = function(){
         var r = JSON.parse(client.responseText);
         console.log(r.status);
-        if(r.status=='success') { alert('Your registration is successful. Please Login.'); form_reset(); };
+        if(r.status=='true') { alert('Your registration is successful. Please Login.'); form_reset(); };
     }
     client.send();
 }
 
+function logout(){
+
+    login_flag = false;
+    login_flip();
+    user_details=[];
+}
+
 function login_flip() {
     if(login_flag){
+        $('#login-text').html(user_details.email);
     document.getElementById('login-btn').style.display = 'none';
     document.getElementById('logout-btn').style.display = '';
+
     }
     else {
         document.getElementById('login-btn').style.display = '';
         document.getElementById('logout-btn').style.display = 'none';
     }
 }
+
+
 
 //****************************************************       map           **************************************//
 
@@ -636,7 +696,7 @@ getprice = function(layer) {
         dateto = new Date(dateto).toISOString();
 
         
-        request.open(method,price_api+'data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
+        request.open(method,price_api+'data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
 		request.setRequestHeader("Content-type","application/json;charset=UTF-8");
 		request.send();
 		request.onload = function(){
@@ -644,7 +704,7 @@ getprice = function(layer) {
 			var data = JSON.parse(request.responseText);
 			console.log(data.price,status);
             if(data.status) {
-			answer.innerHTML += '<p> Price '+ data.price + '</p>';
+			answer.innerHTML += '<p> Datapoints '+ data.datapoints + '</p>'+ '</br> <p> Size '+ data.size + '</p>' ;
 		    }
             else { alert('Hi, Please ensure you select the dates')}  
         }
@@ -660,7 +720,7 @@ var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
 	if(polygon_check) {
         console.log('clicked');
-	request.open(method,order_api+'&data=wave&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
+	request.open(method,order_api+'&data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
 	request.send();
 	request.onload = function(){
 		var status = request.status;

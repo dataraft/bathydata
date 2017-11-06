@@ -59,16 +59,24 @@ color: #00517f !important;
 background: -webkit-linear-gradient(left, #f3f6f1, #00517f);
 background: -moz-linear-gradient(left, #f3f6f1, #00517f);
 background: -o-linear-gradient(left, #f3f6f1, #00517f);
-background: linear-gradient(to left, #f3f6f1, #00517f);
+background: linear-gradient(0deg, #f3f6f1, #00517f);
 font-family: "Roboto", sans-serif;
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
+background-image: url('https://static.pexels.com/photos/542416/pexels-photo-542416.png');
+background-size: cover;
 }
 
 #login  {
 	overflow-y: visible !important;
 }
 
+#login-text {
+	position: absolute;
+	top: 2.8vh;
+	right: 10px;
+	font-size: 12px;
+}
 #pricing section {
 	max-width: 100% !important;
 	width: 100% !important;
