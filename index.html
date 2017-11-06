@@ -297,16 +297,17 @@
 
         //****************************************************Global varaibles*************************************************//
 
-        var storage = window.localStorage;
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
+        var zone_boundary; // the overall boundary latlongs of all zones
         var pricing_flag ;
         var inputs_register ;
         var plan_variable; //plan a or b
         var maps = {};
         var boundary_layer;
         var geoJson
+        var session_api = 'http://ocean.dataraft.in/download/login/';
         var login_api = 'http://ocean.dataraft.in/download/login/?email=';
         var signup_api = 'http://ocean.dataraft.in/download/signup/?email=';
         var price_api = 'http://ocean.dataraft.in/download/price/?';
@@ -314,7 +315,12 @@
         var user_details;
         var login_flag = false;
         var data_type = 'wave';
+        var user_layer= []; //users selected zone boundary latlongs
+        var user_layer_map;   //layer added to map of user_layer
+        var geoJson_sub;                      
+
                                   //map related//
+
         var heatmap_data;
         var method = "GET";
         var async = true;
@@ -322,13 +328,33 @@
         var datatype;
         var email;
         var organisation;
-        var geo_json_data = {};
+        var geo_json_data = {}; //user drawn coordinates jeojson
         var calcButton = document.getElementById('calculate');
         var datefrom;
         var dateto;
         var polygon_check = false;
         //*********************************************Loading Map2**********************************************//
-
+        session_call = function(url,val){
+        var client = new XMLHttpRequest();
+        client.open('GET',url,true);
+        client.setRequestHeader('Content-Type', 'application/json');
+        client.withCredentials = true;
+        client.onreadystatechange = function(){
+            var response = JSON.parse(client.responseText);
+            if(response.status){
+                user_details = response.data;
+                console.log(user_details);
+                       login_flag = true;
+            login_flip();
+            load_zones();   
+            if(val==1) {
+            $('#login').modal('close');
+            }
+            }
+        }
+        client.send();
+        }
+        
         L.mapbox.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
         
         maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],4);
@@ -338,8 +364,7 @@
         boundary_client.setRequestHeader("Content-type","application/json;charset=UTF-8");
         boundary_client.onreadystatechange = function(){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
-            storage.setItem('zone_layer_local', boundary_latlngs);
-            console.log(boundary_latlngs);
+            zone_boundary = boundary_latlngs;
             // var boundary_polygon = [];
             // for(i=0;i<boundary_latlngs.length;i++){
             //     boundary_latlngs[i].geometry.coordinates[0].splice(-1,1);
@@ -370,6 +395,7 @@
                 // })
              })
              addTomap();
+             session_call(session_api,0);
         };  
         boundary_client.send();      
         
@@ -472,16 +498,20 @@
 
         function load_zones() {
             var load_layer;
-            var zones = JSON.parse(storage.getItem('zone_layer_local'));
+            var zones = zone_boundary;
             var index = [];
-            var zids = JSON.parse(storage.getItem('user_details'));
-            zids = zids.subscription_zones;   
+            var zids = user_details.subscription_zones;   
             for(var i=0;i<zids.length;i++) {
-                var ind = zones.zones.findIndex(x => x.properties.zid == zids[i]);
+                var ind = zones.findIndex(x => x.properties.zid == zids[i]);
                 index.push(ind);
+                user_layer.push(zones[ind]);
             }         
-            console.log(index);
-        }
+              geoJson_sub = {type:"FeatureCollection", features:user_layer};
+                console.log(geoJson);
+                user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: " #bb8fce ",weight: 1,fillOpacity:0.1};}
+            }).addTo(map);
+            
+        };
 // login js
     $('.message a').click(function(){
        $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
@@ -507,22 +537,9 @@ login = function(){
     console.log('clicked');
     var inputs = document.getElementById('login-form').elements;
     var url = login_api + inputs[0].value + '&password='+inputs[1].value;  //login fields are bound to the form change if changed in the form
-    var client = new XMLHttpRequest();
-        client.open('GET',url);
-        client.onreadystatechange = function(){
-            var response = JSON.parse(client.responseText);
-            if(response.status){
-                user_details = response.data;
-                storage.setItem('user_details',user_details);
-                console.log(user_details);
-                       login_flag = true;
-            login_flip();
-            load_zones();   
-            $('#login').modal('close');
-            }
-        }
-        client.send();
+    session_call(url,1);
 }
+
 
 register = function(){
     var zone_list=[];
@@ -546,6 +563,7 @@ function logout(){
     login_flag = false;
     login_flip();
     user_details=[];
+
 }
 
 function login_flip() {
@@ -565,11 +583,13 @@ function login_flip() {
 
 //****************************************************       map           **************************************//
 
-function addTomap() {
-    var layer_zones = L.mapbox.featureLayer(geoJson).addTo(map);
+function addTomap() {   //ADD zones to map
+    var layer_zones = L.mapbox.featureLayer(geoJson,{style: function() {return {color: " #e59866 ",weight: 1,fillOpacity:0.2};}
+            }).addTo(map);
 
 }
-var map = L.mapbox.map('map','mapbox.streets').setView([3,70],3);
+
+var map = L.mapbox.map('map','mapbox.streets').setView([22,78],4);
 
 function addControlPlaceholders(map) {
 	var corners = map._controlCorners,
@@ -675,9 +695,18 @@ getcord = function(data) {
     return c;
 }
 
+geoJson_to_poly = function(data){
+    var r = [];
+    for(var i=0;i<data.length;i++){
+        r.push(data[i].geometry.coordinates[0]);
+    }
+    console.log(r);
+    return r;
+}
 getprice = function(layer) {
 	console.log(layer);
     if (layer._latlngs[0].length>2 ) {
+        check_intersect();
         var cordinates = [];
         cordinates[0] = getcord(layer._latlngs[0]);
     	polygon_check=true;
@@ -709,12 +738,22 @@ getprice = function(layer) {
             else { alert('Hi, Please ensure you select the dates')}  
         }
 
+
 	 
     } else {
         alert("Use the draw tools to draw a polygon!");
     }
 };
 
+check_intersect = function() {
+    var zone = turf.polygon(geoJson_to_poly(zone_boundary));
+    var draw =  turf.polygon(geoJson_to_poly(geo_json_data));
+    var subscription_zones = turf.polygon(geoJson_to_poly(geoJson_sub));
+    var inter1 = turf.intersect(draw,subscription_zones);
+    
+    console.log(inter1);
+
+}
 
 var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
