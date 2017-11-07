@@ -41,8 +41,9 @@
         <li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" >Pricing </a></li>
        <!--  <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
         <li><a href="#login" id="login-btn"   class=" modal-trigger">  Login  </a></li>
-        <li id="logout-btn" style="display:none"><a href="#logout"   onclick="logout()" > Logout</a> <span id="login-text"></span> </li>
-        <!-- <li><a href="collapsible.html">Checkout</a></li> -->
+        <li id="logout-btn" style="display:none"><a class='dropdown-button ' href="#logout" data-activates='dropdown1' id="login-text"   >   </a> <span class="badge" style="right:0; top:5vh; padding-left: 0;"> <i class="material-icons tiny" style="height:0.8vh; line-height: 0.8vh">arrow_drop_down</i></span> </li> <ul id='dropdown1' class="dropdown-content" > <li> <a href="#" onclick="logout()"> Logout </a> </li> 
+        </ul>
+         <!-- <li><a href="collapsible.html">Checkout</a></li> -->
       </ul>
     </div>
   </nav>
@@ -357,7 +358,7 @@
         
         L.mapbox.accessToken = 'pk.eyJ1Ijoic2hhc2hhbmsxOTkyIiwiYSI6ImNqODFneGcxNjZ2Z2EycXQ2a21kc3g5MnkifQ.93wfkOvX-_T9RrDA6PXmMA';
         
-        maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],4);
+        maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],5);
         var boundary_client = new XMLHttpRequest();
         var boundary_latlngs = [];
         boundary_client.open('GET','http://ocean.dataraft.in/download/zone/',async)
@@ -408,7 +409,7 @@
             inDuration:0,
             outDuration:0  
         });
-        if( $('#sel-data-type').val() == 'bathymetry' ) {document.getElementById("dates").style.display="none"; };
+        if( $('#sel-data-type').val() == 'bathymetry' ) {document.getElementById("dates").style.display="none"; data_type='bathymetry'};
         $('#select-area').modal({
             inDuration:0,
             outDuration:0,
@@ -418,8 +419,15 @@
             complete:function(){
                 
             }
+
         });
 
+        $('.dropdown-button').dropdown({
+            hover:true,
+            belowOrigin : true,
+            alignment:'right',
+            constrainWidth: false  
+        })
 
             $('#pricing').modal({
                 inDuration:0,
@@ -706,7 +714,7 @@ geoJson_to_poly = function(data){
 getprice = function(layer) {
 	console.log(layer);
     if (layer._latlngs[0].length>2 ) {
-        check_intersect();
+        
         var cordinates = [];
         cordinates[0] = getcord(layer._latlngs[0]);
     	polygon_check=true;
@@ -714,7 +722,7 @@ getprice = function(layer) {
         geo_json_data = {"type":"Polygon"};
         geo_json_data["coordinates"] = cordinates;
         // restrict to area to 2 decimal points
-       
+       //check_intersect();
         var answer = document.getElementById('calculated-area');
         answer.innerHTML = '<p><strong>' + area + 'kms<sup>2</sup> </strong></p>';
         datatype = $('#sel-data-type').val();
@@ -747,9 +755,9 @@ getprice = function(layer) {
 
 check_intersect = function() {
     var zone = turf.polygon(geoJson_to_poly(zone_boundary));
-    var draw =  turf.polygon(geoJson_to_poly(geo_json_data));
-    var subscription_zones = turf.polygon(geoJson_to_poly(geoJson_sub));
-    var inter1 = turf.intersect(draw,subscription_zones);
+    var draw =  turf.polygon(geo_json_data['coordinates']);
+    //var subscription_zones = turf.polygon(geoJson_to_poly(geoJson_sub));
+    var inter1 = turf.intersect(draw,zone);
     
     console.log(inter1);
 

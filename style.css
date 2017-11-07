@@ -72,9 +72,9 @@ background-size: cover;
 }
 
 #login-text {
-	position: absolute;
+	/*position: absolute;
 	top: 2.8vh;
-	right: 10px;
+	right: 10px;*/
 	font-size: 12px;
 }
 #pricing section {
