@@ -765,6 +765,7 @@ check_intersect = function() {
 
 var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
+    if(!login_flag){$('#login').modal('open'); return;}
 	if(polygon_check) {
         console.log('clicked');
 	request.open(method,order_api+'&data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
@@ -774,7 +775,7 @@ orderButton.onclick = function(){
 		var	data = JSON.parse(request.responseText);
 			console.log(data,status);
             if(data.status){
-                alert('Thank you. your order has been placed. A mail with the download link has been sent to you');
+                alert('Thank you. your order has been placed. A mail with the download link has been sent to '+user_details.email);
                 form_reset();
             }
             else {
