@@ -313,6 +313,7 @@
         var signup_api = 'http://ocean.dataraft.in/download/signup/?email=';
         var price_api = 'http://ocean.dataraft.in/download/price/?';
         var order_api = 'http://ocean.dataraft.in/download/order/?';
+        var logout_api = 'http://ocean.dataraft.in/download/logout/';
         var user_details;
         var login_flag = false;
         var data_type = 'wave';
@@ -351,6 +352,9 @@
             if(val==1) {
             $('#login').modal('close');
             }
+            }
+            else {
+                alert(response.msg);
             }
         }
         client.send();
@@ -567,11 +571,16 @@ register = function(){
 }
 
 function logout(){
-
-    login_flag = false;
-    login_flip();
-    user_details=[];
-
+    var client = new XMLHttpRequest();
+    client.open('GET',logout_api);
+    client.onreadystatechange = function(){
+        var r = JSON.parse(client.responseText);
+        console.log(r);
+        login_flag = false;
+                login_flip();
+                user_details=[];   
+    }
+    client.send();    
 }
 
 function login_flip() {
