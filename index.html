@@ -514,6 +514,7 @@
             var load_layer;
             var zones = zone_boundary;
             var index = [];
+            if(login_flag=='true'){
             var zids = user_details.subscription_zones;   
             for(var i=0;i<zids.length;i++) {
                 var ind = zones.findIndex(x => x.properties.zid == zids[i]);
@@ -523,8 +524,9 @@
               geoJson_sub = {type:"FeatureCollection", features:user_layer};
                 console.log(geoJson);
                 user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: " #bb8fce ",weight: 1,fillOpacity:0.1};}
+
             }).addTo(map);
-            
+            }
         };
 // login js
     $('.message a').click(function(){
