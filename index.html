@@ -373,6 +373,7 @@
         boundary_client.open('GET','http://ocean.dataraft.in/download/zone/',async)
         boundary_client.setRequestHeader("Content-type","application/json;charset=UTF-8");
         boundary_client.onreadystatechange = function(){
+            if(boundary_client.readyState==4 && boundary_client.status==200){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
             zone_boundary = boundary_latlngs;
             // var boundary_polygon = [];
@@ -406,6 +407,7 @@
              })
              addTomap();
              session_call(session_api,0);
+           }  
         };  
         boundary_client.send();      
         
