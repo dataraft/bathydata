@@ -318,7 +318,7 @@
         var login_flag = false;
         var data_type = 'wave';
         var user_layer= []; //users selected zone boundary latlongs
-        var user_layer_map;   //layer added to map of user_layer
+       // var user_layer_map;   //layer added to map of user_layer
         var geoJson_sub;                      
 
                                   //map related//
@@ -335,6 +335,7 @@
         var datefrom;
         var dateto;
         var polygon_check = false;
+        var map;
         //*********************************************Loading Map2**********************************************//
         session_call = function(url,val){
             console.log(val + url);
@@ -355,7 +356,7 @@
             $('#login').modal('close');
             }
             }
-            else {
+            else {                  //val =1 implies coming from login
                 if(val==1){
                 alert(response.msg);
                 }
@@ -519,16 +520,19 @@
             var load_layer;
             var zones = zone_boundary;
             var index = [];
-            if(login_flag=='true'){
+            user_layer = [];
+            if(login_flag){
+              console.log('went in');
             var zids = user_details.subscription_zones;   
             for(var i=0;i<zids.length;i++) {
                 var ind = zones.findIndex(x => x.properties.zid == zids[i]);
                 index.push(ind);
                 user_layer.push(zones[ind]);
+                console.log(user_layer);
             }         
               geoJson_sub = {type:"FeatureCollection", features:user_layer};
-                console.log(geoJson);
-                user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: " #bb8fce ",weight: 1,fillOpacity:0.1};}
+                console.log(geoJson_sub);
+               var  user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: " #bb8fce ",weight: 1,fillOpacity:0.5};}
 
             }).addTo(map);
             }
@@ -583,7 +587,7 @@ function logout(){
     var client = new XMLHttpRequest();
     client.open('GET',logout_api);
     client.onreadystatechange = function(){
-
+        
         login_flag = false;
                 login_flip();
                 user_details=[];   
@@ -610,11 +614,12 @@ function login_flip() {
 
 function addTomap() {   //ADD zones to map
     var layer_zones = L.mapbox.featureLayer(geoJson,{style: function() {return {color: " #e59866 ",weight: 1,fillOpacity:0.2};}
-            }).addTo(map);
+            }).addTo(map,true);
 
 }
 
-var map = L.mapbox.map('map','mapbox.streets').setView([22,78],5);
+ map = L.mapbox.map('map','mapbox.streets').setView([22,78],5);
+
 
 function addControlPlaceholders(map) {
 	var corners = map._controlCorners,
@@ -684,10 +689,10 @@ client.onreadystatechange = function() {
  	heatmap_data = client.responseText;
     heatmap_data = JSON.parse(heatmap_data);
  	heatmap_data.data = make_heat_format(heatmap_data.data);
- 	if(heatmap_data.status){
- 		console.log(heatmap_data.data)
- 	var heat = L.heatLayer(heatmap_data.data,{maxZoom:12,gradient:{0:'blue',0.5:'#64F0FA',1:'#F1F743'},minOpacity:0.2,radius:15,blur:10}).addTo(map);
- 	}
+ 	// if(heatmap_data.status){
+ 	// 	console.log(heatmap_data.data)
+ 	// var heat = L.heatLayer(heatmap_data.data,{maxZoom:12,gradient:{0:'blue',0.5:'#64F0FA',1:'#F1F743'},minOpacity:0.2,radius:15,blur:10}).addTo(map,true);
+ 	// }
 }
 client.send();
 make_heat_format = function(data){
