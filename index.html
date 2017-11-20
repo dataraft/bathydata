@@ -590,6 +590,7 @@ function logout(){
             login_flag = false;
             login_flip();
             user_details=[];
+            location.reload();
 	}
     }
     client.open('GET', logout_api);
