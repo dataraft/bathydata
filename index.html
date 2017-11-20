@@ -41,7 +41,7 @@
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="#aboutus" class=" modal-trigger" > About Us    </a></li>
         <li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" >Pricing </a></li>
-         <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li>
+         <!-- <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
         <li><a href="#login" id="login-btn"   class=" modal-trigger">  Login  </a></li>
         <li id="logout-btn" style="display:none"><a class='dropdown-button ' href="#logout" data-activates='dropdown1' id="login-text"   >   </a> <span class="badge" style="right:0; top:5vh; padding-left: 0;"> <i class="material-icons tiny" style="height:0.8vh; line-height: 0.8vh">arrow_drop_down</i></span> </li> <ul id='dropdown1' class="dropdown-content" > <li> <a href="#" onclick="logout()"> Logout </a> </li> 
         </ul>
@@ -79,7 +79,7 @@
   <div id="select-area" class="modal modal-fixed-footer">
                   
     <div class="modal-content" style="height: 400px"> 
-    <div id='map2' style=" width: 100%; height: 100%"></div>
+    <div id='map2' style=" width: 100%; height: 85%"></div>
     <label style="float: left;">Click on the highlighted regions to choose the zone </label>
           <div class="chips chips-initial "></div>
     </div>
@@ -397,7 +397,7 @@
                     layer.closePopup();
                 })  
                 layer.on('click',function(){
-                    zone_array.push({'tag':layer.feature.properties.name});
+                    check_chip_duplicate({'tag':layer.feature.properties.name});
                     $('.chips-initial').material_chip({'data':zone_array});
                     console.log($('.chips-initial').material_chip('data'));
 
@@ -464,7 +464,7 @@
             }
         });
         $('.chips-initial').on('chip.add',function(e,chip){
-            zone_array.push(chip);        
+          check_chip_duplicate(chip);     
         })
         $('.chips-initial').material_chip({
             data:[],
@@ -472,7 +472,11 @@
             secondaryPlaceholder: '+Tag',
             minLength:1
         });
-  
+        
+        check_chip_duplicate = function(chip) {
+          var index = zone_array.findIndex(x=> x.tag==chip.tag);
+          if(index==-1) { zone_array.push(chip);  } 
+        }
   //*******************************************************ui functions & setting global variables*********************************//
 
         $("#sel-data-type").on('change',function(){
@@ -617,7 +621,7 @@ function login_flip() {
 //****************************************************       map           **************************************//
 
 function addTomap() {   //ADD zones to map
-    var layer_zones = L.mapbox.featureLayer(geoJson,{style: function() {return {color: " #e59866 ",weight: 1,fillOpacity:0.2};}
+    var layer_zones = L.mapbox.featureLayer(geoJson,{style: function() {return {color: " #cecccc",weight: 1,fillOpacity:0.2};}
             }).addTo(map,true);
 
 }
