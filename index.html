@@ -360,9 +360,9 @@
             }
            } 
         }
-	client.setRequestHeader('Content-Type', 'application/json');
-        client.withCredentials = true;
 	client.open('GET', url, true);
+	client.setRequestHeader('Content-Type', 'application/json');
+	client.withCredentials = true;
         client.send();
         }
         
