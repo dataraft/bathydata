@@ -340,12 +340,9 @@
         session_call = function(url,val){
             console.log(val + url);
         var client = new XMLHttpRequest();
-        client.open('GET',url,true);
-        client.setRequestHeader('Content-Type', 'application/json');
-        client.withCredentials = true;
         client.onreadystatechange = function(){
-            var response = JSON.parse(client.responseText);
-            if(client.readyState == 4 && client.status==200){
+            var response = JSON.parse(this.responseText);
+            if(this.readyState == 4 && this.status==200){
             if(response.status){
                 user_details = response.data;
                 console.log(user_details);
@@ -363,6 +360,9 @@
             }
            } 
         }
+	client.setRequestHeader('Content-Type', 'application/json');
+        client.withCredentials = true;
+	client.open('GET', url, true);
         client.send();
         }
         
@@ -585,13 +585,14 @@ register = function(){
 
 function logout(){
     var client = new XMLHttpRequest();
-    client.open('GET',logout_api);
     client.onreadystatechange = function(){
-        
-        login_flag = false;
-                login_flip();
-                user_details=[];   
+	if(this.readyState == 4 && this.status==200) {
+            login_flag = false;
+            login_flip();
+            user_details=[];
+	}
     }
+    client.open('GET', logout_api);
     client.send();    
 }
 
