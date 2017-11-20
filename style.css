@@ -1,5 +1,5 @@
 .collapsible-header {
-	background-color: #00517f;
+	background-color: #004165;
 	color: white;
 
 }
@@ -45,21 +45,21 @@ html {
 }
 
 nav ul a {
-color: #00517f !important;
+color: #004165 !important;
 }
 
 .nav-wrapper span {
 	padding-left: 180px;
-	color: #00517f;
+	color: #004165;
 	position: absolute;
 	top:1vh;
 }
 #login .modal-content {
 	background: #f3f6f1;
-background: -webkit-linear-gradient(left, #f3f6f1, #00517f);
-background: -moz-linear-gradient(left, #f3f6f1, #00517f);
-background: -o-linear-gradient(left, #f3f6f1, #00517f);
-background: linear-gradient(0deg, #f3f6f1, #00517f);
+background: -webkit-linear-gradient(left, #f3f6f1, #004165);
+background: -moz-linear-gradient(left, #f3f6f1, #004165);
+background: -o-linear-gradient(left, #f3f6f1, #004165);
+background: linear-gradient(0deg, #f3f6f1, #004165);
 font-family: "Roboto", sans-serif;
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
