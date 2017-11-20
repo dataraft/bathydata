@@ -5,6 +5,8 @@
 
 <script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script>
 <link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.1/mapbox-gl.css' rel='stylesheet' />
 
  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
  <title>Oceanographic database</title>
@@ -39,7 +41,7 @@
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="#aboutus" class=" modal-trigger" > About Us    </a></li>
         <li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" >Pricing </a></li>
-       <!--  <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li> -->
+         <li><a href="#"  > <button data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li>
         <li><a href="#login" id="login-btn"   class=" modal-trigger">  Login  </a></li>
         <li id="logout-btn" style="display:none"><a class='dropdown-button ' href="#logout" data-activates='dropdown1' id="login-text"   >   </a> <span class="badge" style="right:0; top:5vh; padding-left: 0;"> <i class="material-icons tiny" style="height:0.8vh; line-height: 0.8vh">arrow_drop_down</i></span> </li> <ul id='dropdown1' class="dropdown-content" > <li> <a href="#" onclick="logout()"> Logout </a> </li> 
         </ul>
@@ -74,15 +76,15 @@
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
     </div>
   </div>
-  <div id="select-area" class="modal">
+  <div id="select-area" class="modal modal-fixed-footer">
                   
     <div class="modal-content" style="height: 400px"> 
     <div id='map2' style=" width: 100%; height: 100%"></div>
-    
+    <label style="float: left;">Click on the highlighted regions to choose the zone </label>
+          <div class="chips chips-initial "></div>
     </div>
     <div class="modal-footer">        
-        <label style="float: left;">Click on the highlighted regions to choose the zone </label>
-          <div class="chips chips-initial "></div>
+        
           
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn " onclick="select_area_next()"> Proceed</a>
     </div>
@@ -590,7 +592,7 @@ function logout(){
             login_flag = false;
             login_flip();
             user_details=[];
-            location.reload();
+             location.reload();
 	}
     }
     client.open('GET', logout_api);
@@ -620,7 +622,7 @@ function addTomap() {   //ADD zones to map
 
 }
 
- map = L.mapbox.map('map','mapbox.streets').setView([22,78],5);
+ map = L.mapbox.map('map','mapbox.satellite').setView([22,78],5);
 
 
 function addControlPlaceholders(map) {
