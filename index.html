@@ -590,8 +590,8 @@ register = function(){
     client.onreadystatechange = function(){
         var r = JSON.parse(client.responseText);
         console.log(r.status);
-        if(r.status) { alert('Your registration is successful. Please Login.'); form_reset(); };
-        else { alert('Your registration is successful. Please Login.'); };
+        if(r.status) { alert('Your registration is successful. Please Login.'); form_reset(); }
+        else { alert('Your registration is successful. Please Login.'); }
     }
     client.send();
 }
