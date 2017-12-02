@@ -88,7 +88,7 @@
     <div class="modal-footer">        
         
           
-      <a href="#!" class="modal-action modal-close waves-effect waves-green btn " onclick="select_area_next()"> Proceed</a>
+      <a href="#!" class="modal-action modal-close waves-effect waves-green btn " onclick="register()"> Register </a>
     </div>
   </div>
   <div id="faq" class="modal">
@@ -449,16 +449,16 @@
             constrainWidth: false  
         })
 
-            $('#pricing').modal({
-                inDuration:0,
-                outDuration:0,
-                complete:function(){
-                    if(pricing_flag) { pricing_flag = false; return};
-                    $('#planid').empty().html('');
-                    register();
-                    pricing_flag = false;
-                }
-            })
+            // $('#pricing').modal({
+            //     inDuration:0,
+            //     outDuration:0,
+            //     complete:function(){
+            //         if(pricing_flag) { pricing_flag = false; return};
+            //         $('#planid').empty().html('');
+            //         register();
+            //         pricing_flag = false;
+            //     }
+            // })
         });
 
    ///************************************************************material chips ****************************//
@@ -584,13 +584,13 @@ register = function(){
         var index = zone_local.findIndex(x=> x.name == zone_array[i].tag);
         zone_list.push(zone_local[i].zid);
     }
-    var url = signup_api+inputs_register[1].value+'&password='+inputs_register[2].value+'&organization='+inputs_register[4].value+'&phone='+inputs_register[3].value+'&first_name='+inputs_register[0].value+'&subscription_zones='+JSON.stringify(zone_list)+'&subscription_type='+plan_variable+'&last_name=xyz';
+    var url = signup_api+inputs_register[1].value+'&password='+inputs_register[2].value+'&organization='+inputs_register[4].value+'&phone='+inputs_register[3].value+'&name='+inputs_register[0].value+'&subscription_zones='+JSON.stringify(zone_list)+'&subscription_type='+plan_variable;
     var client = new XMLHttpRequest();
     client.open('GET',url);
     client.onreadystatechange = function(){
         var r = JSON.parse(client.responseText);
         console.log(r.status);
-        if(r.status=='true') { alert('Your registration is successful. Please Login.'); form_reset(); };
+        if(r.status) { alert('Your registration is successful. Please Login.'); form_reset(); };
     }
     client.send();
 }
