@@ -508,7 +508,8 @@
         pricing = function(){
             pricing_flag = true;
         }
-        form_reset = function(){
+
+        login_form_reset = function(){
             document.getElementById('register-form').reset();
             document.getElementById('login-form').reset();
             $('.chips-initial').material_chip({'data':[]});
@@ -590,7 +591,7 @@ register = function(){
         if(this.readyState == 4 && this.status==200) {
           var r = JSON.parse(client.responseText);
           console.log(r.status);
-          if(r.status) { alert('Your registration is successful. Please Login.'); form_reset(); }
+          if(r.status) { alert('Your registration is successful. Please Login.'); login_form_reset(); }
           else { alert(r.msg); }
         }
     }
