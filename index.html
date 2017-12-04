@@ -369,6 +369,9 @@
                 }
             }
            } 
+           else if(this.readyState ==4 && this.status==500){
+            alert('Hi, the server is under maintainenace. Please try after some time.');
+           }
         }
 	client.open('GET', url, true);
 	client.setRequestHeader('Content-Type', 'application/json');
@@ -419,6 +422,9 @@
              addTomap();
              session_call(session_api,0);
            }  
+           else if(boundary_client.readyState ==4 && boundary_client.status==500){
+            alert('Hi, the server is under maintainenace. Please retry to get the list of zones.');
+           }
         };  
         boundary_client.send();      
         
@@ -596,6 +602,9 @@ register = function(){
           if(r.status) { alert('Your registration is successful. Please Login.'); login_form_reset(); }
           else { alert(r.msg); }
         }
+        else if(this.readyState ==4 && this.status==500){
+            alert('Hi, the server is under maintainenace. Your registration is invalid.');
+           }
     }
     client.open('GET',url);
     client.send();
@@ -610,6 +619,9 @@ function logout(){
             user_details=[];
              location.reload();
 	}
+  else if(this.readyState ==4 && this.status==500){
+            alert('Hi, the server is under maintainenace. Could not logout.');
+           }
     }
     client.open('GET', logout_api);
     client.send();    
@@ -814,6 +826,7 @@ orderButton.onclick = function(){
 	request.send();
 	request.onload = function(){
 		var status = request.status;
+    if(status==200) {
 		var	data = JSON.parse(request.responseText);
 			console.log(data,status);
             if(data.status){
@@ -824,6 +837,10 @@ orderButton.onclick = function(){
                 alert('Please fill all the fields');
             }
 	}
+  else if(status==500) {
+    alert('Server under maintainenace. Please try Downloading after 30 min.');
+  }
+  }
 
 }
 else {
