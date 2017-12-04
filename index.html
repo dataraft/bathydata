@@ -783,6 +783,8 @@ getprice = function(layer) {
         datefrom = document.getElementById('datefrom').value;
         dateto = document.getElementById('dateto').value;
         console.log(datatype);
+       if(!isNaN(datefrom)) return;
+        if(!isNaN(dateto)) return;
         datefrom = new Date(datefrom).toISOString();
         dateto = new Date(dateto).toISOString();
 
