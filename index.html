@@ -304,6 +304,17 @@
 	  </ul>
       </div>
 
+     <div  class="legend-box">
+        <div class="leg-title"> <b> Data Access </b> </div>
+        <figure class="map-leg-d-1" > </figure> <span style="position: relative;
+top: -5px;"> HD Data </span> </br>
+        <figure class="map-leg-d-2" style="color:#cecccc"> </figure>  <span style="position: relative;
+top: -12px;"> No Access </span> </br>
+        <figure class="map-leg-d-2" style="color:#ff0000"> </figure>  <span style="position: relative;
+top: -12px;"> Subscribed </span>
+    </div>
+
+
 	<script>
 
         //****************************************************Global varaibles*************************************************//
@@ -334,6 +345,8 @@
 
                                   //map related//
 
+        var boundary_latlngs = [];
+        var boundary_latlngs_zones = [];
         var heatmap_data;
         var method = "GET";
         var async = true;
@@ -370,6 +383,9 @@
                 }
             }
            } 
+           else if(this.readyState ==4 && this.status==500){
+            alert('Hi, the server is under maintainenace. Please try after some time.');
+           }
         }
 	client.open('GET', url, true);
 	client.setRequestHeader('Content-Type', 'application/json');
@@ -381,12 +397,14 @@
         
         maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],5);
         var boundary_client = new XMLHttpRequest();
-        var boundary_latlngs = [];
+        
         boundary_client.open('GET','http://ocean.dataraft.in/download/zone/',async)
         boundary_client.setRequestHeader("Content-type","application/json;charset=UTF-8");
         boundary_client.onreadystatechange = function(){
             if(boundary_client.readyState==4 && boundary_client.status==200){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
+            boundary_latlngs_zones = seperate_hd(boundary_latlngs);
+            console.log(boundary_latlngs_zones);
             zone_boundary = boundary_latlngs;
             bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
             // var boundary_polygon = [];
@@ -421,6 +439,9 @@
              addTomap();
              session_call(session_api,0);
            }  
+           else if(boundary_client.readyState ==4 && boundary_client.status==500){
+            alert('Hi, the server is under maintainenace. Please retry to get the list of zones.');
+           }
         };  
         boundary_client.send();      
         
@@ -598,6 +619,9 @@ register = function(){
           if(r.status) { alert('Your registration is successful. Please Login.'); login_form_reset(); }
           else { alert(r.msg); }
         }
+        else if(this.readyState ==4 && this.status==500){
+            alert('Hi, the server is under maintainenace. Your registration is invalid.');
+           }
     }
     client.open('GET',url);
     client.send();
@@ -612,6 +636,9 @@ function logout(){
             user_details=[];
              location.reload();
 	}
+  else if(this.readyState ==4 && this.status==500){
+            alert('Hi, the server is under maintainenace. Could not logout.');
+           }
     }
     client.open('GET', logout_api);
     client.send();    
@@ -734,6 +761,7 @@ make_heat_format = function(data){
 
 }
 
+/// *********************************************** draw polygon ***********************************///
 
 getcord = function(data) {
     var c=[];
@@ -756,6 +784,14 @@ geoJson_to_poly = function(data){
     console.log(r);
     return r;
 }
+
+seperate_hd = function(data ) {   // case when the hd region is named alphabetwise. 
+    var s = data;
+    for(i=0;i<s.length;i++) {var index = s.findIndex(x => isNaN(x.properties.name));
+    s.splice(index,1); 
+    }
+    return s;
+}
 getprice = function(layer) {
 	console.log(layer);
     if (layer._latlngs[0].length>2 ) {
@@ -767,13 +803,15 @@ getprice = function(layer) {
         geo_json_data = {"type":"Polygon"};
         geo_json_data["coordinates"] = cordinates;
         // restrict to area to 2 decimal points
-       //check_intersect();
+       check_intersect();
         var answer = document.getElementById('calculated-area');
         answer.innerHTML = '<p><strong>' + area + 'kms<sup>2</sup> </strong></p>';
         datatype = $('#sel-data-type').val();
         datefrom = document.getElementById('datefrom').value;
         dateto = document.getElementById('dateto').value;
         console.log(datatype);
+       if(!isNaN(datefrom)) return;
+        if(!isNaN(dateto)) return;
         datefrom = new Date(datefrom).toISOString();
         dateto = new Date(dateto).toISOString();
 
@@ -799,13 +837,25 @@ getprice = function(layer) {
 };
 
 check_intersect = function() {
-    var zone = turf.polygon(geoJson_to_poly(zone_boundary));
+
+    var zone_cords = geoJson_to_poly(boundary_latlngs_zones);
     var draw =  turf.polygon(geo_json_data['coordinates']);
+    var l=0;
+    var index=[];
+    for(i=0;i<zone_cords.length;i++) {
+    var zone = turf.polygon([zone_cords[i]]);
     //var subscription_zones = turf.polygon(geoJson_to_poly(geoJson_sub));
     var inter1 = turf.intersect(draw,zone);
-    
-    console.log(inter1);
-
+    if(!inter1) l++;
+    else index.push(i);  // only when index has one element , the value is used. so by default index[0]. array of intersected zones. 
+  }
+  console.log(l);
+  if(l!=zone_cords.length-1) alert('Please draw your polygon within a single zone.');
+  else {
+    var zone_id = boundary_latlngs_zones[index[0]].properties.zid ;
+    var index = user_details.subscription_zones.findIndex(x=> x == zone_id);
+    if(index==-1) alert('Please draw your polygon within your subscribed zone');
+  }
 }
 
 var orderButton = document.getElementById('submit');
@@ -817,6 +867,7 @@ orderButton.onclick = function(){
 	request.send();
 	request.onload = function(){
 		var status = request.status;
+    if(status==200) {
 		var	data = JSON.parse(request.responseText);
 			console.log(data,status);
             if(data.status){
@@ -827,6 +878,10 @@ orderButton.onclick = function(){
                 alert('Please fill all the fields');
             }
 	}
+  else if(status==500) {
+    alert('Server under maintainenace. Please try Downloading after 30 min.');
+  }
+  }
 
 }
 else {
