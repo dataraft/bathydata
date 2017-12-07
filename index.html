@@ -305,9 +305,9 @@
       </div>
 
      <div  class="legend-box">
-        <figure class="map-leg-d-1" style="color:#00ff00"> </figure> <span style="position: relative;top: -5px;"> HD Data </span> </br>
-        <figure class="map-leg-d-1" style="color:#cecccc"> </figure>  <span style="position: relative;top: -5px;"> Zones </span> </br>
-        <figure class="map-leg-d-1" style="color:#ff0000"> </figure>  <span style="position: relative;top: -5px;"> Subscribed Zones </span> </br>
+     			<figure class="map-leg-d-1" style="color:#cecccc"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> zones </span> </br>
+        <figure class="map-leg-d-1" style="color:#ff0000"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
+        <figure class="map-leg-d-1" style="color:#00ff00"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd data </span> </br>
     </div>
 
 
@@ -566,7 +566,7 @@
             }         
               geoJson_sub = {type:"FeatureCollection", features:user_layer};
                 console.log(geoJson_sub);
-               var  user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#ff0000",weight: 3,fillOpacity:0.05};}
+               var  user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}
 
             }).addTo(map);
             }
@@ -661,7 +661,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     var layer_zones = L.mapbox.featureLayer(geoJson,{style: function() {return {color: " #cecccc",weight: 3,fillOpacity:0.05};}
             }).addTo(map,true);
 
-    var bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones},{style: function() {return {color: " #00ff00",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
+    var bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones},{style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite').setView([22,78],5);
