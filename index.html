@@ -664,7 +664,9 @@ function addTomap() {   //ADD zones and bathymetry to map
     var bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones},{style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 }
 
- map = L.mapbox.map('map','mapbox.streets-satellite').setView([22,78],5);
+ map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
+ var credits = L.control.attribution().addTo(map);
+	credits.addAttribution('dataraft pvt. ltd.');
 
 
 function addControlPlaceholders(map) {
