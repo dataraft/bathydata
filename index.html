@@ -344,6 +344,8 @@ top: -12px;"> Subscribed </span>
 
                                   //map related//
 
+        var boundary_latlngs = [];
+        var boundary_latlngs_zones = [];
         var heatmap_data;
         var method = "GET";
         var async = true;
@@ -394,12 +396,14 @@ top: -12px;"> Subscribed </span>
         
         maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],5);
         var boundary_client = new XMLHttpRequest();
-        var boundary_latlngs = [];
+        
         boundary_client.open('GET','http://ocean.dataraft.in/download/zone/',async)
         boundary_client.setRequestHeader("Content-type","application/json;charset=UTF-8");
         boundary_client.onreadystatechange = function(){
             if(boundary_client.readyState==4 && boundary_client.status==200){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
+            boundary_latlngs_zones = seperate_hd(boundary_latlngs);
+            console.log(boundary_latlngs_zones);
             zone_boundary = boundary_latlngs;
             // var boundary_polygon = [];
             // for(i=0;i<boundary_latlngs.length;i++){
@@ -754,6 +758,7 @@ make_heat_format = function(data){
 
 }
 
+/// *********************************************** draw polygon ***********************************///
 
 getcord = function(data) {
     var c=[];
@@ -776,6 +781,14 @@ geoJson_to_poly = function(data){
     console.log(r);
     return r;
 }
+
+seperate_hd = function(data ) {   // case when the hd region is named alphabetwise. 
+    var s = data;
+    for(i=0;i<s.length;i++) {var index = s.findIndex(x => isNaN(x.properties.name));
+    s.splice(index,1); 
+    }
+    return s;
+}
 getprice = function(layer) {
 	console.log(layer);
     if (layer._latlngs[0].length>2 ) {
@@ -787,7 +800,7 @@ getprice = function(layer) {
         geo_json_data = {"type":"Polygon"};
         geo_json_data["coordinates"] = cordinates;
         // restrict to area to 2 decimal points
-       //check_intersect();
+       check_intersect();
         var answer = document.getElementById('calculated-area');
         answer.innerHTML = '<p><strong>' + area + 'kms<sup>2</sup> </strong></p>';
         datatype = $('#sel-data-type').val();
@@ -821,13 +834,25 @@ getprice = function(layer) {
 };
 
 check_intersect = function() {
-    var zone = turf.polygon(geoJson_to_poly(zone_boundary));
+
+    var zone_cords = geoJson_to_poly(boundary_latlngs_zones);
     var draw =  turf.polygon(geo_json_data['coordinates']);
+    var l=0;
+    var index=[];
+    for(i=0;i<zone_cords.length;i++) {
+    var zone = turf.polygon([zone_cords[i]]);
     //var subscription_zones = turf.polygon(geoJson_to_poly(geoJson_sub));
     var inter1 = turf.intersect(draw,zone);
-    
-    console.log(inter1);
-
+    if(!inter1) l++;
+    else index.push(i);  // only when index has one element , the value is used. so by default index[0]. array of intersected zones. 
+  }
+  console.log(l);
+  if(l!=zone_cords.length-1) alert('Please draw your polygon within a single zone.');
+  else {
+    var zone_id = boundary_latlngs_zones[index[0]].properties.zid ;
+    var index = user_details.subscription_zones.findIndex(x=> x == zone_id);
+    if(index==-1) alert('Please draw your polygon within your subscribed zone');
+  }
 }
 
 var orderButton = document.getElementById('submit');
