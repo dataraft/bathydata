@@ -665,11 +665,17 @@ function addTomap() {   //ADD zones and bathymetry to map
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
- var credits = L.control.attribution({prefix:false}).addTo(map);
-	credits.addAttribution('&copy; Dataraft Pvt. Ltd.');
+ var satellitelayer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
 
-	var attribution = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
- attribution.forEach(function (a) {a.remove();})
+ satellitelayer.on('ready', attribution);
+
+ function attribution() {
+	 var credits = L.control.attribution({prefix:false}).addTo(map);
+		credits.addAttribution('&copy; Dataraft Pvt. Ltd.');
+
+		var atags = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
+	 atags.forEach(function (a) {a.remove();})
+ }
 
 function addControlPlaceholders(map) {
 	var corners = map._controlCorners,
