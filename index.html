@@ -312,6 +312,7 @@
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
         var zone_boundary; // the overall boundary latlongs of all zones
+        var bathymetry_zones; // bathymetry zones
         var pricing_flag ;
         var inputs_register ;
         var plan_variable; //plan a or b
@@ -387,6 +388,7 @@
             if(boundary_client.readyState==4 && boundary_client.status==200){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
             zone_boundary = boundary_latlngs;
+            bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
             // var boundary_polygon = [];
             // for(i=0;i<boundary_latlngs.length;i++){
             //     boundary_latlngs[i].geometry.coordinates[0].splice(-1,1);
@@ -632,10 +634,11 @@ function login_flip() {
 
 //****************************************************       map           **************************************//
 
-function addTomap() {   //ADD zones to map
+function addTomap() {   //ADD zones and bathymetry to map
     var layer_zones = L.mapbox.featureLayer(geoJson,{style: function() {return {color: " #cecccc",weight: 3,fillOpacity:0.05};}
             }).addTo(map,true);
 
+    var bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones},{style: function() {return {color: " #00ff00",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite').setView([22,78],5);
