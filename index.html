@@ -403,8 +403,8 @@ top: -12px;"> Subscribed </span>
         boundary_client.onreadystatechange = function(){
             if(boundary_client.readyState==4 && boundary_client.status==200){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
-            boundary_latlngs_zones = seperate_hd(boundary_latlngs);
-            console.log(boundary_latlngs_zones);
+            // boundary_latlngs_zones = seperate_hd(boundary_latlngs);
+            // console.log(boundary_latlngs_zones);
             zone_boundary = boundary_latlngs;
             bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
             // var boundary_polygon = [];
