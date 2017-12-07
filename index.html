@@ -670,9 +670,8 @@ function addTomap() {   //ADD zones and bathymetry to map
  satellitelayer.on('ready', updateAttribution);
 
  function updateAttribution() {
- 	console.log('attribution');
-	 var credits = L.control.attribution({prefix:false}).addTo(map);
-		credits.addAttribution('&copy; Dataraft Pvt. Ltd.');
+ 	var credits = L.control.attribution({prefix:false}).addTo(map);
+		credits.addAttribution('&copy; Dataraft Technologies Pvt. Ltd.');
 
 		var atags = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
 	 atags.forEach(function (a) {a.remove();})
