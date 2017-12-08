@@ -338,7 +338,7 @@
         var user_layer= []; //users selected zone boundary latlongs
        // var user_layer_map;   //layer added to map of user_layer
         var geoJson_sub;                      
-
+        var intersect = false;
                                   //map related//
 
         var boundary_latlngs = [];
@@ -816,6 +816,7 @@ getprice = function(layer) {
         datefrom = document.getElementById('datefrom').value;
         dateto = document.getElementById('dateto').value;
         console.log(datatype);
+        console.log(datefrom + '&' + dateto);
        if(!isNaN(datefrom)) return;
         if(!isNaN(dateto)) return;
         datefrom = new Date(datefrom).toISOString();
@@ -843,8 +844,8 @@ getprice = function(layer) {
 };
 
 check_intersect = function() {
-
     var zone_cords = geoJson_to_poly(boundary_latlngs);
+    intersect = false;
     var draw =  turf.polygon(geo_json_data['coordinates']);
     var l=0;
     var index=[];
@@ -856,20 +857,25 @@ check_intersect = function() {
     else index.push(i);  // only when index has one element , the value is used. so by default index[0]. array of intersected zones. 
   }
   console.log(l);
-  if(l!=zone_cords.length-1) alert('Please draw your polygon within a single zone.');
+  if(l!=zone_cords.length-1) { alert('Please draw your polygon within a single zone.'); intersect=true;  }
   else {
     var zone_id = boundary_latlngs_zones[index[0]].properties.zid ;
     var index = user_details.subscription_zones.findIndex(x=> x == zone_id);
-    if(index==-1) alert('Please draw your polygon within your subscribed zone');
+    if(index==-1) { alert('Please draw your polygon within your subscribed zone'); intersect=true; };
   }
+
 }
 
 var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
     if(!login_flag){$('#login').modal('open'); return;}
-	if(polygon_check) {
+	if(polygon_check ) {
+        if(intersect) { alert('Unable to send request. Please redraw your area.'); return;}
         console.log('clicked');
-	request.open(method,order_api+'&data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
+        var url_order;
+        if(data_type=='bathymetry') url_order = order_api+'&data='+data_type+'&polygon='+JSON.stringify(geo_json_data);
+        else url_order = order_api+'&data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data); 
+	request.open(method,url_order,async);
 	request.send();
 	request.onload = function(){
 		var status = request.status;
