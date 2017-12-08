@@ -305,13 +305,9 @@
       </div>
 
      <div  class="legend-box">
-        <div class="leg-title"> <b> Data Access </b> </div>
-        <figure class="map-leg-d-1" > </figure> <span style="position: relative;
-top: -5px;"> HD Data </span> </br>
-        <figure class="map-leg-d-2" style="color:#cecccc"> </figure>  <span style="position: relative;
-top: -12px;"> No Access </span> </br>
-        <figure class="map-leg-d-2" style="color:#ff0000"> </figure>  <span style="position: relative;
-top: -12px;"> Subscribed </span>
+     			<figure class="map-leg-d-1" style="color:#cecccc"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> zones </span> </br>
+        <figure class="map-leg-d-1" style="color:#00ff00"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
+        <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd data </span> </br>
     </div>
 
 
@@ -323,6 +319,7 @@ top: -12px;"> Subscribed </span>
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
         var zone_boundary; // the overall boundary latlongs of all zones
+        var bathymetry_zones; // bathymetry zones
         var pricing_flag ;
         var inputs_register ;
         var plan_variable; //plan a or b
@@ -402,9 +399,10 @@ top: -12px;"> Subscribed </span>
         boundary_client.onreadystatechange = function(){
             if(boundary_client.readyState==4 && boundary_client.status==200){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
-            boundary_latlngs_zones = seperate_hd(boundary_latlngs);
-            console.log(boundary_latlngs_zones);
+            // boundary_latlngs_zones = seperate_hd(boundary_latlngs);
+            // console.log(boundary_latlngs_zones);
             zone_boundary = boundary_latlngs;
+            bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
             // var boundary_polygon = [];
             // for(i=0;i<boundary_latlngs.length;i++){
             //     boundary_latlngs[i].geometry.coordinates[0].splice(-1,1);
@@ -568,7 +566,7 @@ top: -12px;"> Subscribed </span>
             }         
               geoJson_sub = {type:"FeatureCollection", features:user_layer};
                 console.log(geoJson_sub);
-               var  user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#ff0000",weight: 3,fillOpacity:0.05};}
+               var  user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}
 
             }).addTo(map);
             }
@@ -659,14 +657,25 @@ function login_flip() {
 
 //****************************************************       map           **************************************//
 
-function addTomap() {   //ADD zones to map
+function addTomap() {   //ADD zones and bathymetry to map
     var layer_zones = L.mapbox.featureLayer(geoJson,{style: function() {return {color: " #cecccc",weight: 3,fillOpacity:0.05};}
             }).addTo(map,true);
 
+    var bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones},{style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 }
 
- map = L.mapbox.map('map','mapbox.streets-satellite').setView([22,78],5);
+ map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
+ var satellitelayer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
 
+ satellitelayer.on('ready', updateAttribution);
+
+ function updateAttribution() {
+ 	var credits = L.control.attribution({prefix:false}).addTo(map);
+		credits.addAttribution('&copy; Dataraft Technologies Pvt. Ltd.');
+
+		var atags = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
+	 atags.forEach(function (a) {a.remove();})
+ }
 
 function addControlPlaceholders(map) {
 	var corners = map._controlCorners,
