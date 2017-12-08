@@ -844,7 +844,7 @@ getprice = function(layer) {
 
 check_intersect = function() {
 
-    var zone_cords = geoJson_to_poly(boundary_latlngs_zones);
+    var zone_cords = geoJson_to_poly(boundary_latlngs);
     var draw =  turf.polygon(geo_json_data['coordinates']);
     var l=0;
     var index=[];
