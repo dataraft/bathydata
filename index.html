@@ -314,7 +314,7 @@
 	<script>
 
         //****************************************************Global varaibles*************************************************//
-
+        var host  = 'http://ocean.dataraft.in';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
@@ -326,12 +326,12 @@
         var maps = {};
         var boundary_layer;
         var geoJson
-        var session_api = 'http://ocean.dataraft.in/download/login/';
-        var login_api = 'http://ocean.dataraft.in/download/login/?email=';
-        var signup_api = 'http://ocean.dataraft.in/download/signup/?email=';
-        var price_api = 'http://ocean.dataraft.in/download/price/?';
-        var order_api = 'http://ocean.dataraft.in/download/order/?';
-        var logout_api = 'http://ocean.dataraft.in/download/logout/';
+        var session_api = host+'/download/login/';
+        var login_api = host+'/download/login/?email=';
+        var signup_api = host+'/download/signup/?email=';
+        var price_api = host+'/download/price/?';
+        var order_api = host+'/download/order/?';
+        var logout_api = host+'/download/logout/';
         var user_details;
         var login_flag = false;
         var data_type = 'wave';
@@ -394,7 +394,7 @@
         maps.map2 = L.mapbox.map('map2','mapbox.streets').setView([13,80],5);
         var boundary_client = new XMLHttpRequest();
         
-        boundary_client.open('GET','http://ocean.dataraft.in/download/zone/',async)
+        boundary_client.open('GET',host+'/download/zone/',async)
         boundary_client.setRequestHeader("Content-type","application/json;charset=UTF-8");
         boundary_client.onreadystatechange = function(){
             if(boundary_client.readyState==4 && boundary_client.status==200){
@@ -740,7 +740,7 @@ button_draw.onclick = function(){
 
 
 var client = new XMLHttpRequest();
-client.open('GET', 'http://ocean.dataraft.in/download/heatmap/');
+client.open('GET', host+'/download/heatmap/');
 client.onreadystatechange = function() {  
  	heatmap_data = client.responseText;
     heatmap_data = JSON.parse(heatmap_data);
@@ -887,7 +887,7 @@ orderButton.onclick = function(){
                 form_reset();
             }
             else {
-                alert('Please fill all the fields');
+                alert('Please try again.');
             }
 	}
   else if(status==500) {
