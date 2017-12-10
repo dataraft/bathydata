@@ -844,8 +844,8 @@ getprice = function(layer) {
 };
 
 check_intersect = function() {
+    var zone_cords = geoJson_to_poly(boundary_latlngs);
     intersect = false;
-    var zone_cords = geoJson_to_poly(boundary_latlngs_zones);
     var draw =  turf.polygon(geo_json_data['coordinates']);
     var l=0;
     var index=[];
@@ -857,9 +857,10 @@ check_intersect = function() {
     else index.push(i);  // only when index has one element , the value is used. so by default index[0]. array of intersected zones. 
   }
   console.log(l);
-  if(l!=zone_cords.length-1) { alert('Please draw your polygon within a single zone.'); intersect=true;  }
+  if(index.length==0) { alert('Please draw your polygon within your subscribed zone.'); }
+  else if(index.length>1) { alert('Please draw your polygon within a single zone.'); intersect=true;  }
   else {
-    var zone_id = boundary_latlngs_zones[index[0]].properties.zid ;
+    var zone_id = boundary_latlngs[index[0]].properties.zid ;
     var index = user_details.subscription_zones.findIndex(x=> x == zone_id);
     if(index==-1) { alert('Please draw your polygon within your subscribed zone'); intersect=true; };
   }
