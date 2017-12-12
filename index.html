@@ -413,6 +413,7 @@
              boundary_layer.eachLayer(function(layer){
                 console.log(layer.feature.properties);
                 zone_local.push(layer.feature.properties);
+                console.log(zone_local);
                 layer.bindPopup('The Zone Id is ' + layer.feature.properties.name);
                 layer.on('mouseover',function(){
                     layer.openPopup();
@@ -604,8 +605,10 @@ register = function(){
     var zone_list=[];
     for(i=0;i<zone_array.length;i++){
         var index = zone_local.findIndex(x=> x.name == zone_array[i].tag);
-        zone_list.push(zone_local[i].zid);
+        console.log(zone_local & index);
+        zone_list.push(zone_local[index].zid);
     }
+    console.log(zone_list);
     var url = signup_api+inputs_register[1].value+'&password='+inputs_register[2].value+'&organization='+inputs_register[4].value+'&phone='+inputs_register[3].value+'&name='+inputs_register[0].value+'&subscription_zones='+JSON.stringify(zone_list)+'&subscription_type='+plan_variable;
     var client = new XMLHttpRequest();
     client.onreadystatechange = function(){
@@ -643,7 +646,7 @@ function logout(){
 function login_flip() {
     if(login_flag){
         $('#login-text').html(user_details.email);
-    document.getElementById('login-btn').style.display = 'none';
+    //document.getElementById('login-btn').style.display = 'none';
     document.getElementById('logout-btn').style.display = '';
 
     }
