@@ -818,14 +818,16 @@ getprice = function(layer) {
         var answer = document.getElementById('calculated-area');
         answer.innerHTML = '<p><strong>' + area + 'kms<sup>2</sup> </strong></p>';
         datatype = $('#sel-data-type').val();
-        datefrom = document.getElementById('datefrom').value;
-        dateto = document.getElementById('dateto').value;
-        console.log(datatype);
-        console.log(datefrom + '&' + dateto);
-       if(!isNaN(datefrom)) return;
-        if(!isNaN(dateto)) return;
-        datefrom = new Date(datefrom).toISOString();
-        dateto = new Date(dateto).toISOString();
+        if (datatype != 'bathymetry') {
+          datefrom = document.getElementById('datefrom').value;
+          dateto = document.getElementById('dateto').value;
+          console.log(datatype);
+          console.log(datefrom + '&' + dateto);
+         if(!isNaN(datefrom)) return;
+          if(!isNaN(dateto)) return;
+          datefrom = new Date(datefrom).toISOString();
+          dateto = new Date(dateto).toISOString();
+        }
 
         
         request.open(method,price_api+'data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
