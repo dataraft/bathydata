@@ -889,7 +889,7 @@ orderButton.onclick = function(){
 		var	data = JSON.parse(request.responseText);
 			console.log(data,status);
             if(data.status){
-                alert('Thank you. your order has been placed. A mail with the download link has been sent to '+user_details.email);
+                alert('Thank you. your order has been placed. A mail with the download link will be sent to '+user_details.email);
                 form_reset();
             }
             else {
