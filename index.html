@@ -314,8 +314,10 @@
 	<script>
 
         //****************************************************Global varaibles*************************************************//
-        var host  = 'http://ocean.dataraft.in';
-        var zone; //zones the user needs to update
+        var protocol = location.protocol;
+	var slashes = protocol.concat("//");
+	var host = slashes.concat(window.location.hostname);
+	var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
         var zone_boundary; // the overall boundary latlongs of all zones
