@@ -97,8 +97,8 @@
   <div id="upload" class="modal">
     <div style="text-align: center;color:#004165 !important; font-family: 'Trocchi', serif; font-size: 25px; font-weight: normal; line-height: 48px; margin: 0; "> Upload Data </div>
     <div>
-      <input id="csv-file" type="file" />
-      <input class="button" type="submit" value="Upload" />
+      <input id="csv-file" type="file" /><br/><br/>
+      <button type="button" class="btn" onlclick="uploadData()"> Upload </button>
     </div>
   </div>
   <div id="faq" class="modal">
@@ -349,6 +349,7 @@
         var price_api = host+'/download/price/?';
         var order_api = host+'/download/order/?';
         var logout_api = host+'/download/logout/';
+        var upload_api = host+'/download/upload/';
         var user_details;
         var login_flag = false;
         var data_type = 'wave';
@@ -924,6 +925,24 @@ else {
 }
 };
 
+/// ################## UPLOAD DATA ######################
+uploadData =  function() {
+  var formData = new FormData(); 
+  formData.append('file', document.getElementById('csv-file').files[0]);
+  $.ajax({
+     url : upload_api,
+     type : 'POST',
+     data : formData,
+     processData: false,  // tell jQuery not to process the data
+     contentType: false,  // tell jQuery not to set contentType
+     success : function(data) {
+         console.log(data);
+         alert(data);
+     }
+});
+
+
+};
 
  
 
