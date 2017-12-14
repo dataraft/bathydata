@@ -259,7 +259,14 @@
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
 	      <div class="collapsible-header active">1. Choose Data type </div>
-	      <div class="collapsible-body" id="div-sel-data"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6"><select  id="sel-data-type"> <option value="wave" selected >Wave</option> <!-- <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> --> <option value="bathymetry">Bathymetry </option>	 </select>  </div>
+	      <div class="collapsible-body" id="div-sel-data"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6">
+          <select  id="sel-data-type">
+            <option value="wave" selected >Wave</option>
+            <option value="wavedirection">Wave Direction</option>
+            <option value="waveperiod">Wave Period</option>
+            <option value="bathymetry">Bathymetry </option>
+          </select>
+        </div>
 	      <div id="dates">
           <label for="datefrom">From</label>
 	      <input type="date" id="datefrom" class="datepicker col s6 m2"> 
