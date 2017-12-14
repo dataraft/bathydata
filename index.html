@@ -42,7 +42,8 @@
       <!-- <span> Oceanographic Database</span> -->    
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="#faq" class=" modal-trigger" > FAQ </a></li>
-        <li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" > Subscription </a></li>
+        <!--<li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" > Subscription </a></li>-->
+        <li><a href="#upload" class=" modal-trigger" > Upload Data </a></li>
         <li><a href="#contact" class=" modal-trigger" > Contact </a></li>
         <li><a href="#aboutus" class=" modal-trigger" > About Us </a></li>
         <!--<li><a href="#"  > <button type="button" data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li>-->
@@ -91,6 +92,13 @@
         
           
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn " onclick="register()"> Register </a>
+    </div>
+  </div>
+  <div id="upload" class="modal">
+    <div style="text-align: center;color:#004165 !important; font-family: 'Trocchi', serif; font-size: 25px; font-weight: normal; line-height: 48px; margin: 0; "> Upload Data </div>
+    <div>
+      <input id="csv-file" type="file" />
+      <input class="button" type="submit" value="Upload" />
     </div>
   </div>
   <div id="faq" class="modal">
@@ -314,7 +322,7 @@
      <div  class="legend-box">
      			<figure class="map-leg-d-1" style="color:#cecccc"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> zones </span> </br>
         <figure class="map-leg-d-1" style="color:#00ff00"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
-        <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd data </span> </br>
+        <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd bathymetry </span> </br>
     </div>
 
 
