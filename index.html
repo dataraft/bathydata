@@ -927,8 +927,14 @@ else {
 
 /// ################## UPLOAD DATA ######################
 uploadData =  function() {
+  var csv = document.getElementById('csv-file').files[0])
+  if (csv==undefined) {
+    alert('Please select a file to upload.');
+    return;
+  }
+  
   var formData = new FormData(); 
-  formData.append('file', document.getElementById('csv-file').files[0]);
+  formData.append('file', csv);
   $.ajax({
      url : upload_api,
      type : 'POST',
