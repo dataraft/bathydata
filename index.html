@@ -98,6 +98,7 @@
     <div style="text-align: center;color:#004165 !important; font-family: 'Trocchi', serif; font-size: 25px; font-weight: normal; line-height: 48px; margin: 0; "> Upload Data </div>
     <div style="padding-left: 20px">
       <input id="csv-file" type="file" name='csv-file'/><br/><br/>
+      <input id="zone-name" type="file" name='name'/><br/><br/>
       <button type="button" class="btn" onclick="uploadData()"> Upload </button><br/><br/>
     </div>
   </div>
@@ -928,13 +929,15 @@ else {
 /// ################## UPLOAD DATA ######################
 uploadData =  function() {
   var csv = document.getElementById('csv-file').files[0];
-  if (csv==undefined) {
-    alert('Please select a file to upload.');
+  var name = document.getElementById('zone-name').value;
+  if (csv==undefined || name.trim()==undefined) {
+    alert('Please fill all the fields.');
     return;
   }
 
   var formData = new FormData(); 
   formData.append('file', csv);
+  formData.append('name', name);
   $.ajax({
      url : upload_api,
      type : 'POST',
