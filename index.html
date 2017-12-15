@@ -936,6 +936,10 @@ uploadData =  function() {
     alert('Please fill all the fields.');
     return;
   }
+  if (name.indexOf('.csv') === -1) {
+    alert('Please upload a .csv file.');
+    return;
+  }
 
   var formData = new FormData($('#upload-form')[0]);
   
@@ -947,11 +951,11 @@ uploadData =  function() {
      processData: false,  // tell jQuery not to process the data
      contentType: false,  // tell jQuery not to set contentType
      cache: false,
-     success : function(data) {
-         console.log(data);
-         alert(data);
-     }
-});
+     success : function(response) {
+         console.log(response);
+         alert(response);
+     },
+  });
 
 
 };
