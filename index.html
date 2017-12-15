@@ -326,6 +326,7 @@
      			<figure class="map-leg-d-1" style="color:#cecccc"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> zones </span> </br>
         <figure class="map-leg-d-1" style="color:#00ff00"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
         <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd bathymetry </span> </br>
+        <figure class="map-leg-d-1" style="color:#0000ff"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> user bathymetry </span> </br>
     </div>
 
 
@@ -577,8 +578,12 @@
             var zones = zone_boundary;
             var index = [];
             user_layer = [];
-            if(login_flag){
+            userzone_layer = [];
+
+          if(login_flag){
               console.log('went in');
+
+            // add subscribed zones
             var zids = user_details.subscription_zones;   
             for(var i=0;i<zids.length;i++) {
                 var ind = zones.findIndex(x => x.properties.zid == zids[i]);
@@ -591,7 +596,19 @@
                var  user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}
 
             }).addTo(map);
+
+            // add user added zones
+            var userzones = user_details.userzones;
+            for(var i=0;i<userzones.length;i++) {
+              var z = {};
+              z.geometry = {'type': 'Polygon', 'coordinates': userzones[i][1]};
+              z.type = 'Feature';
+              z.properties = {'uzid': userzones[i][0]}
+              userzone_layer.push(z) 
             }
+            var userzone_layer_map = L.mapbox.featureLayer({type: "FeatureCollection", features: userzone_layer}, {style: function() {return {color: "#0000ff",weight: 3,fillOpacity:0.05};}}).addTo(map);
+
+          }
         };
 // login js
     $('.message a').click(function(){
