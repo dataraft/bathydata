@@ -601,7 +601,7 @@
             var userzones = user_details.userzones;
             for(var i=0;i<userzones.length;i++) {
               var z = {};
-              z.geometry = {'type': 'Polygon', 'coordinates': userzones[i][1]};
+              z.geometry = userzones[i][1]};
               z.type = 'Feature';
               z.properties = {'uzid': userzones[i][0]}
               userzone_layer.push(z) 
