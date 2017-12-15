@@ -940,12 +940,13 @@ uploadData =  function() {
   var formData = new FormData($('#upload-form')[0]);
   
   $.ajax({
-     url : upload_api,
      type : 'POST',
-     data : formData,
      enctype: 'multipart/form-data',
+     url : upload_api,
+     data : formData,
      processData: false,  // tell jQuery not to process the data
      contentType: false,  // tell jQuery not to set contentType
+     cache: false,
      success : function(data) {
          console.log(data);
          alert(data);
