@@ -943,6 +943,7 @@ uploadData =  function() {
      url : upload_api,
      type : 'POST',
      data : formData,
+     enctype: 'multipart/form-data',
      processData: false,  // tell jQuery not to process the data
      contentType: false,  // tell jQuery not to set contentType
      success : function(data) {
