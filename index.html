@@ -937,9 +937,7 @@ uploadData =  function() {
     return;
   }
 
-  var formData = new FormData();
-  var form = $('#upload-form').serialize();
-  formData.append(form);
+  var formData = new FormData($('#upload-form'));
   formData.append('file', csv);
   
   $.ajax({
