@@ -719,12 +719,12 @@ function addTomap() {   //ADD zones and bathymetry to map
 	 atags.forEach(function (a) {a.remove();})
  }
 
-  function pointData(latlong) {
-    var d = $('#sel-data-type')[0].value;
-    var point = JSON.stringify({'type': 'Point', 'coordinates': [parseFloat(latlong.lng), parseFloat(latlong.lat)]});
+  function pointData(latlng) {
+    var data = $('#sel-data-type')[0].value;
+    var point = JSON.stringify({'type': 'Point', 'coordinates': [parseFloat(latlng.lng), parseFloat(latlng.lat)]});
     console.log(point);
 
-    if (d==undefined) {
+    if (data==undefined) {
       alert('Please select a data type.');
       return;
     }
@@ -734,10 +734,8 @@ function addTomap() {   //ADD zones and bathymetry to map
     $.ajax({
        type : 'GET',
        url : point_api,
-       data : {'data': d, 'point': point},
+       data : {'data': data, 'point': point},
        dataType: 'json',
-       processData: false,  // tell jQuery not to process the data
-       contentType: false,  // tell jQuery not to set contentType
        cache: false,
        success : function(response) {
           if(response.status) {
