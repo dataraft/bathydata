@@ -734,10 +734,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     $.ajax({
        type : 'GET',
        url : point_api,
-       data : {
-         'data': data,
-         'point': point,
-       },
+       data : {data: data, point: point},
        dataType: 'json',
        processData: false,  // tell jQuery not to process the data
        contentType: false,  // tell jQuery not to set contentType
