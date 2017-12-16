@@ -737,6 +737,7 @@ function addTomap() {   //ADD zones and bathymetry to map
        type : 'GET',
        url : point_api,
        data : formData,
+       dataType: 'json',
        processData: false,  // tell jQuery not to process the data
        contentType: false,  // tell jQuery not to set contentType
        cache: false,
