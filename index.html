@@ -743,7 +743,7 @@ function addTomap() {   //ADD zones and bathymetry to map
        success : function(response) {
           if(response.status) {
             // display pop-up
-            var popup = L.popup().setLatLng(latlng).setContent(response.data).openOn(map);
+            var popup = L.popup().setLatLng([parseFloat(latlng.lng), parseFloat(latlng.lat)]).setContent(response.data).openOn(map);
             console.log(response.data);
           } else{
             alert(response.msg);
