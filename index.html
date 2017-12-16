@@ -742,7 +742,8 @@ function addTomap() {   //ADD zones and bathymetry to map
        cache: false,
        success : function(response) {
           if(response.status) {
-            // display response
+            // display pop-up
+            var popup = L.popup().setLatLng(latlng).setContent(response.data).openOn(map);
             console.log(response.data);
           } else{
             alert(response.msg);
