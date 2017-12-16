@@ -596,6 +596,11 @@
               console.log(geoJson_sub);
               user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}
 
+               // map point API
+              user_layer_map.on('click', function(e) {
+                pointData(e.latlng);
+              });
+
             }).addTo(map);
 
             // add user added zones
@@ -750,10 +755,6 @@ function addTomap() {   //ADD zones and bathymetry to map
        },
     });
   }
- // map point API
-user_layer_map.on('click', function(e) {
-    pointData(e.latlng);
-  });
 
 function addControlPlaceholders(map) {
 	var corners = map._controlCorners,
