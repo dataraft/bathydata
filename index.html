@@ -725,18 +725,18 @@ function addTomap() {   //ADD zones and bathymetry to map
     
     if (data==undefined) {
       alert('Please select a data type.');
+      return;
     }
 
     // subscribed zone check
 
-    var formData = new FormData();
-    formData.append('data', data)
-    formData.append('point', point)
-
     $.ajax({
        type : 'GET',
        url : point_api,
-       data : formData,
+       data : {
+         'data': data,
+         'point': point,
+       },
        dataType: 'json',
        processData: false,  // tell jQuery not to process the data
        contentType: false,  // tell jQuery not to set contentType
@@ -749,7 +749,7 @@ function addTomap() {   //ADD zones and bathymetry to map
             alert(response.msg);
           }
        },
-       error : function(response) {
+       error : function(xhr) {
          alert('Server is down. Please try after sometime.');
        },
     });
