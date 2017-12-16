@@ -751,7 +751,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     });
   }
  // map point API
-  map.on('click', function(e) {
+ satellitelayer.on('click', function(e) {
     pointData(e.latlng);
   });
 
