@@ -351,6 +351,7 @@
         var login_api = host+'/download/login/?email=';
         var signup_api = host+'/download/signup/?email=';
         var price_api = host+'/download/price/?';
+        var point_api = host+'/download/point/?';
         var order_api = host+'/download/order/?';
         var logout_api = host+'/download/logout/';
         var upload_api = host+'/download/upload/';
@@ -717,6 +718,45 @@ function addTomap() {   //ADD zones and bathymetry to map
 		var atags = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
 	 atags.forEach(function (a) {a.remove();})
  }
+
+  function pointData(latlong) {
+    var data = $('#sel-data-type')[0].value;
+    var point = JSON.stringify({'type': 'Point', 'coordinates': [parseFloat(latlong.long), parseFloat(latlong.lat)]})
+    
+    if (data==undefined) {
+      alert('Please select a data type.');
+    }
+
+    // subscribed zone check
+
+    var formData = new FormData();
+    formData.append('data', data)
+    formData.append('point', point)
+
+    $.ajax({
+       type : 'GET',
+       url : point_api,
+       data : formData,
+       processData: false,  // tell jQuery not to process the data
+       contentType: false,  // tell jQuery not to set contentType
+       cache: false,
+       success : function(response) {
+          if(response.status) {
+            // display response
+            console.log(response.data);
+          } else{
+            alert(response.msg);
+          }
+       },
+       error : function(response) {
+         alert('Server is down. Please try after sometime.');
+       },
+    });
+  }
+ // map point API
+  map.on('click', function(e) {
+    pointData(e.latlng);
+  });
 
 function addControlPlaceholders(map) {
 	var corners = map._controlCorners,
