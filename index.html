@@ -749,6 +749,10 @@ function addTomap() {   //ADD zones and bathymetry to map
                 content = 'wave-height: '+response.data[0].param;
               } else if(data=='bathymetry') {
                 content = 'depth: '+response.data[0].param;
+              } else if(data=='wavedirection') {
+                content = 'wave-direction: '+response.data[0].param;
+              } else if(wave=='waveperiod') {
+                content = 'wave-period: '+response.data[0].param;
               }
               var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(content).openOn(map);
             }
