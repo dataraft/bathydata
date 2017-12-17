@@ -743,7 +743,15 @@ function addTomap() {   //ADD zones and bathymetry to map
        success : function(response) {
           if(response.status) {
             // display pop-up
-            var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(JSON.stringify(response.data)).openOn(map);
+            if (response.data) {
+              var content = '';
+              if (data=='wave') {
+                content = 'wave-height: '+response.data[0].param;
+              } else if(data=='bathymetry') {
+                content = 'depth: '+response.data[0].param;
+              }
+              var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(content).openOn(map);
+            }
             console.log(response.data);
           } else{
             alert(response.msg);
