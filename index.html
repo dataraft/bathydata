@@ -714,7 +714,7 @@ function addTomap() {   //ADD zones and bathymetry to map
  var satellitelayer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
 
  satellitelayer.on('ready', updateAttribution);
- satellitelayer.on('mousemove', latlngDisplay);
+ map.on('mousemove', latlngDisplay);
 
  function updateAttribution() {
  	var credits = L.control.attribution({prefix:false}).addTo(map);
