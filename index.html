@@ -266,6 +266,7 @@
   </div>
 
 	<div id='map' style='position:absolute; top:0; bottom:0; width: 100%;'></div>
+  <pre id='latlng-display'></pre>
 	<div style="position: absolute; top:64px;left:0px; width:20vw;  z-index: 100">
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
@@ -713,6 +714,7 @@ function addTomap() {   //ADD zones and bathymetry to map
  var satellitelayer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
 
  satellitelayer.on('ready', updateAttribution);
+ satellitelayer.on('mousemove', latlngDisplay);
 
  function updateAttribution() {
  	var credits = L.control.attribution({prefix:false}).addTo(map);
@@ -720,6 +722,10 @@ function addTomap() {   //ADD zones and bathymetry to map
 
 		var atags = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
 	 atags.forEach(function (a) {a.remove();})
+ }
+
+ function latlngDisplay(e) {
+   document.getElementById('latlng-display').innerHTML = 'latitude'+e.lat+', longitude'+e.lng
  }
 
   function pointData(latlng) {
