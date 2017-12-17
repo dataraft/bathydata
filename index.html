@@ -725,7 +725,7 @@ function addTomap() {   //ADD zones and bathymetry to map
  }
 
  function latlngDisplay(e) {
-   document.getElementById('latlng-display').innerHTML = 'lat: '+Math.round(parseFloat(e.latlng.lat), 4)+', lng: '+Math.round(parseFloat(e.latlng.lng), 4);
+   document.getElementById('latlng-display').innerHTML = 'lat: '+Math.round(parseFloat(e.latlng.lat)).toFixed(4)+', lng: '+Math.round(parseFloat(e.latlng.lng)).toFixed(4);
  }
 
   function pointData(latlng) {
