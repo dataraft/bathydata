@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head >
-	<meta charset=utf-8 />
+	<meta charset="utf-8" />
   <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
 
@@ -42,8 +42,9 @@
       <!-- <span> Oceanographic Database</span> -->    
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="#faq" class=" modal-trigger" > FAQ </a></li>
-        <li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" > Subscription </a></li>
-        <li><a href="#contact" class=" modal-trigger" > Contact </a></li>
+        <!--<li><a href="#pricing"   class=" modal-trigger" onclick="pricing()" > Subscription </a></li>-->
+        <li><a href="#upload" class=" modal-trigger" > Upload Data </a></li>
+        <li><a href="#contact" class=" modal-trigger" > Contact Us </a></li>
         <li><a href="#aboutus" class=" modal-trigger" > About Us </a></li>
         <!--<li><a href="#"  > <button type="button" data-target="select-area" class="btn modal-trigger">Select-Area </button></a></li>-->
         <li><a href="#login" id="login-btn"   class=" modal-trigger"><button type="button" class="btn"> Login </button> </a></li>
@@ -91,6 +92,16 @@
         
           
       <a href="#!" class="modal-action modal-close waves-effect waves-green btn " onclick="register()"> Register </a>
+    </div>
+  </div>
+  <div id="upload" class="modal">
+    <div style="text-align: center;color:#004165 !important; font-family: 'Trocchi', serif; font-size: 25px; font-weight: normal; line-height: 48px; margin: 0; "> Upload Data </div>
+    <div style="max-width: 50%;padding-left:10%">
+      <form id='upload-form'>
+        CSV:  <input id="csv-file" type="file" name='csv-file' accept=".csv"/><br/><br/>
+        Name: <input id="zone-name" type="text" name='name'/><br/><br/>
+      <button type="button" class="btn" onclick="uploadData()"> Upload </button><br/><br/>
+      </form>
     </div>
   </div>
   <div id="faq" class="modal">
@@ -255,11 +266,19 @@
   </div>
 
 	<div id='map' style='position:absolute; top:0; bottom:0; width: 100%;'></div>
+  <pre id='latlng-display'></pre>
 	<div style="position: absolute; top:64px;left:0px; width:20vw;  z-index: 100">
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
 	      <div class="collapsible-header active">1. Choose Data type </div>
-	      <div class="collapsible-body" id="div-sel-data"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6"><select  id="sel-data-type"> <option value="wave" selected >Wave</option> <!-- <option value="Time period">Time Period </option> <option value="Tide"> Tide </option> --> <option value="bathymetry">Bathymetry </option>	 </select>  </div>
+	      <div class="collapsible-body" id="div-sel-data"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6">
+          <select  id="sel-data-type">
+            <option value="wave" selected >Wave</option>
+            <option value="wavedirection">Wave Direction</option>
+            <option value="waveperiod">Wave Period</option>
+            <option value="bathymetry">Bathymetry </option>
+          </select>
+        </div>
 	      <div id="dates">
           <label for="datefrom">From</label>
 	      <input type="date" id="datefrom" class="datepicker col s6 m2"> 
@@ -282,7 +301,7 @@
 	    </li>
 	    <li>
 	      <div class="collapsible-header">2. Select your area</div>
-	      <div class="collapsible-body"><span> <p> Draw a polygon in the colored regions </p> <button class="btn" id="draw"> Draw</button> <!-- <button id="edit"> Edit </button> --> <div id='calculated-area'></div></span> </div>
+	      <div class="collapsible-body"><span> <p> Draw a polygon in a subscribed(green) zone. </p> <button class="btn" id="draw"> Draw</button> <!-- <button id="edit"> Edit </button> --> <div id='calculated-area'></div></span> </div>
 	    </li>
 	    <li>
 	      <div class="collapsible-header">3. Download </div>
@@ -307,15 +326,18 @@
      <div  class="legend-box">
      			<figure class="map-leg-d-1" style="color:#cecccc"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> zones </span> </br>
         <figure class="map-leg-d-1" style="color:#00ff00"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
-        <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd data </span> </br>
+        <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd bathymetry </span> </br>
+        <figure class="map-leg-d-1" style="color:#0000ff"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> user bathymetry </span> </br>
     </div>
 
 
 	<script>
 
         //****************************************************Global varaibles*************************************************//
-        var host  = 'http://ocean.dataraft.in';
-        var zone; //zones the user needs to update
+        var protocol = location.protocol;
+	var slashes = protocol.concat("//");
+	var host = slashes.concat(window.location.hostname);
+	var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
         var zone_boundary; // the overall boundary latlongs of all zones
@@ -330,13 +352,15 @@
         var login_api = host+'/download/login/?email=';
         var signup_api = host+'/download/signup/?email=';
         var price_api = host+'/download/price/?';
+        var point_api = host+'/download/point/?';
         var order_api = host+'/download/order/?';
         var logout_api = host+'/download/logout/';
+        var upload_api = host+'/download/upload/';
         var user_details;
         var login_flag = false;
         var data_type = 'wave';
         var user_layer= []; //users selected zone boundary latlongs
-       // var user_layer_map;   //layer added to map of user_layer
+        var user_layer_map;   //layer added to map of user_layer
         var geoJson_sub;                      
         var intersect = false;
                                   //map related//
@@ -556,8 +580,12 @@
             var zones = zone_boundary;
             var index = [];
             user_layer = [];
-            if(login_flag){
+            userzone_layer = [];
+
+          if(login_flag){
               console.log('went in');
+
+            // add subscribed zones
             var zids = user_details.subscription_zones;   
             for(var i=0;i<zids.length;i++) {
                 var ind = zones.findIndex(x => x.properties.zid == zids[i]);
@@ -566,11 +594,26 @@
                 console.log(user_layer);
             }         
               geoJson_sub = {type:"FeatureCollection", features:user_layer};
-                console.log(geoJson_sub);
-               var  user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}
+              console.log(geoJson_sub);
+              user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}}).addTo(map);
 
-            }).addTo(map);
+              // map point API
+              user_layer_map.on('click', function(e) {
+                pointData(e.latlng);
+              });
+
+            // add user added zones
+            var userzones = user_details.userzones;
+            for(var i=0;i<userzones.length;i++) {
+              var z = {};
+              z.geometry = userzones[i][1];
+              z.type = 'Feature';
+              z.properties = {'uzid': userzones[i][0]};
+              userzone_layer.push(z);
             }
+            var userzone_layer_map = L.mapbox.featureLayer({type: "FeatureCollection", features: userzone_layer}, {style: function() {return {color: "#0000ff",weight: 3,fillOpacity:0.05};}}).addTo(map);
+
+          }
         };
 // login js
     $('.message a').click(function(){
@@ -617,7 +660,7 @@ register = function(){
         if(this.readyState == 4 && this.status==200) {
           var r = JSON.parse(client.responseText);
           console.log(r.status);
-          if(r.status) { alert('Your registration is successful. Please Login.'); login_form_reset(); }
+          if(r.status) { alert('Your registration is successful. You will get an email once we activate your account.'); login_form_reset(); }
           else { alert(r.msg); }
         }
         else if(this.readyState ==4 && this.status==500){
@@ -673,6 +716,7 @@ function addTomap() {   //ADD zones and bathymetry to map
  var satellitelayer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
 
  satellitelayer.on('ready', updateAttribution);
+ map.on('mousemove', latlngDisplay);
 
  function updateAttribution() {
  	var credits = L.control.attribution({prefix:false}).addTo(map);
@@ -681,6 +725,55 @@ function addTomap() {   //ADD zones and bathymetry to map
 		var atags = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
 	 atags.forEach(function (a) {a.remove();})
  }
+
+ function latlngDisplay(e) {
+   document.getElementById('latlng-display').innerHTML = 'lat: '+parseFloat(e.latlng.lat).toFixed(4)+', lng: '+parseFloat(e.latlng.lng).toFixed(4);
+ }
+
+  function pointData(latlng) {
+    var data = $('#sel-data-type')[0].value;
+    var point = JSON.stringify({'type': 'Point', 'coordinates': [parseFloat(latlng.lng), parseFloat(latlng.lat)]});
+    console.log(point);
+
+    if (data==undefined) {
+      alert('Please select a data type.');
+      return;
+    }
+
+    // subscribed zone check
+
+    $.ajax({
+       type : 'GET',
+       url : point_api,
+       data : {'data': data, 'point': point},
+       dataType: 'json',
+       cache: false,
+       success : function(response) {
+          if(response.status) {
+            // display pop-up
+            if (response.data) {
+              var content = '';
+              if (data=='wave') {
+                content = 'wave-height: '+response.data[0].param;
+              } else if(data=='bathymetry') {
+                content = 'depth: '+response.data[0].param;
+              } else if(data=='wavedirection') {
+                content = 'wave-direction: '+response.data[0].param;
+              } else if(data=='waveperiod') {
+                content = 'wave-period: '+response.data[0].param;
+              }
+              var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(content).openOn(map);
+            }
+            console.log(response.data);
+          } else{
+            alert(response.msg);
+          }
+       },
+       error : function(xhr) {
+         alert('Server is down. Please try after sometime.');
+       },
+    });
+  }
 
 function addControlPlaceholders(map) {
 	var corners = map._controlCorners,
@@ -818,14 +911,16 @@ getprice = function(layer) {
         var answer = document.getElementById('calculated-area');
         answer.innerHTML = '<p><strong>' + area + 'kms<sup>2</sup> </strong></p>';
         datatype = $('#sel-data-type').val();
-        datefrom = document.getElementById('datefrom').value;
-        dateto = document.getElementById('dateto').value;
-        console.log(datatype);
-        console.log(datefrom + '&' + dateto);
-       if(!isNaN(datefrom)) return;
-        if(!isNaN(dateto)) return;
-        datefrom = new Date(datefrom).toISOString();
-        dateto = new Date(dateto).toISOString();
+        if (datatype != 'bathymetry') {
+          datefrom = document.getElementById('datefrom').value;
+          dateto = document.getElementById('dateto').value;
+          console.log(datatype);
+          console.log(datefrom + '&' + dateto);
+         if(!isNaN(datefrom)) return;
+          if(!isNaN(dateto)) return;
+          datefrom = new Date(datefrom).toISOString();
+          dateto = new Date(dateto).toISOString();
+        }
 
         
         request.open(method,price_api+'data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
@@ -889,7 +984,7 @@ orderButton.onclick = function(){
 		var	data = JSON.parse(request.responseText);
 			console.log(data,status);
             if(data.status){
-                alert('Thank you. your order has been placed. A mail with the download link has been sent to '+user_details.email);
+                alert('Thank you. your order has been placed. A mail with the download link will be sent to '+user_details.email);
                 form_reset();
             }
             else {
@@ -907,6 +1002,37 @@ else {
 }
 };
 
+/// ################## UPLOAD DATA ######################
+uploadData =  function() {
+  var csv = document.getElementById('csv-file').files[0];
+  var name = document.getElementById('zone-name').value;
+  if (csv==undefined || name.trim()==undefined) {
+    alert('Please fill all the fields.');
+    return;
+  }
+  if (csv.name.indexOf('.csv') === -1) {
+    alert('Please upload a .csv file.');
+    return;
+  }
+
+  var formData = new FormData($('#upload-form')[0]);
+  
+  $.ajax({
+     type : 'POST',
+     enctype: 'multipart/form-data',
+     url : upload_api,
+     data : formData,
+     processData: false,  // tell jQuery not to process the data
+     contentType: false,  // tell jQuery not to set contentType
+     cache: false,
+     success : function(response) {
+         console.log(response);
+         alert(response);
+     },
+  });
+
+
+};
 
  
 
