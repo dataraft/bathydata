@@ -423,10 +423,16 @@
         boundary_client.onreadystatechange = function(){
             if(boundary_client.readyState==4 && boundary_client.status==200){
             boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
+            for (var i=0; i<boundary_latlngs.length; i++) {
+              boundary_latlngs[i] = {'type':'Feature', 'properties':{'zid':boundary_latlngs[i].zid, 'name':boundary_latlngs[i].name}, 'geometry':boundary_latlngs[i].polygon};
+            }
             // boundary_latlngs_zones = seperate_hd(boundary_latlngs);
             // console.log(boundary_latlngs_zones);
             zone_boundary = boundary_latlngs;
             bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
+            for (var i=0; i<bathymetry_zones.length; i++) {
+              bathymetry_zones[i] = {'type':'Feature', 'properties':{'zid':bathymetry_zones[i].zid, 'name':bathymetry_zones[i].name}, 'geometry':bathymetry_zones[i].polygon};
+            }
             // var boundary_polygon = [];
             // for(i=0;i<boundary_latlngs.length;i++){
             //     boundary_latlngs[i].geometry.coordinates[0].splice(-1,1);
