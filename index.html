@@ -356,6 +356,7 @@
         var bathymetry_triangles = []; // color coding features
         var user_zones_layer;
         var user_zones = []; // user zone features
+        var triangulation_layer;
 
         var pricing_flag ;
         var inputs_register ;
@@ -718,6 +719,8 @@ function addTomap() {   //ADD zones and bathymetry to map
             }).addTo(map,true);
 
     bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
+
+    triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: function() {return {color: " #cecccc",weight: 1,fillOpacity:0};}}).addTo(map,true);
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
@@ -728,7 +731,7 @@ function addTomap() {   //ADD zones and bathymetry to map
 
  function updateAttribution() {
  	var credits = L.control.attribution({prefix:false}).addTo(map);
-		credits.addAttribution('&copy; Dataraft Technologies Pvt. Ltd.');
+		credits.addAttribution('&copy; Shatej Technologies');
 
 		var atags = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
 	 atags.forEach(function (a) {a.remove();})
