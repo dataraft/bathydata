@@ -443,7 +443,7 @@
               // triangle features
               if (bathymetry_zones[i].triangles.length) {
                 bathymetry_zones[i].triangles.forEach(function (t) {
-                  bathymetry_triangles.push({'type':'Feature', 'geometry': t})
+                  bathymetry_triangles.push({'type':'Feature', 'geometry': {'type': 'Polygon': 'coordinates': [t]}});
                 });
             }
 
