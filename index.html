@@ -350,7 +350,7 @@
         var boundary_layer;
         var boundary_zones = []; // boundary zone features
         var boundary_triangles = []; // color coding features
-        var subscribed_layer;
+        var subscribed_layer
         var bathymetry_layer;
         var bathymetry_zones = []; // bathymetry zone features
         var bathymetry_triangles = []; // color coding features
@@ -439,6 +439,13 @@
             
             bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
             for (var i=0; i<bathymetry_zones.length; i++) {
+              // triangle features
+              if (bathymetry_zones[i].triangles.length) {
+                bathymetry_zones[i].triangles.forEach(function (t) {
+                  bathymetry_triangles.push({'type':'Feature', 'geometry': t})
+                });
+            }
+
               bathymetry_zones[i] = {'type':'Feature', 'properties':{'zid':bathymetry_zones[i].zid, 'name':bathymetry_zones[i].name}, 'geometry':bathymetry_zones[i].polygon};
             }
             
