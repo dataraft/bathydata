@@ -339,19 +339,29 @@
 
         //****************************************************Global varaibles*************************************************//
         var protocol = location.protocol;
-	var slashes = protocol.concat("//");
-	var host = slashes.concat(window.location.hostname);
-	var zone; //zones the user needs to update
+	      var slashes = protocol.concat("//");
+	      var host = slashes.concat(window.location.hostname);
+	      
+        var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
-        var zone_boundary; // the overall boundary latlongs of all zones
-        var bathymetry_zones; // bathymetry zones
+        
+        var satellite_layer; // tiles
+        var boundary_layer;
+        var boundary_zones = []; // boundary zone features
+        var boundary_triangles = []; // color coding features
+        var subscribed_layer;
+        var bathymetry_layer;
+        var bathymetry_zones = []; // bathymetry zone features
+        var bathymetry_triangles = []; // color coding features
+        var user_zones_layer;
+        var user_zones = []; // user zone features
+
         var pricing_flag ;
         var inputs_register ;
         var plan_variable; //plan a or b
         var maps = {};
-        var boundary_layer;
-        var geoJson
+        
         var session_api = host+'/download/login/';
         var login_api = host+'/download/login/?email=';
         var signup_api = host+'/download/signup/?email=';
@@ -363,14 +373,9 @@
         var user_details;
         var login_flag = false;
         var data_type = 'wave';
-        var user_layer= []; //users selected zone boundary latlongs
-        var user_layer_map;   //layer added to map of user_layer
-        var geoJson_sub;                      
         var intersect = false;
-                                  //map related//
-
-        var boundary_latlngs = [];
-        var boundary_latlngs_zones = [];
+        
+        // map related //
         var heatmap_data;
         var method = "GET";
         var async = true;
@@ -426,25 +431,19 @@
         boundary_client.setRequestHeader("Content-type","application/json;charset=UTF-8");
         boundary_client.onreadystatechange = function(){
             if(boundary_client.readyState==4 && boundary_client.status==200){
-            boundary_latlngs = JSON.parse(boundary_client.responseText).zones;
-            for (var i=0; i<boundary_latlngs.length; i++) {
-              boundary_latlngs[i] = {'type':'Feature', 'properties':{'zid':boundary_latlngs[i].zid, 'name':boundary_latlngs[i].name}, 'geometry':boundary_latlngs[i].polygon};
+            boundary_zones = JSON.parse(boundary_client.responseText).zones;
+            // feature format
+            for (var i=0; i<boundary_zones.length; i++) {
+              boundary_zones[i] = {'type':'Feature', 'properties':{'zid':boundary_zones[i].zid, 'name':boundary_zones[i].name}, 'geometry':boundary_zones[i].polygon};
             }
-            // boundary_latlngs_zones = seperate_hd(boundary_latlngs);
-            // console.log(boundary_latlngs_zones);
-            zone_boundary = boundary_latlngs;
+            
             bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
             for (var i=0; i<bathymetry_zones.length; i++) {
               bathymetry_zones[i] = {'type':'Feature', 'properties':{'zid':bathymetry_zones[i].zid, 'name':bathymetry_zones[i].name}, 'geometry':bathymetry_zones[i].polygon};
             }
-            // var boundary_polygon = [];
-            // for(i=0;i<boundary_latlngs.length;i++){
-            //     boundary_latlngs[i].geometry.coordinates[0].splice(-1,1);
-            // }
-            geoJson = {type:"FeatureCollection", features:boundary_latlngs};
-            console.log(geoJson);
-             boundary_layer = L.mapbox.featureLayer(geoJson).addTo(maps.map2)
-             boundary_layer.eachLayer(function(layer){
+            
+            boundary_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:boundary_zones}).addTo(maps.map2)
+            boundary_layer.eachLayer(function(layer){
                 console.log(layer.feature.properties);
                 zone_local.push(layer.feature.properties);
                 console.log(zone_local);
@@ -586,42 +585,34 @@
         }
 
         function load_zones() {
-            var load_layer;
-            var zones = zone_boundary;
-            var index = [];
-            user_layer = [];
-            userzone_layer = [];
-
+          var subscribed_zones = [];
+            
           if(login_flag){
               console.log('went in');
 
-            // add subscribed zones
+            // add subscribed layer
             var zids = user_details.subscription_zones;   
             for(var i=0;i<zids.length;i++) {
-                var ind = zones.findIndex(x => x.properties.zid == zids[i]);
-                index.push(ind);
-                user_layer.push(zones[ind]);
-                console.log(user_layer);
+                var ind = boundary_zones.findIndex(x => x.properties.zid == zids[i]);
+                subscribed_zones.push(boundary_zones[ind]);
             }         
-              geoJson_sub = {type:"FeatureCollection", features:user_layer};
-              console.log(geoJson_sub);
-              user_layer_map = L.mapbox.featureLayer(geoJson_sub,{style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}}).addTo(map);
+              subscribed_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: subscribed_zones}, {style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}}).addTo(map);
 
               // map point API
-              user_layer_map.on('click', function(e) {
+              subscribed_layer.on('click', function(e) {
                 pointData(e.latlng);
               });
 
-            // add user added zones
+            // add user zones layer
             var userzones = user_details.userzones;
             for(var i=0;i<userzones.length;i++) {
               var z = {};
               z.geometry = userzones[i][1];
               z.type = 'Feature';
               z.properties = {'uzid': userzones[i][0]};
-              userzone_layer.push(z);
+              user_zones.push(z);
             }
-            var userzone_layer_map = L.mapbox.featureLayer({type: "FeatureCollection", features: userzone_layer}, {style: function() {return {color: "#0000ff",weight: 3,fillOpacity:0.05};}}).addTo(map);
+            user_zones_layer = L.mapbox.featureLayer({type: "FeatureCollection", features: user_zones}, {style: function() {return {color: "#0000ff",weight: 3,fillOpacity:0.05};}}).addTo(map);
 
           }
         };
@@ -716,16 +707,16 @@ function login_flip() {
 //****************************************************       map           **************************************//
 
 function addTomap() {   //ADD zones and bathymetry to map
-    var layer_zones = L.mapbox.featureLayer(geoJson,{style: function() {return {color: " #cecccc",weight: 3,fillOpacity:0.05};}
+    boundary_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:boundary_zones}, {style: function() {return {color: " #cecccc",weight: 3,fillOpacity:0.05};}
             }).addTo(map,true);
 
-    var bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones},{style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
+    bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
- var satellitelayer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
+ satellite_layer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
 
- satellitelayer.on('ready', updateAttribution);
+ satellite_layer.on('ready', updateAttribution);
  map.on('mousemove', latlngDisplay);
 
  function updateAttribution() {
@@ -954,7 +945,7 @@ getprice = function(layer) {
 };
 
 check_intersect = function() {
-    var zone_cords = geoJson_to_poly(boundary_latlngs);
+    var zone_cords = geoJson_to_poly(boundary_zones);
     intersect = false;
     var draw =  turf.polygon(geo_json_data['coordinates']);
     var l=0;
@@ -970,7 +961,7 @@ check_intersect = function() {
   if(index.length==0) { alert('Please draw your polygon within your subscribed zone.'); }
   else if(index.length>1) { alert('Please draw your polygon within a single zone.'); intersect=true;  }
   else {
-    var zone_id = boundary_latlngs[index[0]].properties.zid ;
+    var zone_id = boundary_zones[index[0]].properties.zid ;
     var index = user_details.subscription_zones.findIndex(x=> x == zone_id);
     if(index==-1) { alert('Please draw your polygon within your subscribed zone'); intersect=true; };
   }
