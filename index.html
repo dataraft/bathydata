@@ -720,11 +720,11 @@ function addTomap() {   //ADD zones and bathymetry to map
     boundary_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:boundary_zones}, {style: function() {return {color: " #cecccc",weight: 3,fillOpacity:0.05};}
             }).addTo(map,true);
 
-    bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
-
     if (bathymetry_triangles.length) {
       triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: bathymetry_Style}).addTo(map,true);
     }
+
+    bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
@@ -1038,8 +1038,8 @@ function bathymetry_Style (feature) {
     return {
       fillColor: getColor(feature.properties.depth),
       color: " #cecccc",
-      weight: 1,
-      fillOpacity:.7
+      weight: 0,
+      fillOpacity:0.7
     };
 }
 
