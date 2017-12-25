@@ -441,7 +441,7 @@
             bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
             for (var i=0; i<bathymetry_zones.length; i++) {
               // triangle features
-              if (bathymetry_zones[i].triangles.length) {
+              if (bathymetry_zones[i].triangles && bathymetry_zones[i].triangles.length) {
                 bathymetry_zones[i].triangles.forEach(function (t) {
                   bathymetry_triangles.push({'type':'Feature', 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
                 });
