@@ -341,8 +341,8 @@
         var protocol = location.protocol;
 
 	      var slashes = protocol.concat("//");
-	      var host = slashes.concat(window.location.hostname);
-	      
+	      //var host = slashes.concat(window.location.hostname);
+	      var host = 'http://10.24.1.151';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
@@ -354,10 +354,10 @@
         var subscribed_layer
         var bathymetry_layer;
         var bathymetry_zones = []; // bathymetry zone features
-        var bathymetry_triangles = []; // color coding features
+        var bathymetry_triangles = []; // color coding features  //All triangles 
         var user_zones_layer;
         var user_zones = []; // user zone features
-        var triangulation_layer;
+        var triangulation_layer;    
 
         var pricing_flag ;
         var inputs_register ;
@@ -439,12 +439,13 @@
               boundary_zones[i] = {'type':'Feature', 'properties':{'zid':boundary_zones[i].zid, 'name':boundary_zones[i].name}, 'geometry':boundary_zones[i].polygon};
             }
             
+            //bathymetry zones 
             bathymetry_zones = JSON.parse(boundary_client.responseText).bathymetry;
             for (var i=0; i<bathymetry_zones.length; i++) {
               // triangle features
               if (bathymetry_zones[i].triangles && bathymetry_zones[i].triangles.length) {
                 bathymetry_zones[i].triangles.forEach(function (t) {
-                  bathymetry_triangles.push({'type':'Feature', 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
+                  bathymetry_triangles.push({'type':'Feature','properties':{'depth':t[1]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
                 });
             }
 
@@ -722,7 +723,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 
     if (bathymetry_triangles.length) {
-      triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: function() {return {color: " #cecccc",weight: 1,fillOpacity:0};}}).addTo(map,true);
+      triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: bathymetry_Style}).addTo(map,true);
     }
 }
 
@@ -1015,6 +1016,32 @@ else {
 	alert("Use the draw tools to draw a polygon!");
 }
 };
+
+// *******************************************************************************************//
+
+//*******************************************************Bathymetry****************************************//
+
+function getColor (d) {
+
+  return d > 8 ? '#800026' :
+           d > 7  ? '#BD0026' :
+           d > 5  ? '#E31A1C' :
+           d > 4  ? '#FC4E2A' :
+           d > 3   ? '#FD8D3C' :
+           d > 1   ? '#FEB24C' :
+           d > 0  ? '#FED976' :
+                      '#FFEDA0';
+}
+
+function bathymetry_Style (feature) {
+  
+    return {
+      fillColor: getColor(feature.properties.depth),
+      color: " #cecccc",
+      weight: 1,
+      fillOpacity:.7
+    };
+}
 
 /// ################## UPLOAD DATA ######################
 uploadData =  function() {
