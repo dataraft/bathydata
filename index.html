@@ -356,6 +356,7 @@
         var boundary_layer;
         var boundary_zones = []; // boundary zone features
         var boundary_triangles = []; // color coding features
+        var shoreline_json = [];
         var subscribed_layer
         var bathymetry_layer;
         var shoreline_layer;  // all shorelines 
@@ -501,8 +502,17 @@
         
         var shoreline_client = new XMLHttpRequest();
         shoreline_client.open('GET',shoreline_api+'2017',async);
-
-        shoreline_layer = L.mapbox.featureLayer
+        shoreline_json.push( {"type": "Feature",
+           "geometry": {
+               "type": "LineString",
+               "coordinates": [
+                   [102.0, 0.0],
+                   [103.0, 1.0],
+                   [104.0, 0.0],
+                   [105.0, 1.0]
+               ]
+           }} )
+        shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
 
         shoreline_client.send();
   //***************************************************************jquery document.ready initializations*******************//      
@@ -1132,6 +1142,37 @@ uploadData =  function() {
 
   function timestamp(str){
     return new Date(str).getTime();   
+}
+
+function formatDate ( date ) {
+    return weekdays[date.getDay()] + ", " +
+        date.getDate() + nth(date.getDate()) + " " +
+        months[date.getMonth()] + " " +
+        date.getFullYear();
+}
+var
+  weekdays = [
+    "Sunday", "Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday",
+    "Saturday"
+  ],
+  months = [
+    "January", "February", "March",
+    "April", "May", "June", "July",
+    "August", "September", "October",
+    "November", "December"
+  ];
+
+// Append a suffix to dates.
+// Example: 23 => 23rd, 1 => 1st.
+function nth (d) {
+  if(d>3 && d<21) return 'th';
+  switch (d % 10) {
+        case 1:  return "st";
+        case 2:  return "nd";
+        case 3:  return "rd";
+        default: return "th";
+    }
 }
 
 var dateValues = [
