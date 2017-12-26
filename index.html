@@ -512,8 +512,11 @@
                    [105.0, 1.0]
                ]
            }} )
-        shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
-
+        shoreline_client.onreadystatechange = function() {
+          if(shoreline_client.readyState==4 && shoreline_client.status==200){
+            shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
+          }
+        }
         shoreline_client.send();
   //***************************************************************jquery document.ready initializations*******************//      
     	$(document).ready(function() {
