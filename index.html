@@ -376,7 +376,11 @@
         var login_flag = false;
         var data_type = 'wave';
         var intersect = false;
-        
+        var dates;      //datatype.from_date/to_date
+        var d_chose_from = '2017-10-10';
+        var d_chose_to = '2017-12-25';
+
+
         // map related //
         var heatmap_data;
         var method = "GET";
@@ -386,11 +390,13 @@
         var email;
         var organisation;
         var geo_json_data = {}; //user drawn coordinates jeojson
-        var calcButton = document.getElementById('calculate');
-        var datefrom;
+        var calcButton = document.getElementById('calculate');   
+        var datefrom;   
         var dateto;
         var polygon_check = false;
         var map;
+
+        
         //*********************************************Loading Map2**********************************************//
         session_call = function(url,val){
             console.log(val + url);
@@ -400,9 +406,10 @@
             if(this.readyState == 4 && this.status==200){
             if(response.status){
                 user_details = response.data;
+                dates = user_details.dates;
                 console.log(user_details);
                        login_flag = true;
-            login_flip();
+            login_flip(); 
             load_zones();   
             if(val==1) {
             $('#login').modal('close');
@@ -555,8 +562,19 @@
             var el = document.getElementById('dates');
             if(data_type=='bathymetry') { el.style.display = 'none'}
                 else el.style.display='';
+              //console.log(dates);
+            if(dates) 
+              change_dates();
             
         });
+        change_dates = function(){
+          console.log('changing dates');
+          d_chose_from = dates['data_type'].from_date;
+          d_chose_to =   dates['data_type'].to_date;
+          picker.set('min', new Date(d_chose_from));
+          picker.set('max',new Date(d_chose_to));
+
+        }
         plan_option = function(val){
             plan_variable = val;
             $('#planid').empty().html('You have chosen Plan'+val);
@@ -630,16 +648,23 @@
     $('.message a').click(function(){
        $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
     });
-    $('.datepicker').pickadate({
-      min: new Date(2017,10,10),
-      max: new Date(2017,12,17),
+
+    var $input = $('.datepicker').pickadate({
+      min: new Date(d_chose_from),
+      max: new Date(d_chose_to),
       selectMonths: true, // Creates a dropdown to control month
       //selectYears: 15, // Creates a dropdown of 15 years to control year,
       today: 'Today',
       clear: 'Clear',
       close: 'Ok',
-      closeOnSelect: false // Close upon selecting a date
+      closeOnSelect: false, // Close upon selecting a date
+      onClose: function(){
+        console.log('caleder closed');
+        $('.picker').blur();
+        $('.datepicker').blur();
+    }
   });
+    var picker = $input.pickadate('picker');
 
     function changeFunc($i){
         console.log($i);
