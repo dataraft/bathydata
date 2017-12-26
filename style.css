@@ -126,7 +126,7 @@ background-size: cover;
 	position: absolute; 
 	bottom:70px; 
 	width:11vw; 
-	right:16px; 
+	right:10px; 
 	z-index: 100
 }
 
@@ -148,4 +148,46 @@ background-size: cover;
 	z-index: 100000000;
 	font-size: 12px;
 	text-align: center;
+}
+
+#year-slider {
+	position: absolute;
+	top: 100px;
+	width: 10%;
+	right: 10px;
+}
+
+#year-slider-start {
+	position: absolute;
+	top: 110px;
+	right: 10px;	
+}
+/*slider styling */
+
+.noUi-connect {
+	background: #004165;
+}
+.noUi-horizontal .noUi-handle, .noUi-vertical .noUi-handle {
+	background: #004165;
+}
+.noUi-target.noUi-horizontal .noUi-tooltip {
+	background-color: #004165;
+}
+
+/**** Custom styles for Range ****/
+input[type=range]::-webkit-slider-thumb {
+  background-color: skyblue;
+}
+input[type=range]::-moz-range-thumb {
+  background-color: skyblue;
+}
+input[type=range]::-ms-thumb {
+  background-color: skyblue;
+}
+/* For the globe and the text inside */
+input[type=range] + .thumb {
+  background-color: blue;
+}
+input[type=range] + .thumb.active .value {
+  color: #fff;
 }
