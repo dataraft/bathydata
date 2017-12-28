@@ -588,14 +588,14 @@
             if(data_type=='bathymetry') { el.style.display = 'none'}
                 else el.style.display='';
               //console.log(dates);
-            if(dates) 
-              change_dates();
+            if(dates and dates[data_type]) 
+              change_dates(data_type);
             
         });
-        change_dates = function(){
+        change_dates = function(type){
           console.log('changing dates');
-          d_chose_from = dates['data_type'].from_date;
-          d_chose_to =   dates['data_type'].to_date;
+          d_chose_from = dates[type].from_date;
+          d_chose_to =   dates[type].to_date;
           picker.set('min', new Date(d_chose_from));
           picker.set('max',new Date(d_chose_to));
 
