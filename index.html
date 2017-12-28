@@ -25,7 +25,7 @@
 	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.css' rel='stylesheet' />
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
    
    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
@@ -33,8 +33,9 @@
 	<link rel="stylesheet" href="style.css" />	
     <link rel="stylesheet" href="login/style.css" />
     <link rel="stylesheet" href="pricing/style.css" />
-    <link rel="stylesheet" href="nouislider.css" />
+   
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
+
     <script type="text/javascript" src="bootstrap.min.js"></script>
      <script type="text/javascript" src="nouislider.min.js"></script>
      <script type="text/javascript" src="wNumb.js"></script>
@@ -337,9 +338,20 @@
         <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd bathymetry </span> </br>
         <figure class="map-leg-d-1" style="color:#0000ff"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> user bathymetry </span> </br>
     </div>
- <div id="year-slider"></div>
+ <div id="year-slider" ></div>
  <div id="year-slider-start"></div>  
 
+<!-- <div class="preloader-wrapper active" id="loader">
+      <div class="spinner-layer spinner-green-only">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div> -->
 	<script>
 
         //****************************************************Global varaibles*************************************************//
@@ -387,7 +399,7 @@
         var dates;      //datatype.from_date/to_date
         var d_chose_from = '2017-10-10';
         var d_chose_to = '2017-12-25';
-
+        var loader = document.getElementById('loader');
 
         // map related //
         var heatmap_data;
@@ -449,6 +461,7 @@
         boundary_client.onreadystatechange = function(){
             if(boundary_client.readyState==4 && boundary_client.status==200){
             boundary_zones = JSON.parse(boundary_client.responseText).zones;
+            console.log(boundary_zones);
             // feature format
             for (var i=0; i<boundary_zones.length; i++) {
               boundary_zones[i] = {'type':'Feature', 'properties':{'zid':boundary_zones[i].zid, 'name':boundary_zones[i].name}, 'geometry':boundary_zones[i].polygon};
@@ -502,7 +515,7 @@
         
         var shoreline_client = new XMLHttpRequest();
         shoreline_client.open('GET',shoreline_api+'2017',async);
-        shoreline_json.push( {"type": "Feature",
+        shoreline_json[0]= {"type": "Feature",
            "geometry": {
                "type": "LineString",
                "coordinates": [
@@ -511,10 +524,11 @@
                    [104.0, 0.0],
                    [105.0, 1.0]
                ]
-           }} )
-        shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
+           }};
+        
 
         shoreline_client.send();
+        //shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
   //***************************************************************jquery document.ready initializations*******************//      
     	$(document).ready(function() {
         $('select').material_select();
@@ -772,6 +786,8 @@ function addTomap() {   //ADD zones and bathymetry to map
     }
 
     bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
+
+    loader.style.display='none';
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
