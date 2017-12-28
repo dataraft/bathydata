@@ -1168,12 +1168,12 @@ uploadData =  function() {
 
  var slider = document.getElementById('year-slider');
   noUiSlider.create(slider, {
-   start: [80],
+   start: [timestamp('2017')],
    connect: true,
    step: 365*24*60*60*1000, //steps of one month
     orientation: 'horizontal', // 'horizontal' or 'vertical'
    range: {
-     'min': timestamp('2010'),
+     'min': timestamp('2010-01-10'),
      'max': timestamp('2017')
    },
    format: wNumb({
@@ -1187,8 +1187,9 @@ uploadData =  function() {
 
 function formatDate ( date ) {
     //weekdays[date.getDay()] + ", " +
-    return date.getDate() + nth(date.getDate()) + " " +
-        months[date.getMonth()] + " " +
+    // date.getDate() + nth(date.getDate()) + " " +
+    //     months[date.getMonth()] + " " +
+    return "Year "+
         date.getFullYear();
 }
 var
