@@ -504,12 +504,14 @@
         boundary_client.send();      
         
         shoreline_update = function(val){
-          var year;
+          console.log(val);
+          var year,date;
           if(val) { 
             console.log(val);
-          year = new Date(val).getFullYear();
+          date = new Date(Number(val));
+          year = date.getFullYear();
         }
-        else  year = 2010;
+        else year = 2010;
         var shoreline_client = new XMLHttpRequest();
         shoreline_client.open('GET',shoreline_api+year,async);
         shoreline_client.onreadystatechange = function(){
@@ -534,6 +536,7 @@
           }
         }
         shoreline_client.send();
+        
       }
 
       shoreline_update();
