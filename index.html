@@ -501,20 +501,20 @@
         };  
         boundary_client.send();      
         
-        shoreline_update = function(){
-          console.log('update value');
+        shoreline_update = function(val){
+          if(val) console.log(val);
+          var year = new Date(val);
+          year = year.getFullYear();
         var shoreline_client = new XMLHttpRequest();
-        shoreline_client.open('GET',shoreline_api+'2017',async);
-        shoreline_json.push( {"type": "Feature",
-           "geometry": {
-               "type": "LineString",
-               "coordinates": [
-                   [102.0, 0.0],
-                   [103.0, 1.0],
-                   [104.0, 0.0],
-                   [105.0, 1.0]
-               ]
-           }} )
+        shoreline_client.open('GET',shoreline_api+year,async);
+        shoreline_client.onreadystatechange = function(){
+          if(shoreline_client.readyState==4 && shoreline_client.status==200){
+            console.log(shoreline_client.responseText);
+          }
+          else if(shoreline_client.readyState==4&& shoreline_client.status==500) {
+            alert('Hi, the server is under maintainenace. Please retry after some time.');
+          }
+        }
         //shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
 
         shoreline_client.send();
@@ -1187,7 +1187,7 @@ var dateValues = [
 
 slider.noUiSlider.on('update',function(values,handle){
     dateValues[handle].innerHTML = formatDate(new Date(+values[handle]));
-    shoreline_update();
+    shoreline_update(slider.noUiSlider.get());
 
 });
 
