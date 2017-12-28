@@ -343,6 +343,19 @@
  <div id="year-slider"></div>
  <div id="year-slider-start"></div>  
 
+
+<div class="preloader-wrapper active" id="loader">
+      <div class="spinner-layer spinner-green-only">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+
 	<script>
 
         //****************************************************Global varaibles*************************************************//
@@ -390,7 +403,7 @@
         var dates;      //datatype.from_date/to_date
         var d_chose_from = '2017-10-10';
         var d_chose_to = '2017-12-25';
-
+        var loader = document.getElementById('loader');
 
         // map related //
         var heatmap_data;
@@ -798,6 +811,8 @@ function addTomap() {   //ADD zones and bathymetry to map
     }
 
     bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
+
+    loader.style.display='none';
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
