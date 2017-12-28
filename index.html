@@ -505,6 +505,7 @@
         shoreline_client.onreadystatechange = function() {
           if(shoreline_client.readyState==4 && shoreline_client.status==200){
             shoreline_json = JSON.parse(boundary_client.responseText).shoreline;
+            console.log('shoreline');
             console.log(shoreline_json);
             if (shoreline_json.length) {
               shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFFF00",weight: 3,fillOpacity:0.05};}}).addTo(map);
