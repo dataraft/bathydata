@@ -1170,7 +1170,7 @@ uploadData =  function() {
   noUiSlider.create(slider, {
    start: [80],
    connect: true,
-   step: 30*24*60*60*1000, //steps of one month
+   step: 365*24*60*60*1000, //steps of one month
     orientation: 'horizontal', // 'horizontal' or 'vertical'
    range: {
      'min': timestamp('2010'),
@@ -1237,9 +1237,9 @@ handle.addEventListener('keydown', function( e ) {
   var value = Number( slider.noUiSlider.get() );
 
   switch ( e.which ) {
-    case 37: slider.noUiSlider.set( value - 30*24*60*60*1000 );
+    case 37: slider.noUiSlider.set( value - 365*24*60*60*1000 );
       break;
-    case 39: slider.noUiSlider.set( value + 30*24*60*60*1000 );
+    case 39: slider.noUiSlider.set( value + 365*24*60*60*1000 );
       break;
   }
 });
