@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="login/style.css" />
     <link rel="stylesheet" href="pricing/style.css" />
     <link rel="stylesheet" href="nouislider.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
     <script type="text/javascript" src="bootstrap.min.js"></script>
      <script type="text/javascript" src="nouislider.min.js"></script>
@@ -512,7 +513,7 @@
                    [105.0, 1.0]
                ]
            }} )
-        shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
+        //shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
 
         shoreline_client.send();
   //***************************************************************jquery document.ready initializations*******************//      
@@ -1145,8 +1146,8 @@ uploadData =  function() {
 }
 
 function formatDate ( date ) {
-    return weekdays[date.getDay()] + ", " +
-        date.getDate() + nth(date.getDate()) + " " +
+    //weekdays[date.getDay()] + ", " +
+    return date.getDate() + nth(date.getDate()) + " " +
         months[date.getMonth()] + " " +
         date.getFullYear();
 }
@@ -1181,6 +1182,7 @@ var dateValues = [
 
 slider.noUiSlider.on('update',function(values,handle){
     dateValues[handle].innerHTML = formatDate(new Date(+values[handle]));
+
 });
 </script>
 </body>
