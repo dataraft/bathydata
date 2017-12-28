@@ -501,6 +501,8 @@
         };  
         boundary_client.send();      
         
+        shoreline_update = function(){
+          console.log('update value');
         var shoreline_client = new XMLHttpRequest();
         shoreline_client.open('GET',shoreline_api+'2017',async);
         shoreline_json.push( {"type": "Feature",
@@ -516,6 +518,9 @@
         //shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
 
         shoreline_client.send();
+      }
+
+      shoreline_update();
   //***************************************************************jquery document.ready initializations*******************//      
     	$(document).ready(function() {
         $('select').material_select();
@@ -1182,8 +1187,28 @@ var dateValues = [
 
 slider.noUiSlider.on('update',function(values,handle){
     dateValues[handle].innerHTML = formatDate(new Date(+values[handle]));
+    shoreline_update();
 
 });
+
+//keyboard support
+var handle = slider.querySelector('.noUi-handle');
+handle.addEventListener('click', function(){
+  this.focus();
+});
+
+handle.addEventListener('keydown', function( e ) {
+
+  var value = Number( slider.noUiSlider.get() );
+
+  switch ( e.which ) {
+    case 37: slider.noUiSlider.set( value - 30*24*60*60*1000 );
+      break;
+    case 39: slider.noUiSlider.set( value + 30*24*60*60*1000 );
+      break;
+  }
+});
+
 </script>
 </body>
 </html>
