@@ -102,7 +102,7 @@
     <div style="text-align: center;color:#004165 !important; font-family: 'Trocchi', serif; font-size: 25px; font-weight: normal; line-height: 48px; margin: 0; "> Upload Data </div>
     <div style="max-width: 50%;padding-left:10%">
       <form id='upload-form'>
-        Data: <select  id="data-type">
+        Data: <select  id="data-type" name="data-type">
                 <option value="bathymetry" selected>Bathymetry</option>
                 <option value="shoreline">Shoreline</option>
               </select><br/><br/>
@@ -337,6 +337,8 @@
         <figure class="map-leg-d-1" style="color:#00ff00"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
         <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd bathymetry </span> </br>
         <figure class="map-leg-d-1" style="color:#0000ff"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> user bathymetry </span> </br>
+        <figure class="map-leg-d-2" style="color:#FFF700"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> current shoreline </span> </br>
+        <figure class="map-leg-d-2" style="color:#FFAA1D"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> past shoreline </span> </br>
     </div>
  <div id="year-slider"></div>
  <div id="year-slider-start"></div>  
@@ -502,21 +504,35 @@
         boundary_client.send();      
         
         shoreline_update = function(val){
-          if(val) console.log(val);
-          var year = new Date(val);
-          year = year.getFullYear();
+          var year;
+          if(val) { 
+            console.log(val);
+          year = new Date(val).getFullYear();
+        }
+        else  year = 2010;
         var shoreline_client = new XMLHttpRequest();
         shoreline_client.open('GET',shoreline_api+year,async);
         shoreline_client.onreadystatechange = function(){
           if(shoreline_client.readyState==4 && shoreline_client.status==200){
-            console.log(shoreline_client.responseText);
+            shorelines = JSON.parse(shoreline_client.responseText).shoreline;
+            // features
+            for(var i=0;i<shorelines.length;i++) {
+              var s = {};
+              s.geometry = shorelines[i];
+              s.type = 'Feature';
+              s.properties = shorelines[i].properties;
+              shoreline_json.push(s);
+            }
+            console.log('shoreline');
+            console.log(shoreline_json);
+            if (shoreline_json.length) {
+              shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFF700",weight: 3,fillOpacity:0.05};}}).addTo(map);
+            }
           }
           else if(shoreline_client.readyState==4&& shoreline_client.status==500) {
             alert('Hi, the server is under maintainenace. Please retry after some time.');
           }
         }
-        //shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}).addTo(map);
-
         shoreline_client.send();
       }
 
@@ -591,14 +607,15 @@
             if(data_type=='bathymetry') { el.style.display = 'none'}
                 else el.style.display='';
               //console.log(dates);
-            if(dates) 
-              change_dates();
+            if(dates && dates[data_type]) {
+              change_dates(data_type);
+            }
             
         });
-        change_dates = function(){
+        change_dates = function(type){
           console.log('changing dates');
-          d_chose_from = dates['data_type'].from_date;
-          d_chose_to =   dates['data_type'].to_date;
+          d_chose_from = dates[type].from_date;
+          d_chose_to =   dates[type].to_date;
           picker.set('min', new Date(d_chose_from));
           picker.set('max',new Date(d_chose_to));
 
@@ -1091,7 +1108,7 @@ function bathymetry_Style (feature) {
     return {
       fillColor: getColor(feature.properties.depth),
       color: " #cecccc",
-      weight: 0,
+      weight: 1,
       fillOpacity:0.7
     };
 }
