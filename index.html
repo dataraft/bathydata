@@ -504,7 +504,15 @@
         shoreline_client.open('GET',shoreline_api+'2017',async);
         shoreline_client.onreadystatechange = function() {
           if(shoreline_client.readyState==4 && shoreline_client.status==200){
-            shoreline_json = JSON.parse(shoreline_client.responseText).shoreline;
+            shorelines = JSON.parse(shoreline_client.responseText).shoreline;
+            // features
+            for(var i=0;i<shorelines.length;i++) {
+              var s = {};
+              s.geometry = shorelines[i];
+              s.type = 'Feature';
+              s.properties = shorelines[i].properties;
+              shoreline_json.push(s);
+            }
             console.log('shoreline');
             console.log(shoreline_json);
             if (shoreline_json.length) {
