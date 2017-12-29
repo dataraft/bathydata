@@ -817,7 +817,7 @@ function login_flip() {
 
 
 //****************************************************       map           **************************************//
-
+var target;
 function addTomap() {   //ADD zones and bathymetry to map
     boundary_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:boundary_zones}, {style: function() {return {color: " #cecccc",weight: 3,fillOpacity:0.05};}
             }).addTo(map,true);
@@ -829,7 +829,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 
     bathymetry_layer.on('click', function (e) {
-      alert(e.target.keys());
+      target = e.target;
     });
 
     loader.style.display='none';
