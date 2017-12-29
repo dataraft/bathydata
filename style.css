@@ -155,6 +155,8 @@ background-size: cover;
 	top: 100px;
 	width: 10%;
 	right: 10px;
+	height: 8px;
+
 }
 
 #year-slider-start {
@@ -162,34 +164,142 @@ background-size: cover;
 	top: 120px;
 	right: 10px;
 	height:20px;
-	
+	color: #fe0303;
+	background-color: #fff;
+	font-size: 10px;
+	padding: 3px;
 }
 /*slider styling */
 
-.noUi-connect {
-	background: #004165;
+.noUi-base {
+	width: 100%;
+	height: 100%;
+	position: relative;
 }
-.noUi-horizontal .noUi-handle, .noUi-vertical .noUi-handle {
-	background: #004165;
+.noUi-origin {
+	position: absolute;
+	right: 0;
+	top: 0;
+	left: 0;
+	bottom: 0;
 }
-.noUi-target.noUi-horizontal .noUi-tooltip {
-	background-color: #004165;
+.noUi-handle {
+	position: relative;
+	z-index: 1;
+  cursor: move;
+}
+.noUi-stacking .noUi-handle {
+/* This class is applied to the lower origin when
+   its values is > 50%. */
+	z-index: 10;
+}
+.noUi-stacking + .noUi-origin {
+/* Fix stacking order in IE7, which incorrectly
+   creates a new context for the origins. */
+	*z-index: -1;
+}
+.noUi-state-tap .noUi-origin {
+-webkit-transition: left 0.3s, top 0.3s;
+	transition: left 0.3s, top 0.3s;
+}
+.noUi-state-drag * {
+	cursor: inherit !important;
 }
 
-/**** Custom styles for Range ****/
-input[type=range]::-webkit-slider-thumb {
-  background-color: skyblue;
+/* Slider size and handle placement;
+ */
+.noUi-horizontal {
+	height: 15px;
 }
-input[type=range]::-moz-range-thumb {
-  background-color: skyblue;
+.noUi-horizontal .noUi-handle {
+	width: 16px !important;
+	height: 16px !important;
+	left: -8px !important;
+	top: -4px !important;
+	border-radius: 100%;
+	background-color: #52b840 !important;
+	box-shadow: none !important;
 }
-input[type=range]::-ms-thumb {
-  background-color: skyblue;
+.noUi-horizontal.noUi-extended {
+	padding: 0 15px;
 }
-/* For the globe and the text inside */
-input[type=range] + .thumb {
-  background-color: blue;
+.noUi-horizontal.noUi-extended .noUi-origin  {
+	right: -15px;
 }
-input[type=range] + .thumb.active .value {
-  color: #fff;
+
+
+/* Styling;
+ */
+.noUi-background {
+	background: #FAFAFA;
+	box-shadow: inset 0 1px 1px #f0f0f0;
+}
+.noUi-connect {
+	background: #464646;
+	box-shadow: inset 0 0 3px rgba(51,51,51,0.45);
+-webkit-transition: background 450ms;
+	transition: background 450ms;
+}
+.noUi-origin {
+	border-radius: 10px;
+}
+.noUi-target {
+	background: #fff;
+	border-radius: 10px;
+	border: 1px solid #D3D3D3;
+}
+.noUi-target.noUi-connect {
+	box-shadow: inset 0 0 3px rgba(51,51,51,0.45), 0 3px 6px -5px #BBB;
+}
+
+/* Handles and cursors;
+ */
+.noUi-dragable {
+	cursor: w-resize;
+}
+
+.noUi-handle {
+	border: 1px solid #464646;
+	border-radius: 100%;
+	background: #464646;
+	cursor: default;
+}
+.noUi-active {
+
+}
+
+/* Handle stripes;
+ */
+.noUi-handle:before,
+.noUi-handle:after {
+	display: none !important;
+	position: absolute;
+	height: 14px;
+	width: 1px;
+	background: #E8E7E6;
+	left: 14px;
+	top: 6px;
+}
+.noUi-handle:after {
+	left: 17px;
+}
+
+/* Disabled state;
+ */
+[disabled].noUi-connect,
+[disabled] .noUi-connect {
+	background: #B8B8B8;
+}
+[disabled] .noUi-handle {
+	cursor: not-allowed;
+}
+
+
+.preloader-wrapper {
+	z-index: 1000000;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-left: -25px;
+	margin-top: -25px;
 }

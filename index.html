@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="login/style.css" />
     <link rel="stylesheet" href="pricing/style.css" />
     <link rel="stylesheet" href="nouislider.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
     <script type="text/javascript" src="bootstrap.min.js"></script>
      <script type="text/javascript" src="nouislider.min.js"></script>
@@ -342,6 +343,19 @@
  <div id="year-slider"></div>
  <div id="year-slider-start"></div>  
 
+
+<div class="preloader-wrapper active" id="loader">
+      <div class="spinner-layer spinner-green-only">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+
 	<script>
 
         //****************************************************Global varaibles*************************************************//
@@ -361,12 +375,13 @@
         var shoreline_json = [];
         var subscribed_layer
         var bathymetry_layer;
-        var shoreline_layer;  // all shorelines 
+        var shoreline_layer=[];  // all shorelines 
         var bathymetry_zones = []; // bathymetry zone features
         var bathymetry_triangles = []; // color coding features  //All triangles 
         var user_zones_layer;
         var user_zones = []; // user zone features
-        var triangulation_layer;    
+        var triangulation_layer;
+        var s_first_load =0; //check if shoreline default layer is loaded.    
 
         var pricing_flag ;
         var inputs_register ;
@@ -389,7 +404,7 @@
         var dates;      //datatype.from_date/to_date
         var d_chose_from = '2017-10-10';
         var d_chose_to = '2017-12-25';
-
+        var loader = document.getElementById('loader');
 
         // map related //
         var heatmap_data;
@@ -502,12 +517,24 @@
         };  
         boundary_client.send();      
         
+        shoreline_update = function(val){
+          console.log(val);
+          var year,date;
+          shoreline_json=[];
+          if(val) { 
+            console.log(val);
+          date = new Date(Number(val));
+          year = date.getFullYear();
+        }
+        else year = 2017;
+        if(year == 2017 && s_first_load ==1) return;
         var shoreline_client = new XMLHttpRequest();
-        shoreline_client.open('GET',shoreline_api+'2017',async);
-        shoreline_client.onreadystatechange = function() {
+        shoreline_client.open('GET',shoreline_api+year,async);
+        shoreline_client.onreadystatechange = function(){
           if(shoreline_client.readyState==4 && shoreline_client.status==200){
             shorelines = JSON.parse(shoreline_client.responseText).shoreline;
             // features
+            if(shorelines.length){
             for(var i=0;i<shorelines.length;i++) {
               var s = {};
               s.geometry = shorelines[i];
@@ -515,14 +542,32 @@
               s.properties = shorelines[i].properties;
               shoreline_json.push(s);
             }
+            }
             console.log('shoreline');
             console.log(shoreline_json);
+
             if (shoreline_json.length) {
-              shoreline_layer = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFF700",weight: 3,fillOpacity:0.05};}}).addTo(map);
+              if(shoreline_layer.length==0){
+                s_first_load = 1;
+              shoreline_layer[0] = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFF700",weight: 3,fillOpacity:0.05};}}).addTo(map);
+              }
+
+              else {
+                if(shoreline_layer.length>1)  map.removeLayer(shoreline_layer[1]);
+                shoreline_layer[1] = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFAA1D",weight: 3,fillOpacity:0.05};}}).addTo(map);
+              };
             }
           }
+          else if(shoreline_client.readyState==4&& shoreline_client.status==500) {
+            alert('Hi, the server is under maintainenace. Please retry after some time.');
+          }
         }
+        shoreline_client.withCredentials=true;
         shoreline_client.send();
+        
+      }
+
+      shoreline_update();
   //***************************************************************jquery document.ready initializations*******************//      
     	$(document).ready(function() {
         $('select').material_select();
@@ -785,6 +830,8 @@ function addTomap() {   //ADD zones and bathymetry to map
     bathymetry_layer.on('click', function (e) {
       alert(e.features[0].properties);
     });
+
+    loader.style.display='none';
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
@@ -1140,12 +1187,12 @@ uploadData =  function() {
 
  var slider = document.getElementById('year-slider');
   noUiSlider.create(slider, {
-   start: [80],
+   start: [timestamp('2017')],
    connect: true,
-   step: 30*24*60*60*1000, //steps of one month
+   step: 365*24*60*60*1000, //steps of one month
     orientation: 'horizontal', // 'horizontal' or 'vertical'
    range: {
-     'min': timestamp('2010'),
+     'min': timestamp('2010-01-10'),
      'max': timestamp('2017')
    },
    format: wNumb({
@@ -1158,9 +1205,10 @@ uploadData =  function() {
 }
 
 function formatDate ( date ) {
-    return weekdays[date.getDay()] + ", " +
-        date.getDate() + nth(date.getDate()) + " " +
-        months[date.getMonth()] + " " +
+    //weekdays[date.getDay()] + ", " +
+    // date.getDate() + nth(date.getDate()) + " " +
+    //     months[date.getMonth()] + " " +
+    return "Year "+
         date.getFullYear();
 }
 var
@@ -1194,7 +1242,28 @@ var dateValues = [
 
 slider.noUiSlider.on('update',function(values,handle){
     dateValues[handle].innerHTML = formatDate(new Date(+values[handle]));
+    shoreline_update(slider.noUiSlider.get());
+
 });
+
+//keyboard support
+var handle = slider.querySelector('.noUi-handle');
+handle.addEventListener('click', function(){
+  this.focus();
+});
+
+handle.addEventListener('keydown', function( e ) {
+
+  var value = Number( slider.noUiSlider.get() );
+
+  switch ( e.which ) {
+    case 37: slider.noUiSlider.set( value - 365*24*60*60*1000 );
+      break;
+    case 39: slider.noUiSlider.set( value + 365*24*60*60*1000 );
+      break;
+  }
+});
+
 </script>
 </body>
 </html>
