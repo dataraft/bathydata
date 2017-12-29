@@ -828,7 +828,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 
     bathymetry_layer.on('click', function (e) {
-      alert(e.features[0].properties);
+      alert(e.features);
     });
 
     loader.style.display='none';
