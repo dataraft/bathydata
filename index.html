@@ -565,12 +565,12 @@
               if (shoreline_layer.length && shoreline_layer[0]) {
                 shoreline_layer[0].eachLayer(function(layer){
                   layer.bindPopup('name:' + layer.feature.properties.name+'\n date: '+layer.feature.properties.date+'\n lid:'+layer.feature.properties.lid);
-                  layer.on('mouseover',function(){
+                  layer.on('click',function(){
                       layer.openPopup();
                   });
-                  layer.on('mouseout',function(){
-                      layer.closePopup();
-                  });
+                  // layer.on('mouseout',function(){
+                  //     layer.closePopup();
+                  // });
                 });
               }
             }
@@ -923,6 +923,7 @@ map.on("click", function (event) {
 map.on("overlayadd", function (event) {
   if(shoreline_layer.length && shoreline_layer[0]) 
     {shoreline_layer[0].bringToFront();}
+    console.log(map.);
 });
 
  function latlngDisplay(e) {
