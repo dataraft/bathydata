@@ -562,16 +562,16 @@
               };
 
               // shoreline pop-up
-              if (shoreline_layer[0]) {
+              if (shoreline_layer.length && shoreline_layer[0]) {
                 shoreline_layer[0].eachLayer(function(layer){
                   layer.bindPopup('name:' + layer.feature.properties.name+'\n date: '+layer.feature.properties.date+'\n lid:'+layer.feature.properties.lid);
                   layer.on('mouseover',function(){
                       layer.openPopup();
-                  })
+                  });
                   layer.on('mouseout',function(){
                       layer.closePopup();
                   });
-                }
+                });
               }
             }
           }
