@@ -918,6 +918,13 @@ map.on("click", function (event) {
     })
   })
 });
+
+// always shoreline layer on top
+map.on("overlayadd", function (event) {
+  if(shoreline_layer.length && shoreline_layer[0]) 
+    {shoreline_layer[0].bringToFront();}
+});
+
  function latlngDisplay(e) {
    document.getElementById('latlng-display').innerHTML = 'lat: '+parseFloat(e.latlng.lat).toFixed(4)+', lng: '+parseFloat(e.latlng.lng).toFixed(4);
  }
