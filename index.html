@@ -40,6 +40,7 @@
      <script type="text/javascript" src="nouislider.min.js"></script>
      <script type="text/javascript" src="wNumb.js"></script>
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-heat/v0.1.3/leaflet-heat.js'></script>
+  <script src="https://unpkg.com/@mapbox/leaflet-pip@latest/leaflet-pip.js"></script>
 	<nav style="background-color: #fcfcfc; position: absolute; z-index: 1000; height:7vh; line-height: 7vh !important;">
     <div class="nav-wrapper">
       <a href="#" class="brand-logo" style="color:#004165; padding-left: 20px; font-weight: 400;">   SAMUDRA   </a> 
@@ -396,6 +397,7 @@
         var order_api = host+'/download/order/?';
         var logout_api = host+'/download/logout/';
         var upload_api = host+'/download/upload/';
+        var triangular_api = host+'/download/zonedata?zid=';
         var shoreline_api = host+'/download/shoreline/?year='
         var user_details;
         var login_flag = false;
@@ -435,7 +437,8 @@
                 console.log(user_details);
                        login_flag = true;
             login_flip(); 
-            load_zones();   
+            load_zones();
+            shoreline_update();   
             if(val==1) {
             $('#login').modal('close');
             }
@@ -840,6 +843,52 @@ function addTomap() {   //ADD zones and bathymetry to map
 
     bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
 
+    // bathymetry_layer.on('click', function (e) {
+    //   target = e.target;
+    // });
+
+    bathymetry_layer.eachLayer(function(layer){
+
+      console.log(layer.feature.properties);
+      layer.on('click',function(){
+        console.log(layer.feature.properties.zid);
+        $.ajax({
+       type : 'GET',
+       url : triangular_api+layer.feature.properties.zid,
+       dataType: 'json',
+       cache: false,
+       xhrFields: {
+       withCredentials: true
+      },
+    crossDomain: true,
+       success : function(response) {
+          if(response.status) {
+            // display pop-up
+            
+            console.log(response);
+            var data = response;
+            if (data.triangles && data.triangles.length) {
+                data.triangles.forEach(function (t) {
+                  bathymetry_triangles.push({'type':'Feature','properties':{'depth':t[1]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
+                });
+            }
+
+            if (bathymetry_triangles.length) {
+        triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: bathymetry_Style}).addTo(map,true);
+        }
+
+          } else{
+            alert(response.msg);
+          }
+       },
+       error : function(xhr) {
+         alert('Server is down. Please try after sometime.');
+       },
+    });
+
+      });
+    });
+
     loader.style.display='none';
 }
 
@@ -857,6 +906,18 @@ function addTomap() {   //ADD zones and bathymetry to map
 	 atags.forEach(function (a) {a.remove();})
  }
 
+map.on("click", function (event) {
+  var clickedLayers = leafletPip.pointInLayer(event.latlng, bathymetry_layer);
+  // Do something with clickedLayers
+  clickedLayers.forEach(function(layer){
+    layer.fireEvent('click',{
+      latlng: event.latlng,
+      layerPoint : event.layerPoint,
+      containerPoint: event.containerPoint,
+      originalEvent: event.originalEvent,
+    })
+  })
+});
  function latlngDisplay(e) {
    document.getElementById('latlng-display').innerHTML = 'lat: '+parseFloat(e.latlng.lat).toFixed(4)+', lng: '+parseFloat(e.latlng.lng).toFixed(4);
  }
@@ -879,6 +940,10 @@ function addTomap() {   //ADD zones and bathymetry to map
        data : {'data': data, 'point': point},
        dataType: 'json',
        cache: false,
+       xhrFields: {
+       withCredentials: true
+      },
+    crossDomain: true,
        success : function(response) {
           if(response.status) {
             // display pop-up
