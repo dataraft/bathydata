@@ -557,6 +557,19 @@
                 if(year == 2017 && s_first_load ==1) return;
                 shoreline_layer[1] = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFAA1D",weight: 3,fillOpacity:0.05};}}).addTo(map);
               };
+
+              // shoreline pop-up
+              if (shoreline_layer[0]) {
+                shoreline_layer[0].eachLayer(function(layer){
+                  layer.bindPopup('name:' + layer.feature.properties.name+'\n date: '+layer.feature.properties.date+'\n lid:'+layer.feature.properties.lid);
+                  layer.on('mouseover',function(){
+                      layer.openPopup();
+                  })
+                  layer.on('mouseout',function(){
+                      layer.closePopup();
+                  });
+                }
+              }
             }
           }
           else if(shoreline_client.readyState==4&& shoreline_client.status==500) {
