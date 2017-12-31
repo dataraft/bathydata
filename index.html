@@ -560,7 +560,6 @@
                 if(year == 2017 && s_first_load ==1) return;
                 shoreline_layer[1] = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFAA1D",weight: 3,fillOpacity:0.05};}}).addTo(map);
               };
-             }
             }
           }
           else if(shoreline_client.readyState==4&& shoreline_client.status==500) {
