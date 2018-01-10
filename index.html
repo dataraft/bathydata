@@ -1195,31 +1195,14 @@ else {
 //*******************************************************Bathymetry****************************************//
 
 function getColor (d) {
-  switch (d) {
-    case d < -1:
-      return '#B24A2A'
-      break;
-    case d < -1.5:
-      return '#C86339'
-      break;
-    case d < -2:
-      return '#F19D2B'
-      break;
-    case d < -3:
-      return '#F6C550'
-      break;
-    case d < -5:
-      return '#FAED9D'
-      break;
-    case d < -8:
-      return '#E2E0D0'
-      break;
-    case d < -10:
-      return '#A69BBC'
-      break;
-    default:
-      return '#5A58AC'
-  }
+  return d > -1 ? '#B24A2A' :
+         d > -1.5  ? '#C86339' :
+         d > -2  ? '#F19D2B' :
+         d > -3  ? '#F6C550' :
+         d > -5  ? '#FAED9D' :
+         d > -8  ? '#E2E0D0' :
+         d > -10  ? '#A69BBC' :
+                    '#5A58AC';
 }
 
 function bathymetry_Style (feature) {
