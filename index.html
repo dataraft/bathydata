@@ -1196,14 +1196,14 @@ else {
 
 function getColor (d) {
 
-  return d > 8 ? '#3541fb' :
-           d > 5.5  ? '#3376b9' :
-           d > 4.75  ? '#338cb9' :
-           d > 3.5  ? '#3baacd' :
-           d > 2   ? '#3bc2cd' :
-           d > 1   ? '#41e5dd' :
-           d > 0.5  ? '#7cfaf4' :
-                      '#f9f969';
+  return d < -1 ? '#B24A2A' :
+           d < -2  ? '#C86339' :
+           d < -4  ? '#F19D2B' :
+           d < -6  ? '#F6C550' :
+           d < -8   ? '#FAED9D' :
+           d < -10   ? '#E2E0D0' :
+           d < -15  ? '#A69BBC' :
+                      '#5A58AC';
 }
 
 function bathymetry_Style (feature) {
@@ -1211,8 +1211,8 @@ function bathymetry_Style (feature) {
     return {
       fillColor: getColor(feature.properties.depth),
       color: " #cecccc",
-      weight: 1,
-      fillOpacity:0.7
+      weight: 0,
+      fillOpacity:0.5
     };
 }
 
