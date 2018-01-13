@@ -358,9 +358,9 @@
     </div>
 
 <div id="browser_detect_modal" class="modal">
-  <div class="modal-content">
+  <div class="modal-content" style="text-align: center;">
       <h4>Browser Unsupported</h4>
-      <p>Please download latest mozilla or chrome version</p>
+      <p>Please download latest <a href="https://www.mozilla.org/en-US/firefox/new/" target="_blank">Mozilla Firefox </a> or <a href="https://www.google.com/chrome/browser/desktop/" target="_blank" >Chrome</a> browsers.</p>
     </div>
 </div>
 	<script>
@@ -599,10 +599,16 @@
             }
 
         });
-        $("#browser_detect_modal").modal({
-          dismissable:false,
+        $("#browser_detect_modal").modal();
 
-        })
+
+        addCloseHandler($('#browser_detect_modal'), function (close) {
+          return;
+        }); 
+
+        detect(); //initialize browser detection
+
+
 
         $('.dropdown-button').dropdown({
             hover:true,
@@ -1347,7 +1353,7 @@ function detect() {
         prevent_display();    }
     else if(navigator.userAgent.indexOf("Chrome") != -1 )
     {
-        alert('Chrome');
+        return;
     }
     else if(navigator.userAgent.indexOf("Safari") != -1)
     {
@@ -1356,7 +1362,7 @@ function detect() {
     else if(navigator.userAgent.indexOf("Firefox") != -1 ) 
     {
          //alert('Firefox');
-        prevent_display();
+        return;
     }
     else if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) //IF IE > 10
     {
@@ -1368,12 +1374,19 @@ function detect() {
     }
     }
 
-    detect();
+    
 
     function prevent_display() {
             $('#browser_detect_modal').modal('open');
     }
 
+    function addCloseHandler($modal, handler) {
+          var modal = $modal[0].M_Modal;
+          modal._close = modal.close;
+          modal.close = function () { handler(function () { modal._close(); }) };
+        } 
+
+    
 </script>
 </body>
 </html>
