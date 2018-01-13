@@ -25,7 +25,7 @@
 	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.css' rel='stylesheet' />
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
-
+<script type="text/javascript" src="browser_detect.js"></script>
    
    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
@@ -357,6 +357,12 @@
       </div>
     </div>
 
+<div id="browser_detect_modal" class="modal">
+  <div class="modal-content">
+      <h4>Browser Unsupported</h4>
+      <p>Please download latest mozilla or chrome version</p>
+    </div>
+</div>
 	<script>
 
         //****************************************************Global varaibles*************************************************//
@@ -593,6 +599,10 @@
             }
 
         });
+        $("#browser_detect_modal").modal({
+          dismissable:false,
+
+        })
 
         $('.dropdown-button').dropdown({
             hover:true,
@@ -1327,6 +1337,42 @@ handle.addEventListener('keydown', function( e ) {
       break;
   }
 });
+
+
+//**********************************************browser detect*************************************************//
+
+function detect() { 
+     if((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 ) 
+    {
+        prevent_display();    }
+    else if(navigator.userAgent.indexOf("Chrome") != -1 )
+    {
+        alert('Chrome');
+    }
+    else if(navigator.userAgent.indexOf("Safari") != -1)
+    {
+       prevent_display(); 
+    }
+    else if(navigator.userAgent.indexOf("Firefox") != -1 ) 
+    {
+         //alert('Firefox');
+        prevent_display();
+    }
+    else if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) //IF IE > 10
+    {
+      prevent_display(); 
+    }  
+    else 
+    {
+       prevent_display(); 
+    }
+    }
+
+    detect();
+
+    function prevent_display() {
+            $('#browser_detect_modal').modal('open');
+    }
 
 </script>
 </body>
