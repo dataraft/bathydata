@@ -303,3 +303,7 @@ background-size: cover;
 	margin-left: -25px;
 	margin-top: -25px;
 }
+
+br {
+	font-size: 1.8vh !important;
+}

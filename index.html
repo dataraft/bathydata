@@ -382,7 +382,8 @@
         var user_zones_layer;
         var user_zones = []; // user zone features
         var triangulation_layer;
-        var s_first_load =0; //check if shoreline default layer is loaded.    
+        var s_first_load =0; //check if shoreline default layer is loaded.   
+        var s_latest_year = 2018 //the shoreline display latest year on slider. Also the dfault location of slider. 
 
         var pricing_flag ;
         var inputs_register ;
@@ -404,7 +405,7 @@
         var data_type = 'wave';
         var intersect = false;
         var dates;      //datatype.from_date/to_date
-        var d_chose_from = '2017-10-10';
+        var d_chose_from = '2017-10-10';      //download data date range
         var d_chose_to = '2017-12-25';
         var loader = document.getElementById('loader');
 
@@ -529,8 +530,8 @@
           date = new Date(Number(val));
           year = date.getFullYear();
         }
-        else year = 2017;
-        if(year == 2017 && s_first_load ==1) return;
+        else year = s_latest_year;
+        if(year == s_latest_year && s_first_load ==1) return;
         var shoreline_client = new XMLHttpRequest();
         shoreline_client.open('GET',shoreline_api+year,async);
         shoreline_client.onreadystatechange = function(){
@@ -557,7 +558,7 @@
 
               else {
                 if(shoreline_layer.length>1)  map.removeLayer(shoreline_layer[1]);
-                if(year == 2017 && s_first_load ==1) return;
+                if(year == s_latest_year && s_first_load ==1) return;
                 shoreline_layer[1] = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFAA1D",weight: 3,fillOpacity:0.05};}}).addTo(map);
               };
             }
@@ -1248,14 +1249,15 @@ uploadData =  function() {
  // ************************ slider *************************************************************************************//
 
  var slider = document.getElementById('year-slider');
+
   noUiSlider.create(slider, {
-   start: [timestamp('2017')],
+   start: [timestamp(s_latest_year.toString())],
    connect: true,
    step: 365*24*60*60*1000, //steps of one month
     orientation: 'horizontal', // 'horizontal' or 'vertical'
    range: {
      'min': timestamp('2010-01-10'),
-     'max': timestamp('2017')
+     'max': timestamp(s_latest_year.toString())
    },
    format: wNumb({
      decimals: 0
@@ -1270,7 +1272,7 @@ function formatDate ( date ) {
     //weekdays[date.getDay()] + ", " +
     // date.getDate() + nth(date.getDate()) + " " +
     //     months[date.getMonth()] + " " +
-    return "Year "+
+    return months[date.getMonth()] + " " +"Year "+
         date.getFullYear();
 }
 var
