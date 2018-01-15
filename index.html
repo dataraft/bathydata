@@ -393,7 +393,7 @@
         var user_zones = []; // user zone features
         var triangulation_layer;
         var s_first_load =0; //check if shoreline default layer is loaded.   
-        var s_latest_year = 2018 //the shoreline display latest year on slider. Also the dfault location of slider. 
+        var s_latest_year = 2017 //the shoreline display latest year on slider. Also the dfault location of slider. 
 
         var pricing_flag ;
         var inputs_register ;
@@ -571,6 +571,17 @@
                 if(year == s_latest_year && s_first_load ==1) return;
                 shoreline_layer[1] = L.mapbox.featureLayer({type:'FeatureCollection',features:shoreline_json}, {style: function() {return {color: "#FFAA1D",weight: 3,fillOpacity:0.05};}}).addTo(map);
               };
+            }
+            for (i=0;i<shoreline_layer.length;i++){
+            shoreline_layer[i].eachLayer(function(layer){
+              layer.bindPopup('Shoreline dated ');
+              layer.on('mouseover',function(){
+                    layer.openPopup();
+                })
+                layer.on('mouseout',function(){
+                    layer.closePopup();
+                })  
+            })
             }
           }
           else if(shoreline_client.readyState==4&& shoreline_client.status==500) {
@@ -858,7 +869,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     bathymetry_layer.eachLayer(function(layer){
 
       console.log(layer.feature.properties);
-      layer.on('click',function(){
+      layer.on('dblclick',function(){
         console.log(layer.feature.properties.zid);
         $.ajax({
        type : 'GET',
@@ -1027,7 +1038,6 @@ button_draw.onclick = function(){
 // }
   map.on('draw:created', function(e) {
       featureGroup.addLayer(e.layer);
-      
       getprice(e.layer);
       
   });
@@ -1035,6 +1045,12 @@ button_draw.onclick = function(){
   map.on('draw:edited',function(e){
     getprice(e.layer);
   })
+
+  map.on('draw:drawstart',function(e){
+
+    if(!login_flag) { $("#login").modal('open'); return;}
+  })
+
 
 
 
@@ -1102,6 +1118,7 @@ seperate_hd = function(data ) {   // case when the hd region is named alphabetwi
     return s;
 }
 getprice = function(layer) {
+  
 	console.log(layer);
     if (layer._latlngs[0].length>2 ) {
         
@@ -1291,7 +1308,7 @@ function formatDate ( date ) {
     //weekdays[date.getDay()] + ", " +
     // date.getDate() + nth(date.getDate()) + " " +
     //     months[date.getMonth()] + " " +
-    return months[date.getMonth()] + " " +"Year "+
+    return months[date.getMonth()] + " " +" "+
         date.getFullYear();
 }
 var
