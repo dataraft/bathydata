@@ -286,7 +286,7 @@
 	      <div class="collapsible-header active">1. Choose Data type </div>
 	      <div class="collapsible-body" id="div-sel-data"><label for="data_types"> Data types </label><div id="data_types" class="input-field col s6">
           <select  id="sel-data-type">
-            <option value="wave" selected >Wave</option>
+            <option value="waveheight" selected >Wave Height</option>
             <option value="wavedirection">Wave Direction</option>
             <option value="waveperiod">Wave Period</option>
             <option value="bathymetry">Bathymetry </option>
@@ -941,7 +941,7 @@ map.on("click", function (event) {
             // display pop-up
             if (response.data) {
               var content = '';
-              if (data=='wave') {
+              if (data=='waveheight') {
                 content = 'wave-height: '+response.data[0].param;
               } else if(data=='bathymetry') {
                 content = 'depth: '+response.data[0].param;
