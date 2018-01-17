@@ -445,6 +445,7 @@
             if(response.status){
                 user_details = response.data;
                 dates = user_details.dates;
+                change_dates('waveheight');
                 console.log(user_details);
                        login_flag = true;
             login_flip(); 
