@@ -754,36 +754,36 @@
                 layer.on('dblclick',function(){
                   console.log(layer.feature.properties.zid);
                   $.ajax({
-                   type : 'GET',
-                   url : triangular_api+layer.feature.properties.zid,
-                   dataType: 'json',
-                   cache: false,
-                   xhrFields: {
-                   withCredentials: true
-                  },
-                crossDomain: true,
-               success : function(response) {
-                  if(response.status) {
-                    // display pop-up
-                    //console.log(response);
-                    var data = response;
-                    if (data.triangles && data.triangles.length) {
-                        data.triangles.forEach(function (t) {
-                          visualisation_triangles.push({'type':'Feature','properties':{'wave_height':t[1], 'wave_direction':t[2], 'wave_period':t[3], 'bathymetry':t[4], 'tide':t[5], 'current_speed':t[6][0], 'current_direction':t[6][1]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
-                        });
-                    }
+                     type : 'GET',
+                     url : triangular_api+layer.feature.properties.zid,
+                     dataType: 'json',
+                     cache: false,
+                     xhrFields: {withCredentials: true},
+                     crossDomain: true,
+                      success : function(response) {
+                        if(response.status) {
+                           // display pop-up
+                           //console.log(response);
+                           var data = response;
+                           if (data.triangles && data.triangles.length) {
+                              data.triangles.forEach(function (t) {
+                                visualisation_triangles.push({'type':'Feature','properties':{'wave_height':t[1], 'wave_direction':t[2], 'wave_period':t[3], 'bathymetry':t[4], 'tide':t[5], 'current_speed':t[6][0], 'current_direction':t[6][1]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
+                              });
+                           }
 
-                  if (visualisation_triangles.length) {
-                    triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: waveheight_Style}).addTo(map,true);
-                  }
+                          if (visualisation_triangles.length) {
+                            triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: waveheight_Style}).addTo(map,true);
+                          }
 
-                  } else{
-                    alert(response.msg);
-                  }
-                },
-               error : function(xhr) {
-                 alert('Server is down. Please try after sometime.');
-               },
+                        } else{
+                        alert(response.msg);
+                         }
+                      },
+                      error : function(xhr) {
+                        alert('Server is down. Please try after sometime.');
+                      },
+                    });
+                });
             });
 
             // add user zones layer
