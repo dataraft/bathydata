@@ -992,7 +992,7 @@ map.on("click", function (event) {
               var width = 600 - margin.left - margin.right;
               var height = 270 - margin.top - margin.bottom;
 
-              var parseDate = d3.time.format("%Y-%m-%d-%I").parse;
+              var parseDate = d3.timeFormat("%Y-%m-%d-%I").parse;
 
               var x = d3.time.scale().range([0, width]);
               var y = d3.scale.linear().range([height, 0]);
