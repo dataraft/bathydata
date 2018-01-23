@@ -280,7 +280,6 @@
   </div>
 
 	<div id='map' style='position:absolute; top:0; bottom:0; width: 100%;'></div>
-  <div id='chart'><svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg></div>
   <pre id='latlng-display'></pre>
 	<div style="position: absolute; top:64px;left:0px; width:20vw;  z-index: 100">
 	  <ul class="collapsible" data-collapsible="accordion">
@@ -983,9 +982,8 @@ map.on("click", function (event) {
               } else if(data=='waveperiod') {
                 content = 'wave-period: '+response.data[0].param;
               }
-              var div = $('#chart')[0];
-              $("#chart svg").empty();
-              var svg = d3.select('#chart svg').attr("width", 200).attr("height", 200);
+              var div = $('<div style="width: 200px; height: 200px;"><svg/></div>')[0];
+              var svg = d3.select('div svg').attr("width", 200).attr("height", 200);
               svg.append("circle").style("stroke", "gray").style("fill", "white").attr("r", 100).attr("cx", 100).attr("cy", 100).on("mouseover", function () {
                   d3.select(this).style("fill", "aliceblue");
               }).on("mouseout", function () {
@@ -993,7 +991,7 @@ map.on("click", function (event) {
               });
               var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div).openOn(map);
             }
-            console.log(response.data);
+            console.log(div);
           } else{
             alert(response.msg);
           }
