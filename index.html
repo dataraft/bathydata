@@ -793,7 +793,7 @@
                               }
                             });
                             // add layer
-                            triangulation_layer = L.layerGroup(polylines);
+                            triangulation_layer = L.layerGroup(polylines).addTo(map,true);
                           }
                         } else{
                         alert(response.msg);
