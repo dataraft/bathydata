@@ -1014,8 +1014,8 @@ map.on("click", function (event) {
               .x(function (d) {return x(d.d);})
               .y(function (d) {return y(d.v);});
 
-              var div = $('<div id="chart" style="width:600px;height:270px;"><svg/></div>')[0];
-              var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div).openOn(map);
+              var div = $('<div id="chart" style="width:700px;height:300px;"><svg/></div>')[0];
+              var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div, {maxWidth : 750}).openOn(map);
               var svg = d3.select('#chart svg')
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
