@@ -994,22 +994,26 @@ map.on("click", function (event) {
 
               var parseDate = d3.timeFormat("%Y-%m-%d-%I").parse;
 
-              var x = d3.time.scale().range([0, width]);
-              var y = d3.scale.linear().range([height, 0]);
+              var x = d3.scaleTime().range([0, width]);
+              var y = d3.scaleLinear().range([height, 0]);
 
-              var xAxis = d3.svg.axis().scale(x)
-                .orient("bottom").ticks(5);
+              var xAxis = d3.select(".axis")
+              .call(d3.axisBottom(x))
+              .tickArguments([20, 'm'])
 
-              var yAxis = d3.svg.axis().scale(y)
-                .orient("left").ticks(5);
+              var yAxis = d3.select(".axis")
+              .call(d3.axisLeft(y))
+              .tickArguments([d3.timeMinute.every(6*60)])
+
+              // var xAxis = d3.svg.axis().scale(x)
+              //   .orient("bottom").ticks(5);
+
+              // var yAxis = d3.svg.axis().scale(y)
+              //   .orient("left").ticks(5);
               
-              var valueline = d3.svg.line()
-              .x(function (d) {
-                return x(d.d);
-              })
-              .y(function (d) {
-                return y(d.v);
-              });
+              var valueline = d3.line()
+              .x(function (d) {return x(d.d);})
+              .y(function (d) {return y(d.v);});
 
               var div = $('<div id="chart"><svg/></div>')[0];
               var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div).openOn(map);
