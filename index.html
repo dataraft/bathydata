@@ -391,7 +391,8 @@
         var bathymetry_layer;
         var shoreline_layer=[];  // all shorelines 
         var bathymetry_zones = []; // bathymetry zone features
-        var bathymetry_triangles = []; // color coding features  //All triangles 
+        var bathymetry_triangles = []; // color coding features  //bathy zone 
+        var visualisation_triangles = []; // color coding features  //subscribed zone 
         var user_zones_layer;
         var user_zones = []; // user zone features
         var triangulation_layer;
@@ -746,6 +747,44 @@
               subscribed_layer.on('click', function(e) {
                 pointData(e.latlng);
               });
+
+              // visualisation
+              subscribed_layer.eachLayer(function(layer){
+                console.log(layer.feature.properties);
+                layer.on('dblclick',function(){
+                  console.log(layer.feature.properties.zid);
+                  $.ajax({
+                   type : 'GET',
+                   url : triangular_api+layer.feature.properties.zid,
+                   dataType: 'json',
+                   cache: false,
+                   xhrFields: {
+                   withCredentials: true
+                  },
+                crossDomain: true,
+               success : function(response) {
+                  if(response.status) {
+                    // display pop-up
+                    //console.log(response);
+                    var data = response;
+                    if (data.triangles && data.triangles.length) {
+                        data.triangles.forEach(function (t) {
+                          visualisation_triangles.push({'type':'Feature','properties':{'wave_height':t[1], 'wave_direction':t[2], 'wave_period':t[3], 'bathymetry':t[4], 'tide':t[5], 'current_speed':t[6][0], 'current_direction':t[6][1]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
+                        });
+                    }
+
+                  if (visualisation_triangles.length) {
+                    triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: waveheight_Style}).addTo(map,true);
+                  }
+
+                  } else{
+                    alert(response.msg);
+                  }
+                },
+               error : function(xhr) {
+                 alert('Server is down. Please try after sometime.');
+               },
+            });
 
             // add user zones layer
             var userzones = user_details.userzones;
@@ -1300,6 +1339,29 @@ else {
 };
 
 // *******************************************************************************************//
+
+//*******************************************************Visualisation****************************************//
+
+function getColor (d) {
+  return d > -1 ? '#B24A2A' :
+         d > -1.5  ? '#C86339' :
+         d > -2  ? '#F19D2B' :
+         d > -3  ? '#F6C550' :
+         d > -5  ? '#FAED9D' :
+         d > -8  ? '#E2E0D0' :
+         d > -10  ? '#A69BBC' :
+                    '#5A58AC';
+}
+
+function waveheight_Style (feature) {
+  
+    return {
+      fillColor: getColor(feature.properties.depth),
+      color: " #cecccc",
+      weight: 0,
+      fillOpacity:0.7
+    };
+}
 
 //*******************************************************Bathymetry****************************************//
 
