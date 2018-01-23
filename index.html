@@ -764,6 +764,8 @@
                         if(response.status) {
                            // display pop-up
                            //console.log(response);
+                           var vis_type = $('#sel-data-type').value;
+
                            var data = response;
                            if (data.triangles && data.triangles.length) {
                               data.triangles.forEach(function (t) {
@@ -771,10 +773,29 @@
                               });
                            }
 
-                          if (visualisation_triangles.length) {
-                            triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: waveheight_Style}).addTo(map,true);
+                          if (vis_type=='waveheight' || vis_type=='waveperiod' || vis_type=='bathymetry' || vis_type=='tide') {
+                            if (visualisation_triangles.length) {
+                              triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: waveheight_Style}).addTo(map,true);
+                            }
+                          } else if(vis_type=='wavedirection' || vis_type=='current') {
+                            var polylines = [];
+                            visualisation_triangles.forEach(function (t) {
+                              var tri = t['geometry']['coordinates'];
+                              var centroid = [(tri[0][0]+tri[0][1]+tri[0][2])/3, (tri[1][0]+tri[1][1]+tri[1][2])/3];
+                              var max_waveheight = 5;
+                              var waveheight = t['properties']['wave_height'];
+                              var wavedirection = t['properties']['wave_direction'];
+                              if (waveheight && wavedirection) { // draw arrow
+                                var m = Math.tan(wavedirection * Math.PI/180);
+                                var k = 0.001*(wave_height/max_waveheight)/Math.sqrt(1+m^2);
+                                var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
+                                polylines.append(L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])]));
+                              }
+                            });
+                            // add layer
+                            triangulation_layer = L.layerGroup(polylines);
+                            }
                           }
-
                         } else{
                         alert(response.msg);
                          }
