@@ -994,7 +994,7 @@ map.on("click", function (event) {
 
               var parseDate = d3.timeFormat("%Y-%m-%d-%I");
 
-              var x = d3.scaleTime().range([0, width]).ticks(20);;
+              var x = d3.scaleTime().range([0, width]);
               var y = d3.scaleLinear().range([height, 0]);
 
               var xAxis = d3.axisBottom(x)
@@ -1027,24 +1027,24 @@ map.on("click", function (event) {
               });
 
               // Scale the range of the data
-              x.domain(d3.extent(response.data, function (d) {
-                  return d.d;
-                  }));
-              y.domain([0, d3.max(response.data, function (d) {
-                  return d.v;
-                  })]);
+              x.domain(d3.extent(response.data, function (d) {return d.d;}));
+              y.domain([0, d3.max(response.data, function (d) {return d.v;})]);
 
-              svg.append("path") // Add the valueline path.
-              .attr("d", valueline(response.data));
+              // Add the valueline path.
+              svg.append("path") 
+              .data([response.data])
+              .attr("d", valueline);
 
-              svg.append("g") // Add the X Axis
-              .attr("class", "x axis")
-                  .attr("transform", "translate(0," + height + ")")
-                  .call(xAxis);
+              // Add the X Axis
+              svg.append("g") 
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
 
-              svg.append("g") // Add the Y Axis
-              .attr("class", "y axis")
-                  .call(yAxis);
+              // Add the Y Axis
+              svg.append("g") 
+                .attr("class", "y axis")
+                .call(yAxis);
 
 
               // svg.append("circle").style("stroke", "gray").style("fill", "white").attr("r", 100).attr("cx", 100).attr("cy", 100).on("mouseover", function () {
