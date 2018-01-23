@@ -983,13 +983,13 @@ map.on("click", function (event) {
                 content = 'wave-period: '+response.data[0].param;
               }
               var div = $('<div style="width: 200px; height: 200px;"><svg/></div>')[0];
+              var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div).openOn(map);
               var svg = d3.select('div svg').attr("width", 200).attr("height", 200);
               svg.append("circle").style("stroke", "gray").style("fill", "white").attr("r", 100).attr("cx", 100).attr("cy", 100).on("mouseover", function () {
                   d3.select(this).style("fill", "aliceblue");
               }).on("mouseout", function () {
                   d3.select(this).style("fill", "white");
               });
-              var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div).openOn(map);
             }
             console.log(div);
           } else{
