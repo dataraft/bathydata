@@ -377,7 +377,7 @@
 
 	      var slashes = protocol.concat("//");
 	      var host = slashes.concat(window.location.hostname);
-        host.contact(':'+window.location.port);
+        host.concat(':'+window.location.port);
 	      //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
