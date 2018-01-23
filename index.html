@@ -781,7 +781,7 @@
                             var polylines = [];
                             visualisation_triangles.forEach(function (t) {
                               var tri = t['geometry']['coordinates'];
-                              var centroid = [(tri[0][0]+tri[0][1]+tri[0][2])/3, (tri[1][0]+tri[1][1]+tri[1][2])/3];
+                              var centroid = [(tri[0][0][0]+tri[0][0][1]+tri[0][0][2])/3, (tri[0][1][0]+tri[0][1][1]+tri[0][1][2])/3];
                               var max_waveheight = 5;
                               var waveheight = t['properties']['wave_height'];
                               var wavedirection = t['properties']['wave_direction'];
