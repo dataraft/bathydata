@@ -790,7 +790,7 @@
                                 var m = Math.tan(wavedirection * Math.PI/180);
                                 var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
                                 var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
-                                polylines.push(L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])]));
+                                polylines.push(L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0}));
                               }
                             });
                             // add layer
