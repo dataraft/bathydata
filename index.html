@@ -1034,6 +1034,7 @@ map.on("click", function (event) {
               // Add the valueline path.
               svg.append("path") 
               .data([response.data])
+              .attr("class", "line")
               .attr("d", valueline);
 
               // Add the X Axis

@@ -307,3 +307,9 @@ background-size: cover;
 br {
 	font-size: 1.8vh !important;
 }
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
