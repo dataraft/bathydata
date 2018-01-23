@@ -25,6 +25,7 @@
 	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.css' rel='stylesheet' />
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
 <script type="text/javascript" src="browser_detect.js"></script>
    
    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -981,7 +982,21 @@ map.on("click", function (event) {
               } else if(data=='waveperiod') {
                 content = 'wave-period: '+response.data[0].param;
               }
-              var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(content).openOn(map);
+              var div = $('<div style="width: 200px; height: 200px;"><svg/></div>')[0];
+              var svg = d3.select("div svg").attr("width", 200).attr("height", 200);
+              svg.append("circle")
+              .style("stroke", "gray")
+              .style("fill", "white")
+              .attr("r", 100)
+              .attr("cx", 100)
+              .attr("cy", 100)
+              .on("mouseover", function () {
+                  d3.select(this).style("fill", "aliceblue");
+              })
+              .on("mouseout", function () {
+                  d3.select(this).style("fill", "white");
+              });
+              var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div).openOn(map);
             }
             console.log(response.data);
           } else{
