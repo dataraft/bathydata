@@ -1014,7 +1014,7 @@ map.on("click", function (event) {
               .x(function (d) {return x(d.d);})
               .y(function (d) {return y(d.v);});
 
-              var div = $('<div id="chart" style="width:700px;height:300px;"><svg/></div>')[0];
+              var div = $('<div id="chart" style="width:650px;height:300px;"><svg/></div>')[0];
               var popup = L.popup({maxWidth : 750}).setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div).openOn(map);
               var svg = d3.select('#chart svg')
               .attr("width", width + margin.left + margin.right)
