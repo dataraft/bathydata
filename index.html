@@ -376,8 +376,8 @@
         var protocol = location.protocol;
 
 	      var slashes = protocol.concat("//");
-	      //var host = slashes.concat(window.location.hostname);
-	      var host = 'http://14.139.160.45:8080';
+	      var host = slashes.concat(window.location.hostname);
+	      //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
@@ -982,18 +982,11 @@ map.on("click", function (event) {
               } else if(data=='waveperiod') {
                 content = 'wave-period: '+response.data[0].param;
               }
-              var div = $('<div style="width: 200px; height: 200px;"><svg/></div>')[0];
-              var svg = d3.select("div svg").attr("width", 200).attr("height", 200);
-              svg.append("circle")
-              .style("stroke", "gray")
-              .style("fill", "white")
-              .attr("r", 100)
-              .attr("cx", 100)
-              .attr("cy", 100)
-              .on("mouseover", function () {
+              var div = $('<div style="width: 200px; height: 200px;"><svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /><svg/></div>')[0];
+              var svg = d3.select(div).attr("width", 200).attr("height", 200);
+              svg.append("circle").style("stroke", "gray").style("fill", "white").attr("r", 100).attr("cx", 100).attr("cy", 100).on("mouseover", function () {
                   d3.select(this).style("fill", "aliceblue");
-              })
-              .on("mouseout", function () {
+              }).on("mouseout", function () {
                   d3.select(this).style("fill", "white");
               });
               var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent(div).openOn(map);
