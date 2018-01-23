@@ -764,7 +764,7 @@
                         if(response.status) {
                            // display pop-up
                            //console.log(response);
-                           var vis_type = $('#sel-data-type').value;
+                           var vis_type = $('#sel-data-type')[0].value;
 
                            var data = response;
                            if (data.triangles && data.triangles.length) {
