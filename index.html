@@ -788,7 +788,7 @@
                               var waveheight = t['properties']['wave_height'];
                               var wavedirection = t['properties']['wave_direction'];
                               if (waveheight && wavedirection) { // draw arrow
-                                var m = Math.tan(wavedirection * Math.PI/180);
+                                var m = Math.abs(Math.tan(wavedirection * Math.PI/180));
                                 var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
                                 var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
                                 var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
