@@ -755,6 +755,9 @@
                 console.log(layer.feature.properties);
                 layer.on('dblclick',function(){
                   console.log(layer.feature.properties.zid);
+                  // clear layer
+                  map.removeLayer(triangulation_layer);
+                  
                   $.ajax({
                      type : 'GET',
                      url : triangular_api+layer.feature.properties.zid,
@@ -784,26 +787,49 @@
                             visualisation_triangles.forEach(function (t) {
                               var tri = t['geometry']['coordinates'];
                               var centroid = [(tri[0][0][0]+tri[0][1][0]+tri[0][2][0])/3, (tri[0][0][1]+tri[0][1][1]+tri[0][2][1])/3];
-                              var max_waveheight = 0.5;
-                              var waveheight = t['properties']['wave_height'];
-                              var wavedirection = t['properties']['wave_direction'];
-                              if (waveheight && wavedirection) { // draw arrow
-                                var m = Math.abs(Math.tan(wavedirection * Math.PI/180));
-                                var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
-                                var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
-                                var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
-                                var arrowHead = L.polylineDecorator(arrow, {
-                                    patterns: [
-                                        {
-                                            offset: '100%',
-                                            repeat: 0,
-                                            symbol: L.Symbol.arrowHead({pixelSize: 8, polygon: false, pathOptions: {fillOpacity: 1, weight: 1}})
-                                        }
-                                    ]
-                                });
-                                polylines.push(arrow);
-                                polylines.push(arrowHead);
+                              if (vis_type=='wavedirection') {
+                                var max_waveheight = 0.5;
+                                var waveheight = t['properties']['wave_height'];
+                                var wavedirection = t['properties']['wave_direction'];
+                                if (waveheight && wavedirection) { // draw arrow
+                                  var m = Math.abs(Math.tan(wavedirection * Math.PI/180));
+                                  var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
+                                  var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
+                                  var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
+                                  var arrowHead = L.polylineDecorator(arrow, {
+                                      patterns: [
+                                          {
+                                              offset: '100%',
+                                              repeat: 0,
+                                              symbol: L.Symbol.arrowHead({pixelSize: 8, polygon: false, pathOptions: {fillOpacity: 1, weight: 1}})
+                                          }
+                                      ]
+                                  });
+                                  polylines.push(arrow);
+                                  polylines.push(arrowHead);
+                                }
+                              } else if(vis_type=='current') {
+                                var max_speed = 0.05;
+                                var speed = t['properties']['current_speed'];
+                                var currentdirection = t['properties']['current_direction'];
+                                if (speed && currentdirection) { // draw arrow
+                                  var m = Math.abs(Math.tan(currentdirection * Math.PI/180));
+                                  var k = 0.1*(speed/max_speed)/Math.sqrt(1+m*m);
+                                  var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
+                                  var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
+                                  var arrowHead = L.polylineDecorator(arrow, {
+                                      patterns: [
+                                          {
+                                              offset: '100%',
+                                              repeat: 0,
+                                              symbol: L.Symbol.arrowHead({pixelSize: 8, polygon: false, pathOptions: {fillOpacity: 1, weight: 1}})
+                                          }
+                                      ]
+                                  });
+                                  polylines.push(arrow);
+                                  polylines.push(arrowHead);
                               }
+
                             });
                             // add layer
                             triangulation_layer = L.layerGroup(polylines).addTo(map,true);
