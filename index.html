@@ -786,7 +786,15 @@
                           if (vis_type=='waveheight' || vis_type=='waveperiod' || vis_type=='bathymetry' || vis_type=='tide') {
                             if (visualisation_triangles.length) {
                               // add layer
-                              triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: waveheight_Style}).addTo(map,true);
+                              var vis_style = waveheight_Style;
+                              switch (vis_type) {
+                                case 'bathymetry':
+                                  vis_style = bathymetry_Style;
+                                  break;
+                                case tide:
+                                  vis_style = tide_Style;
+                              }
+                              triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: vis_style}).addTo(map,true);
                               triangulation_layers.push(triangulation_layer);
                               // clear layer
                               triangulation_layer.on('dblclick', function () {
@@ -1438,9 +1446,7 @@ function waveheight_Style (feature) {
     };
 }
 
-//*******************************************************Bathymetry****************************************//
-
-function getColor (d) {
+function getBathymetryColor (d) {
   return d > -1 ? '#B24A2A' :
          d > -1.5  ? '#C86339' :
          d > -2  ? '#F19D2B' :
@@ -1454,7 +1460,7 @@ function getColor (d) {
 function bathymetry_Style (feature) {
   
     return {
-      fillColor: getColor(feature.properties.depth),
+      fillColor: getBathymetryColor(feature.properties.depth),
       color: " #cecccc",
       weight: 0,
       fillOpacity:0.7
