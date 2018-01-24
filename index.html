@@ -26,6 +26,7 @@
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-polylinedecorator/1.1.0/leaflet.polylineDecorator.min.js"></script>
 <script type="text/javascript" src="browser_detect.js"></script>
    
    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -790,7 +791,18 @@
                                 var m = Math.tan(wavedirection * Math.PI/180);
                                 var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
                                 var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
-                                polylines.push(L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true}));
+                                var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
+                                var arrowHead = L.polylineDecorator(arrow, {
+                                    patterns: [
+                                        {
+                                            offset: '100%',
+                                            repeat: 0,
+                                            symbol: L.Symbol.arrowHead({pixelSize: 15, polygon: false, pathOptions: {stroke: true}})
+                                        }
+                                    ]
+                                });
+                                polylines.push(arrow);
+                                polylines.push(arrowHead);
                               }
                             });
                             // add layer
