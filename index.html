@@ -756,7 +756,7 @@
                 layer.on('dblclick',function(){
                   console.log(layer.feature.properties.zid);
                   // clear layer
-                  map.removeLayer(triangulation_layer);
+                  if (triangulation_layer) {map.removeLayer(triangulation_layer);}
 
                   $.ajax({
                      type : 'GET',
