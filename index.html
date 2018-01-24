@@ -1418,14 +1418,13 @@ else {
 //*******************************************************Visualisation****************************************//
 
 function getColor (d) {
-  return d > -1 ? '#B24A2A' :
-         d > -1.5  ? '#C86339' :
-         d > -2  ? '#F19D2B' :
-         d > -3  ? '#F6C550' :
-         d > -5  ? '#FAED9D' :
-         d > -8  ? '#E2E0D0' :
-         d > -10  ? '#A69BBC' :
-                    '#5A58AC';
+  return d < 0.3 ?  '#8B71FA' :
+         d < 0.5 ?  '#7CACFF' :
+         d < 0.75 ? '##55EAFF' :
+         d < 1  ?   '#35FCE1' :
+         d < 1.25 ? '#4DEEB8' :
+         d < 1.5  ? '#55E08A' :
+                    '#A0F081';
 }
 
 function waveheight_Style (feature) {
@@ -1433,7 +1432,7 @@ function waveheight_Style (feature) {
     return {
       fillColor: getColor(feature.properties.depth),
       color: " #cecccc",
-      weight: 1,
+      weight: 0,
       fillOpacity:0.7
     };
 }
