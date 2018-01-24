@@ -397,7 +397,7 @@
         var visualisation_triangles = []; // color coding features  //subscribed zone 
         var user_zones_layer;
         var user_zones = []; // user zone features
-        var triangulation_layer;
+        var triangulation_layers = [];
         var s_first_load =0; //check if shoreline default layer is loaded.   
         var s_latest_year = 2017 //the shoreline display latest year on slider. Also the dfault location of slider. 
 
@@ -731,6 +731,11 @@
             document.getElementById('dateto').reset();
         }
 
+        clearVisualisation = function() {
+          if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
+          visualisation_triangles = [];
+        }
+
         function load_zones() {
           var subscribed_zones = [];
             
@@ -756,8 +761,7 @@
                 layer.on('dblclick',function(){
                   console.log(layer.feature.properties.zid);
                   // clear layer
-                  if (triangulation_layer) {map.removeLayer(triangulation_layer);}
-                  visualisation_triangles = [];
+                  clearVisualisation();
 
                   $.ajax({
                      type : 'GET',
@@ -781,7 +785,13 @@
 
                           if (vis_type=='waveheight' || vis_type=='waveperiod' || vis_type=='bathymetry' || vis_type=='tide') {
                             if (visualisation_triangles.length) {
+                              // add layer
                               triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: waveheight_Style}).addTo(map,true);
+                              triangulation_layers.push(triangulation_layer);
+                              // clear layer
+                              triangulation_layer.on('dblclick', function () {
+                                 clearVisualisation();
+                              });
                             }
                           } else if(vis_type=='wavedirection' || vis_type=='current') {
                             var polylines = [];
@@ -834,11 +844,10 @@
                             });
                             // add layer
                             triangulation_layer = L.layerGroup(polylines).addTo(map,true);
+                            triangulation_layers.push(triangulation_layer);
                             // clear layer
                             triangulation_layer.on('dblclick', function () {
-                              console.log('removing visualisation layer.');
-                              if (triangulation_layer) {map.removeLayer(triangulation_layer);}
-                              visualisation_triangles = [];
+                              clearVisualisation();
                             });
                           }
                         } else{
