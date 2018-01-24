@@ -814,7 +814,7 @@
                                 var currentdirection = t['properties']['current_direction'];
                                 if (speed && currentdirection) { // draw arrow
                                   var m = Math.abs(Math.tan(currentdirection * Math.PI/180));
-                                  var k = 1*(speed/max_speed)/Math.sqrt(1+m*m);
+                                  var k = 0.1*(speed/max_speed)/Math.sqrt(1+m*m);
                                   var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
                                   var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
                                   var arrowHead = L.polylineDecorator(arrow, {
