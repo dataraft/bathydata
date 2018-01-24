@@ -787,13 +787,8 @@
                             if (visualisation_triangles.length) {
                               // add layer
                               var vis_style = waveheight_Style;
-                              switch (vis_type) {
-                                case 'bathymetry':
-                                  vis_style = bathymetry_Style;
-                                  break;
-                                case tide:
-                                  vis_style = tide_Style;
-                              }
+                              if (vis_type=='bathymetry') {vis_style = bathymetry_Style;}
+                              
                               triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: vis_style}).addTo(map,true);
                               triangulation_layers.push(triangulation_layer);
                               // clear layer
