@@ -757,7 +757,7 @@
                   console.log(layer.feature.properties.zid);
                   // clear layer
                   map.removeLayer(triangulation_layer);
-                  
+
                   $.ajax({
                      type : 'GET',
                      url : triangular_api+layer.feature.properties.zid,
@@ -828,8 +828,8 @@
                                   });
                                   polylines.push(arrow);
                                   polylines.push(arrowHead);
+                                }
                               }
-
                             });
                             // add layer
                             triangulation_layer = L.layerGroup(polylines).addTo(map,true);
