@@ -1442,6 +1442,27 @@ function waveheight_Style (feature) {
 }
 
 function getBathymetryColor (d) {
+  return d > -10 ? '#B24A2A' :
+         d > -20  ? '#C86339' :
+         d > -50 ? '#F19D2B' :
+         d > -100  ? '#F6C550' :
+         d > -500  ? '#FAED9D' :
+         d > -1000  ? '#E2E0D0' :
+         d > -5000  ? '#A69BBC' :
+                    '#5A58AC';
+}
+
+function bathymetry_Style (feature) {
+  
+    return {
+      fillColor: getBathymetryColor(feature.properties.bathymetry),
+      color: " #cecccc",
+      weight: 0,
+      fillOpacity:0.7
+    };
+}
+
+function getBathymetryHDColor (d) {
   return d > -1 ? '#B24A2A' :
          d > -1.5  ? '#C86339' :
          d > -2  ? '#F19D2B' :
@@ -1452,7 +1473,7 @@ function getBathymetryColor (d) {
                     '#5A58AC';
 }
 
-function bathymetry_Style (feature) {
+function bathymetryHD_Style (feature) {
   
     return {
       fillColor: getBathymetryColor(feature.properties.bathymetry),
