@@ -1418,7 +1418,8 @@ else {
 //*******************************************************Visualisation****************************************//
 
 function getWaveColor (d) {
-  return d < 0.2 ?  '#8B71FA' :
+  return d == null ? null:
+         d < 0.2 ?  '#8B71FA' :
          d < 0.4 ?  '#7CACFF' :
          d < 0.6 ? '##55EAFF' :
          d < 0.8  ?   '#35FCE1' :
