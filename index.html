@@ -834,8 +834,9 @@
                             });
                             // add layer
                             triangulation_layer = L.layerGroup(polylines).addTo(map,true);
+                            // clear layer
                             triangulation_layer.on('dblclick', function () {
-                              // clear layer
+                              console.log('removing visualisation layer.');
                               if (triangulation_layer) {map.removeLayer(triangulation_layer);}
                               visualisation_triangles = [];
                             });
