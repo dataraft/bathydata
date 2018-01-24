@@ -1417,7 +1417,7 @@ else {
 
 //*******************************************************Visualisation****************************************//
 
-function getColor (d) {
+function getWaveColor (d) {
   return d < 0.3 ?  '#8B71FA' :
          d < 0.5 ?  '#7CACFF' :
          d < 0.75 ? '##55EAFF' :
@@ -1430,7 +1430,7 @@ function getColor (d) {
 function waveheight_Style (feature) {
   
     return {
-      fillColor: getColor(feature.properties.wave_height),
+      fillColor: getWaveColor(feature.properties.wave_height),
       color: " #cecccc",
       weight: 0,
       fillOpacity:0.7
