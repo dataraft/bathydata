@@ -1033,6 +1033,7 @@ function addTomap() {   //ADD zones and bathymetry to map
 }
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
+ map.doubleClickZoom.disable();
  satellite_layer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
 
  satellite_layer.on('ready', updateAttribution);
