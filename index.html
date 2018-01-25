@@ -296,7 +296,7 @@
             <option value="current">Current </option>
           </select>
         </div>
-        <div>
+        <div id="div-sel-month">
           <select  id="sel-month">
             <option value="1" selected >January</option>
             <option value="2">February</option>
@@ -693,7 +693,7 @@
 
         $("#sel-data-type").on('change',function(){
             data_type = $('#sel-data-type').val();
-            var el = document.getElementById('dates');
+            var el = document.getElementById('#div-sel-month');
             if(data_type=='bathymetry') { el.style.display = 'none'}
                 else el.style.display='';
               //console.log(dates);
@@ -1414,7 +1414,8 @@ orderButton.onclick = function(){
         console.log('clicked');
         var url_order;
         if(data_type=='bathymetry') url_order = order_api+'&data='+data_type+'&polygon='+JSON.stringify(geo_json_data);
-        else url_order = order_api+'&data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data); 
+        else url_order = order_api+'&data='+data_type+'&month='+month+'&polygon='+JSON.stringify(geo_json_data);
+        //else url_order = order_api+'&data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data); 
 	request.open(method,url_order,async);
 	request.send();
 	request.onload = function(){
