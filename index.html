@@ -735,6 +735,8 @@
           if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
           visualisation_triangles = [];
         }
+        
+        var doubleclicked = false;
 
         function load_zones() {
           var subscribed_zones = [];
@@ -752,13 +754,19 @@
 
               // map point API
               subscribed_layer.on('click', function(e) {
-                pointData(e.latlng);
+                setTimeout(function() {
+                  if (!doubleclicked) {pointData(e.latlng);}
+                }, 100);
               });
 
               // visualisation
               subscribed_layer.eachLayer(function(layer){
                 console.log(layer.feature.properties);
                 layer.on('dblclick',function(){
+                  //prevent click event for 1 sec
+                  doubleclicked = true;
+                  setTimeout(function(){doubleclicked=false;}, 1000);
+
                   console.log(layer.feature.properties.zid);
                   // clear layer
                   clearVisualisation();
