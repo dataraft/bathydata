@@ -297,6 +297,7 @@
           </select>
         </div>
         <div id="div-sel-month">
+          <label for="sel-month">Month</label>
           <select  id="sel-month">
             <option value="1" selected >January</option>
             <option value="2">February</option>
@@ -439,6 +440,7 @@
         var dates;      //datatype.from_date/to_date
         var d_chose_from = '2017-10-10';      //download data date range
         var d_chose_to = '2017-12-25';
+        var month = 1;
         var loader = document.getElementById('loader');
 
         // map related //
@@ -1351,18 +1353,20 @@ getprice = function(layer) {
         answer.innerHTML = '<p><strong>' + area + 'kms<sup>2</sup> </strong></p>';
         datatype = $('#sel-data-type').val();
         if (datatype != 'bathymetry') {
-          datefrom = document.getElementById('datefrom').value;
-          dateto = document.getElementById('dateto').value;
-          console.log(datatype);
-          console.log(datefrom + '&' + dateto);
-         if(!isNaN(datefrom)) return;
-          if(!isNaN(dateto)) return;
-          datefrom = new Date(datefrom).toISOString();
-          dateto = new Date(dateto).toISOString();
+          month = document.getElementById('sel-month').value;
+          // datefrom = document.getElementById('datefrom').value;
+          // dateto = document.getElementById('dateto').value;
+          // console.log(datatype);
+          // console.log(datefrom + '&' + dateto);
+         // if(!isNaN(datefrom)) return;
+         //  if(!isNaN(dateto)) return;
+         //  datefrom = new Date(datefrom).toISOString();
+         //  dateto = new Date(dateto).toISOString();
         }
 
         
-        request.open(method,price_api+'data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
+    //request.open(method,price_api+'data='+data_type+'&from_date='+datefrom+'&to_date='+dateto+'&polygon='+JSON.stringify(geo_json_data),async);
+    request.open(method,price_api+'data='+data_type+'&month='+month+'&polygon='+JSON.stringify(geo_json_data),async);
 		request.setRequestHeader("Content-type","application/json;charset=UTF-8");
 		request.send();
 		request.onload = function(){
