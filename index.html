@@ -467,7 +467,7 @@
             if(response.status){
                 user_details = response.data;
                 dates = user_details.dates;
-                change_dates('waveheight');
+                //change_dates('waveheight');
                 console.log(user_details);
                        login_flag = true;
             login_flip(); 
@@ -697,9 +697,9 @@
             if(data_type=='bathymetry') { el.style.display = 'none'}
                 else el.style.display='';
               //console.log(dates);
-            if(dates && dates[data_type]) {
-              change_dates(data_type);
-            }
+            // if(dates && dates[data_type]) {
+            //   change_dates(data_type);
+            // }
             
         });
         change_dates = function(type){
