@@ -358,7 +358,7 @@
 	  </ul>
       </div>
 
-     <div  class="legend-box" id="legend-box">
+     <div  class="legend-box">
      		<figure class="map-leg-d-1" style="color:#cecccc"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> zones </span> </br>
         <figure class="map-leg-d-1" style="color:#00ff00"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
         <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd bathymetry </span> </br>
@@ -443,7 +443,7 @@
         var d_chose_to = '2017-12-25';
         var month = 1;
         var loader = document.getElementById('loader');
-        var legend_default =  $('#legend-box').innerHTML;
+        var legend_default =  $('.legend-box')[0].innerHTML;
 
         // map related //
         var heatmap_data;
@@ -755,7 +755,7 @@
           if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
           visualisation_triangles = [];
           // legend
-          $('#legend-box').innerHTML = legend_default;
+          $('.legend-box')[0].innerHTML = legend_default;
         }
         
         var doubleclicked = false;
@@ -832,7 +832,7 @@
                                   legend_html += '<figure class="map-leg-d-3"'+' style="background-color:'+getWaveColor(d)+'"">';
                                   legend_html += '<span style="font-size: 10px;position: relative;top: -5px;">< '+d+'</span> <br>';
                                 });
-                                $('#legend-box').innerHTML = legend_html;
+                                $('.legend-box')[0].innerHTML = legend_html;
                               }
                             }
                           } else if(vis_type=='wavedirection' || vis_type=='current') {
