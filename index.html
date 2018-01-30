@@ -1112,6 +1112,7 @@ map.on("click", function (event) {
 
   function pointData(latlng) {
     var data = $('#sel-data-type')[0].value;
+    var month = $('#sel-month')[0].value;
     var point = JSON.stringify({'type': 'Point', 'coordinates': [parseFloat(latlng.lng), parseFloat(latlng.lat)]});
     console.log(point);
 
@@ -1125,7 +1126,7 @@ map.on("click", function (event) {
     $.ajax({
        type : 'GET',
        url : point_api,
-       data : {'data': data, 'point': point},
+       data : {'data': data, 'month': month, 'point': point},
        dataType: 'json',
        cache: false,
        xhrFields: {
