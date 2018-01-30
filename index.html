@@ -829,9 +829,10 @@
                               if (vis_type=='waveheight' || vis_type=='waveperiod' || vis_type=='tide') {
                                 var legend_html = '';
                                 [0.2, 0.4, 0.6, 0.8, 1, 1,5].forEach(function(d) {
-                                  legend_html.push('<figure class="map-leg-d-3"'+' style="background-color:'+getWaveColor(d)+'"">');
-                                  legend_html.push('<span style="font-size: 10px;position: relative;top: -5px;">< '+d+'</span> <br>');
+                                  legend_html += '<figure class="map-leg-d-3"'+' style="background-color:'+getWaveColor(d)+'"">';
+                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;">< '+d+'</span> <br>';
                                 });
+                                $('legend-box').innerHTML = legend_html;
                               }
                             }
                           } else if(vis_type=='wavedirection' || vis_type=='current') {
