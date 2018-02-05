@@ -363,12 +363,12 @@
         <figure class="map-leg-d-1" style="color:#00ff00"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
         <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd bathymetry </span> </br>
         <figure class="map-leg-d-1" style="color:#0000ff"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> user bathymetry </span> </br>
-        <figure class="map-leg-d-2" style="color:#FFF700"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> current shoreline </span> </br>
-        <figure class="map-leg-d-2" style="color:#FFAA1D"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> past shoreline </span> </br>
+        <!--<figure class="map-leg-d-2" style="color:#FFF700"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> current shoreline </span> </br>
+        <figure class="map-leg-d-2" style="color:#FFAA1D"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> past shoreline </span> </br>-->
     </div>
 
- <div id="year-slider"></div>
- <div id="year-slider-start"></div>  
+ <div style="display:none;" id="year-slider"></div>
+ <div style="display:none;" id="year-slider-start"></div>  
 
 
 <div class="preloader-wrapper active" id="loader">
@@ -1246,12 +1246,12 @@ function addControlPlaceholders(map) {
     createCorner('verticalcenter', 'right');
 }
 addControlPlaceholders(map);
-map.zoomControl.setPosition('verticalcenterright');
+map.zoomControl.setPosition('topright');
 
 
 var featureGroup = L.featureGroup().addTo(map);
 var drawControl = new L.Control.Draw({
-	position:'verticalcenterright',
+	position:'topright',
 	draw:{
 		polyline:false,
 		circle:false,
