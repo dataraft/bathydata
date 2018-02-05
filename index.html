@@ -281,7 +281,7 @@
   </div>
 
 	<div id='map' style='position:absolute; top:0; bottom:0; width: 100%;'></div>
-  <pre id='latlng-display'></pre>
+  <pre id='latlng-display'>lat: 0.0, lng: 0.0</pre>
 	<div style="position: absolute; top:64px;left:0px; width:20vw;  z-index: 100">
 	  <ul class="collapsible" data-collapsible="accordion">
 	    <li>
@@ -397,7 +397,8 @@
 	      var slashes = protocol.concat("//");
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
-	      //var host = 'http://14.139.160.45:8080';
+	      //var host = 'http://10.24.1.151'
+        //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
@@ -1491,9 +1492,10 @@ function waveheight_Style (feature) {
   
     return {
       fillColor: getWaveColor(feature.properties.wave_height),
-      color: " #cecccc",
-      weight: 0,
-      fillOpacity:0.7
+      fillOpacity: 1,
+      color: getWaveColor(feature.properties.wave_height),
+      opacity: 1,
+      weight: 1,    
     };
 }
 
@@ -1512,9 +1514,10 @@ function bathymetry_Style (feature) {
   
     return {
       fillColor: getBathymetryColor(feature.properties.bathymetry),
-      color: " #cecccc",
-      weight: 0,
-      fillOpacity:0.7
+      fillOpacity: 1,
+      color: getWaveColor(feature.properties.wave_height),
+      opacity: 1,
+      weight: 1,
     };
 }
 
