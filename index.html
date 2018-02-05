@@ -777,14 +777,18 @@
               // map point API
               subscribed_layer.on('click', function(e) {
                 setTimeout(function() {
+                  console.log('click doubleclicked:'+doubleclicked);
                   if (!doubleclicked) {pointData(e.latlng);}
-                }, 100);
+                }, 500);
               });
 
               // visualisation
               subscribed_layer.eachLayer(function(layer){
                 console.log(layer.feature.properties);
                 layer.on('dblclick',function(){
+                  console.log('dbclick');
+                  //prevent second dbclick
+                  if (doubleclicked) return;
                   //prevent click event for 1 sec
                   doubleclicked = true;
                   setTimeout(function(){doubleclicked=false;}, 1000);
@@ -1082,29 +1086,30 @@ function addTomap() {   //ADD zones and bathymetry to map
  map.doubleClickZoom.disable();
  satellite_layer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
 
- satellite_layer.on('ready', updateAttribution);
+ map.on('ready', updateAttribution);
  map.on('mousemove', latlngDisplay);
 
  function updateAttribution() {
+  console.log('map loaded.');
  	var credits = L.control.attribution({prefix:false}).addTo(map);
-		credits.addAttribution('&copy; Shatej Technologies');
+		credits.addAttribution('&copy; Shatej Technologies Pvt. Ltd.');
 
 		var atags = Array.from(document.getElementsByClassName( 'leaflet-control-attribution' )[1].getElementsByTagName('a'));
 	 atags.forEach(function (a) {a.remove();})
  }
 
-map.on("click", function (event) {
-  var clickedLayers = leafletPip.pointInLayer(event.latlng, bathymetry_layer);
-  // Do something with clickedLayers
-  clickedLayers.forEach(function(layer){
-    layer.fireEvent('click',{
-      latlng: event.latlng,
-      layerPoint : event.layerPoint,
-      containerPoint: event.containerPoint,
-      originalEvent: event.originalEvent,
-    })
-  })
-});
+// map.on("click", function (event) {
+//   var clickedLayers = leafletPip.pointInLayer(event.latlng, bathymetry_layer);
+//   // Do something with clickedLayers
+//   clickedLayers.forEach(function(layer){
+//     layer.fireEvent('click',{
+//       latlng: event.latlng,
+//       layerPoint : event.layerPoint,
+//       containerPoint: event.containerPoint,
+//       originalEvent: event.originalEvent,
+//     })
+//   })
+// });
 
  function latlngDisplay(e) {
    document.getElementById('latlng-display').innerHTML = 'lat: '+parseFloat(e.latlng.lat).toFixed(4)+', lng: '+parseFloat(e.latlng.lng).toFixed(4);
