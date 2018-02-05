@@ -398,7 +398,7 @@
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
 	      //var host = 'http://10.24.1.151'
-        //var host = 'http://14.139.160.45:8080';
+        var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
@@ -788,6 +788,8 @@
                 console.log(layer.feature.properties);
                 layer.on('dblclick',function(){
                   console.log('dbclick');
+                  // loading bar
+                  loader.style.display = '';
                   //prevent second dbclick
                   if (doubleclicked) return;
                   //prevent click event for 1 sec
@@ -907,9 +909,11 @@
                         } else{
                         alert(response.msg);
                          }
+                        loader.style.display = 'none';
                       },
                       error : function(xhr) {
-                        alert('Server is down. Please try after sometime.');
+                        loader.style.display = 'none';
+                        alert('Unable to reach server. Please try after sometime.');
                       },
                     });
                 });
@@ -1042,6 +1046,8 @@ function addTomap() {   //ADD zones and bathymetry to map
 
       console.log(layer.feature.properties);
       layer.on('dblclick',function(){
+        // loader
+        loader.style.display = '';
         console.log(layer.feature.properties.zid);
         $.ajax({
        type : 'GET',
@@ -1071,9 +1077,11 @@ function addTomap() {   //ADD zones and bathymetry to map
           } else{
             alert(response.msg);
           }
+        loader.style.display = 'none';
        },
        error : function(xhr) {
-         alert('Server is down. Please try after sometime.');
+         loader.style.display = 'none';
+         alert('Unable to reach server. Please try after sometime.');
        },
     });
 
@@ -1128,6 +1136,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     }
 
     // subscribed zone check
+    loader.style.display = '';
 
     $.ajax({
        type : 'GET',
@@ -1144,25 +1153,22 @@ function addTomap() {   //ADD zones and bathymetry to map
             // display pop-up
             if (response.data) {
               console.log(response.data);
-              // var content = '';
-              // if (data=='waveheight') {
-              //   content = 'wave-height: '+response.data[0].param;
-              // } else if(data=='bathymetry') {
-              //   content = 'depth: '+response.data[0].param;
-              // } else if(data=='wavedirection') {
-              //   content = 'wave-direction: '+response.data[0].param;
-              // } else if(data=='waveperiod') {
-              //   content = 'wave-period: '+response.data[0].param;
-              // }
-              // d3-chart
+              
+              if (response.data instanceof Array && response.data.length==0) {
+                alert('No data available for selected month.');
+                loader.style.display = 'none';
+                return;
+              }
+              
+
               var margin = {
                   top: 30,
                   right: 20,
                   bottom: 30,
                   left: 50
               };
-              var width = 600 - margin.left - margin.right;
-              var height = 270 - margin.top - margin.bottom;
+              var width = 530;
+              var height = 210;
 
               var parseDate = d3.timeParse("%Y-%m-%d-%I");
 
@@ -1170,17 +1176,8 @@ function addTomap() {   //ADD zones and bathymetry to map
               var y = d3.scaleLinear().range([height, 0]);
 
               var xAxis = d3.axisBottom(x)
-              //.tickArguments([20, 'm'])
-
               var yAxis = d3.axisLeft(y)
-              //.tickArguments([d3.timeMinute.every(6*60)])
-
-              // var xAxis = d3.svg.axis().scale(x)
-              //   .orient("bottom").ticks(5);
-
-              // var yAxis = d3.svg.axis().scale(y)
-              //   .orient("left").ticks(5);
-              
+                            
               var valueline = d3.line()
               .x(function (d) {return x(d.d);})
               .y(function (d) {return y(d.v);});
@@ -1214,25 +1211,43 @@ function addTomap() {   //ADD zones and bathymetry to map
                 .attr("transform", "translate(0," + height + ")")
                 .call(xAxis);
 
+              // xLabel
+              svg.append("text")
+                .attr("transform", "translate(" + (width/2) + " ," +(height+margin.top) + ")")
+                .style("text-anchor", "middle")
+                .text("Date");
+
               // Add the Y Axis
               svg.append("g") 
                 .attr("class", "y axis")
                 .call(yAxis);
 
+              // yLabel
+              var yLabel = '';
+              if(data=='waveheight') yLabel = 'Wave Height (m)'
+              if(data=='waveperiod') yLabel = 'Wave Period (sec)'
+              if(data=='wavedirection') yLabel = 'Wave Direction (degrees)'
+              if(data=='tide') yLabel = 'Tide (m)'
+              if(data=='current') yLabel = 'Current Speed (m/s)'
+              if(data=='bathymetry') yLabel = 'Depth (m)'
 
-              // svg.append("circle").style("stroke", "gray").style("fill", "white").attr("r", 100).attr("cx", 100).attr("cy", 100).on("mouseover", function () {
-              //     d3.select(this).style("fill", "aliceblue");
-              // }).on("mouseout", function () {
-              //     d3.select(this).style("fill", "white");
-              // });
+              svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text(yLabel);
             }
             console.log(div);
           } else{
             alert(response.msg);
           }
+        loader.style.display = 'none';
        },
        error : function(xhr) {
-         alert('Server is down. Please try after sometime.');
+         loader.style.display = 'none';
+         alert('Unable to reach server. Please try after sometime.');
        },
     });
   }
