@@ -1154,12 +1154,19 @@ function addTomap() {   //ADD zones and bathymetry to map
             if (response.data) {
               console.log(response.data);
               
+              // No data
               if (response.data instanceof Array && response.data.length==0) {
                 alert('No data available for selected month.');
-                loader.style.display = 'none';
+                loader.style.display = 'none'; 
                 return;
               }
               
+              // bathymetry
+              if (data=='bathymetry') {
+                var popup = L.popup().setLatLng([parseFloat(latlng.lat), parseFloat(latlng.lng)]).setContent('<div>depth: '+response.data+' m</div>').openOn(map);
+                loader.style.display = 'none';
+                return;
+              }
 
               var margin = {
                   top: 30,
@@ -1209,7 +1216,7 @@ function addTomap() {   //ADD zones and bathymetry to map
               svg.append("g") 
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
-                .call(xAxis);
+                .call(xAxis.tickFormat(d3.timeFormat("%b %d")));
 
               // xLabel
               svg.append("text")
