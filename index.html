@@ -398,7 +398,7 @@
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
 	      //var host = 'http://10.24.1.151'
-        var host = 'http://14.139.160.45:8080';
+        //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
@@ -859,9 +859,9 @@
                                 var waveheight = t['properties']['wave_height'];
                                 var wavedirection = t['properties']['wave_direction'];
                                 if (waveheight && wavedirection) { // draw arrow
-                                  var m = Math.abs(Math.tan(wavedirection * Math.PI/180));
+                                  var m = Math.tan(wavedirection * Math.PI/180);
                                   var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
-                                  var new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];
+                                  var new_point = [centroid[0]-(k*1), centroid[1]-(k*m)];
                                   var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
                                   var arrowHead = L.polylineDecorator(arrow, {
                                       patterns: [
