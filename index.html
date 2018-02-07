@@ -1182,7 +1182,7 @@ function addTomap() {   //ADD zones and bathymetry to map
               var width = 530;
               var height = 210;
 
-              var parseDate = d3.timeParse("%Y-%m-%d-%I");
+              var parseDate = d3.timeParse("%Y-%m-%d-%H-%M");
 
               var x = d3.scaleTime().range([0, width]);
               var y = d3.scaleLinear().range([height, 0]);
