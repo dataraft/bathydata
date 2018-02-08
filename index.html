@@ -824,6 +824,8 @@
                             if (visualisation_triangles.length) {
                               // add layer
                               var vis_style = waveheight_Style;
+                              if (vis_type=='waveperiod') {vis_style = waveperiod_Style;}
+                              if (vis_type=='tide') {vis_style = tide_Style;}
                               if (vis_type=='bathymetry') {vis_style = bathymetry_Style;}
                               
                               triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: vis_style}).addTo(map,true);
@@ -833,16 +835,30 @@
                                  clearVisualisation();
                               });
                               // update legend
-                              if (vis_type=='waveheight' || vis_type=='waveperiod' || vis_type=='tide') {
+                              if (vis_type=='waveheight') {
                                 var legend_html = '';
-                                [0.2, 0.4, 0.6, 0.8, 1, 1,5].forEach(function(d) {
+                                [0.2, 0.4, 0.6, 0.8, 1, 1.5, 'rest'].forEach(function(d) {
                                   legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getWaveColor(d)+';background-color:'+getWaveColor(d)+'""></figure>';
-                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;"><= '+d+'</span> <br>';
+                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;"><= '+d+' m</span> <br>';
+                                });
+                                $('.legend-box')[0].innerHTML = legend_html;
+                              } else if (vis_type=='tide') {
+                                var legend_html = '';
+                                [0.01, 0.03, 0.05, 0.075, 0.1, 0.125, 'rest'].forEach(function(d) {
+                                  legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getTideColor(d)+';background-color:'+getTideColor(d)+'""></figure>';
+                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;"><= '+d+' m</span> <br>';
+                                });
+                                $('.legend-box')[0].innerHTML = legend_html;
+                              } else if (vis_type=='waveperiod'){
+                                var legend_html = '';
+                                [4, 4.5, 5, 5.5, 6, 8, 'rest'].forEach(function(d) {
+                                  legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getWavePeriodColor(d)+';background-color:'+getWavePeriodColor(d)+'""></figure>';
+                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;"><= '+d+' sec</span> <br>';
                                 });
                                 $('.legend-box')[0].innerHTML = legend_html;
                               } else {
                                 var legend_html = '';
-                                [-10, -20, -50, -100, -500, -1000, -5000].forEach(function(d) {
+                                [-10, -20, -50, -100, -500, -1000, -5000, 'rest'].forEach(function(d) {
                                   legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getBathymetryColor(d)+';background-color:'+getBathymetryColor(d)+'""></figure>';
                                   legend_html += '<span style="font-size: 10px;position: relative;top: -5px;">>= '+d+'</span> <br>';
                                 });
@@ -1186,7 +1202,7 @@ function addTomap() {   //ADD zones and bathymetry to map
 
               var x = d3.scaleTime().range([0, width]);
               var y = d3.scaleLinear().range([height, 0]);
-
+              
               var xAxis = d3.axisBottom(x)
               var yAxis = d3.axisLeft(y)
                             
@@ -1209,7 +1225,7 @@ function addTomap() {   //ADD zones and bathymetry to map
 
               // Scale the range of the data
               x.domain(d3.extent(response.data, function (d) {return d.d;}));
-              y.domain([0, d3.max(response.data, function (d) {return d.v;})]);
+              y.domain([d3.min(response.data, function (d) {return d.v;}), d3.max(response.data, function (d) {return d.v;})]);
 
               // Add the valueline path.
               svg.append("path") 
@@ -1512,7 +1528,7 @@ function getWaveColor (d) {
          d <= 0.8  ?   '#35FCE1' :
          d <= 1 ? '#4DEEB8' :
          d <= 1.5  ? '#55E08A' :
-                    '#A0F081';
+                    '#008000';
 }
 
 function waveheight_Style (feature) {
@@ -1521,6 +1537,50 @@ function waveheight_Style (feature) {
       fillColor: getWaveColor(feature.properties.wave_height),
       fillOpacity: 1,
       color: getWaveColor(feature.properties.wave_height),
+      opacity: 1,
+      weight: 1,    
+    };
+}
+
+function getWavePeriodColor (d) {
+  return d == null ? '':
+         d <= 4 ?  '#8B71FA' :
+         d <= 4.5 ?  '#7CACFF' :
+         d <= 5 ? '#55EAFF' :
+         d <= 5.5  ?   '#35FCE1' :
+         d <= 6 ? '#4DEEB8' :
+         d <= 8  ? '#55E08A' :
+                    '#008000';
+}
+
+function waveperiod_Style (feature) {
+  
+    return {
+      fillColor: getWavePeriodColor(feature.properties.wave_period),
+      fillOpacity: 1,
+      color: getWavePeriodColor(feature.properties.wave_period),
+      opacity: 1,
+      weight: 1,    
+    };
+}
+
+function getTideColor (d) {
+  return d == null ? '':
+         d <= 0.01 ?  '#8B71FA' :
+         d <= 0.03 ?  '#7CACFF' :
+         d <= 0.05 ? '#55EAFF' :
+         d <= 0.075  ?   '#35FCE1' :
+         d <= 0.1 ? '#4DEEB8' :
+         d <= 0.125  ? '#55E08A' :
+                    '#008000';
+}
+
+function tide_Style (feature) {
+  
+    return {
+      fillColor: getTideColor(feature.properties.tide),
+      fillOpacity: 1,
+      color: getTideColor(feature.properties.tide),
       opacity: 1,
       weight: 1,    
     };
@@ -1542,7 +1602,7 @@ function bathymetry_Style (feature) {
     return {
       fillColor: getBathymetryColor(feature.properties.bathymetry),
       fillOpacity: 1,
-      color: getWaveColor(feature.properties.wave_height),
+      color: getBathymetryColor(feature.properties.bathymetry),
       opacity: 1,
       weight: 1,
     };
