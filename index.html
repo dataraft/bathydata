@@ -397,8 +397,8 @@
 	      var slashes = protocol.concat("//");
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
-	      var host = 'http://10.24.1.151'
-        //var host = 'http://14.139.160.45:8080';
+	      //var host = 'http://10.24.1.151'
+        var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
@@ -755,6 +755,7 @@
         clearVisualisation = function() {
           if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
           visualisation_triangles = [];
+          bathymetry_triangles = [];        
           // legend
           $('.legend-box')[0].innerHTML = legend_default;
         }
@@ -1054,7 +1055,7 @@ function addTomap() {   //ADD zones and bathymetry to map
             }).addTo(map,true);
 
     if (bathymetry_triangles.length) {
-      triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: bathymetry_Style}).addTo(map,true);
+      triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: hdbathymetry_Style}).addTo(map,true);
     }
 
     bathymetry_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_zones}, {style: function() {return {color: " #ff0000",weight: 3,fillOpacity:0.05};}}).addTo(map,true);
@@ -1092,8 +1093,19 @@ function addTomap() {   //ADD zones and bathymetry to map
             }
 
             if (bathymetry_triangles.length) {
-        triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: bathymetry_Style}).addTo(map,true);
-        }
+                triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: hdbathymetry_Style}).addTo(map,true);
+                triangulation_layers.push(triangulation_layer);
+                // clear layer
+                triangulation_layer.on('dblclick', function () {
+                   clearVisualisation();
+                });
+                var legend_html = '';
+                [-2, -4, -6, -8, -10, 'rest'].forEach(function(d) {
+                  legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getHDBathymetryColor(d)+';background-color:'+getHDBathymetryColor(d)+'""></figure>';
+                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;">>= '+d+' m</span> <br>';
+                });
+                $('.legend-box')[0].innerHTML = legend_html;
+            } 
 
           } else{
             alert(response.msg);
@@ -1603,6 +1615,26 @@ function bathymetry_Style (feature) {
       fillColor: getBathymetryColor(feature.properties.bathymetry),
       fillOpacity: 1,
       color: getBathymetryColor(feature.properties.bathymetry),
+      opacity: 1,
+      weight: 1,
+    };
+}
+
+function getHDBathymetryColor (d) {
+  return d >= -2 ? '#B24A2A' :
+         d >= -4  ? '#C86339' :
+         d >= -6 ? '#F19D2B' :
+         d >= -8  ? '#F6C550' :
+         d >= -10  ? '#FAED9D' :
+                     '#5A58AC';
+}
+
+function hdbathymetry_Style (feature) {
+  
+    return {
+      fillColor: getHDBathymetryColor(feature.properties.depth),
+      fillOpacity: 1,
+      color: getHDBathymetryColor(feature.properties.depth),
       opacity: 1,
       weight: 1,
     };
