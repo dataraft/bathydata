@@ -860,7 +860,7 @@
                                 var legend_html = '';
                                 [-10, -20, -50, -100, -500, -1000, -5000, 'rest'].forEach(function(d) {
                                   legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getBathymetryColor(d)+';background-color:'+getBathymetryColor(d)+'""></figure>';
-                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;">>= '+d+'</span> <br>';
+                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;">>= '+d+' m</span> <br>';
                                 });
                                 $('.legend-box')[0].innerHTML = legend_html;
                               }
