@@ -802,9 +802,11 @@
                   // clear layer
                   clearVisualisation();
 
+                  month = $('#sel-month')[0].value;
+
                   $.ajax({
                      type : 'GET',
-                     url : triangular_api+layer.feature.properties.zid,
+                     url : triangular_api+layer.feature.properties.zid+'&month='+month,
                      dataType: 'json',
                      cache: false,
                      xhrFields: {withCredentials: true},
@@ -818,7 +820,7 @@
                            var data = response;
                            if (data.triangles && data.triangles.length) {
                               data.triangles.forEach(function (t) {
-                                visualisation_triangles.push({'type':'Feature','properties':{'wave_height':t[1], 'wave_direction':t[2], 'wave_period':t[3], 'bathymetry':t[4], 'tide':t[5], 'current_speed':t[6][0], 'current_direction':t[6][1]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
+                                visualisation_triangles.push({'type':'Feature','properties':{'wave_height':t[1], 'wave_direction':t[2], 'wave_period':t[3], 'bathymetry':t[4], 'tide':t[5], 'current_speed':t[6], 'current_direction':t[7]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
                               });
                            }
 
