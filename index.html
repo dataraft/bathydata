@@ -369,7 +369,8 @@
     </div>
 
  <div style="display:none;" id="year-slider"></div>
- <div style="display:none;" id="year-slider-start"></div>  
+ <div style="display:none;" id="year-slider-start"></div>
+ <div id="visualisation-slider"></div> 
 
 
 <div class="preloader-wrapper active" id="loader">
@@ -409,12 +410,14 @@
         var boundary_zones = []; // boundary zone features
         var boundary_triangles = []; // color coding features
         var shoreline_json = [];
-        var subscribed_layer
+        var subscribed_layer;
         var bathymetry_layer;
         var shoreline_layer=[];  // all shorelines 
         var bathymetry_zones = []; // bathymetry zone features
         var bathymetry_triangles = []; // color coding features  //bathy zone 
         var visualisation_triangles = []; // color coding features  //subscribed zone 
+        var visualisation_zid;
+        var visualisation_day = 1;
         var user_zones_layer;
         var user_zones = []; // user zone features
         var triangulation_layers = [];
@@ -753,12 +756,17 @@
             document.getElementById('dateto').reset();
         }
 
-        clearVisualisation = function() {
+        clearVisualisation = function(zid) {
           if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
           visualisation_triangles = [];
           bathymetry_triangles = [];        
           // legend
           $('.legend-box')[0].innerHTML = legend_default;
+          // slider off
+          if (zid!=visualisation_zid) {
+            vis_slider.style.display = 'none';
+            visualisation_zid = undefined;
+          }          
         }
         
         var doubleclicked = false;
@@ -799,14 +807,15 @@
                   setTimeout(function(){doubleclicked=false;}, 1000);
 
                   console.log(layer.feature.properties.zid);
+                                    
                   // clear layer
-                  clearVisualisation();
+                  clearVisualisation(layer.feature.properties.zid);
 
                   month = $('#sel-month')[0].value;
 
                   $.ajax({
                      type : 'GET',
-                     url : triangular_api+layer.feature.properties.zid+'&month='+month,
+                     url : triangular_api+layer.feature.properties.zid+'&month='+month+'&day='+visualisation_day,
                      dataType: 'json',
                      cache: false,
                      xhrFields: {withCredentials: true},
@@ -929,7 +938,26 @@
                             // clear layer
                             triangulation_layer.on('dblclick', function () {
                               clearVisualisation();
+                            });    
+                          }
+                          // slider update
+                          if (layer.feature.properties.zid!=visualisation_zid) {
+                            // current vis zid
+                            visualisation_zid = layer.feature.properties.zid;
+
+                            console.log('updating slider');
+                            vis_today = new Date();
+                            vis_from_date = new Date(vis_today.getFullYear(), parseInt(month)-1, 1);
+                            vis_to_date = new Date(vis_today.getFullYear(), parseInt(month), 0);
+                            vis_slider.noUiSlider.updateOptions({
+                              start: timestamp(vis_from_date.toString()),
+                              range: {
+                                'min': timestamp(vis_from_date.toString()),
+                                'max': timestamp(vis_to_date.toString())
+                              }
                             });
+
+                            vis_slider.style.display = 'block';
                           }
                         } else{
                         alert(response.msg);
@@ -1751,6 +1779,14 @@ function nth (d) {
     }
 }
 
+// Create a string representation of the date.
+function formatDate ( date ) {
+    return weekdays[date.getDay()] + ", " +
+        date.getDate() + nth(date.getDate()) + " " +
+        months[date.getMonth()] + " " +
+        date.getFullYear();
+}
+
 var dateValues = [
   document.getElementById('year-slider-start'),
 ];
@@ -1778,6 +1814,34 @@ handle.addEventListener('keydown', function( e ) {
       break;
   }
 });
+
+ // visualisation slider
+ var vis_slider = document.getElementById('visualisation-slider');
+ vis_slider.style.display = 'none';
+ var vis_today = new Date();
+ var vis_from_date = new Date(vis_today.getFullYear(), 0, 1);
+ var vis_to_date = new Date(vis_today.getFullYear(), 0, 31);
+
+ noUiSlider.create(vis_slider, {
+  start: timestamp(vis_from_date.toString()),
+  step: 24*60*60*1000,
+  connect: true,
+  tooltips: {
+    to: function (value) {return new Date(value).getDate()+' '+months[new Date(value).getMonth()]},
+  },
+  range: {
+    'min': timestamp(vis_from_date.toString()),
+    'max': timestamp(vis_to_date.toString())
+  }
+ });
+
+ vis_slider.noUiSlider.on('end', function(values, handle) {
+  visualisation_day = new Date(parseInt(values[0])).getDate();
+  // dblclick
+  subscribed_layer.eachLayer(function (layer) {
+    if (layer.feature.properties.zid==visualisation_zid) layer.fire('dblclick');
+  });
+ });
 
 
 //**********************************************browser detect*************************************************//
