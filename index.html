@@ -848,14 +848,16 @@
                            var vis_type = $('#sel-data-type')[0].value;
 
                            var data = response;
+                           var visualisation_triangles_temp = [];
+
                            if (data.triangles && data.triangles.length) {
                               data.triangles.forEach(function (t) {
-                                visualisation_triangles.push({'type':'Feature','properties':{'wave_height':t[1], 'wave_direction':t[2], 'wave_period':t[3], 'bathymetry':t[4], 'tide':t[5], 'current_speed':t[6], 'current_direction':t[7]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
+                                visualisation_triangles_temp.push({'type':'Feature','properties':{'wave_height':t[1], 'wave_direction':t[2], 'wave_period':t[3], 'bathymetry':t[4], 'tide':t[5], 'current_speed':t[6], 'current_direction':t[7]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
                               });
                            }
 
                           if (vis_type=='waveheight' || vis_type=='waveperiod' || vis_type=='bathymetry' || vis_type=='tide') {
-                            if (visualisation_triangles.length) {
+                            if (visualisation_triangles_temp.length) {
                               // add layer
                               var vis_style = waveheight_Style;
                               if (vis_type=='waveperiod') {vis_style = waveperiod_Style;}
@@ -864,9 +866,8 @@
 
                               // clear only layer
                               clearVisualisation(layer.feature.properties.zid, true);
-                              console.log('ok');
                               // add layer
-                              triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: vis_style}).addTo(map,true);
+                              triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles_temp}, {style: vis_style}).addTo(map,true);
                               triangulation_layers.push(triangulation_layer);
                               // clear layer
                               triangulation_layer.on('dblclick', function () {
@@ -905,7 +906,7 @@
                             }
                           } else if(vis_type=='wavedirection' || vis_type=='current') {
                             var polylines = [];
-                            visualisation_triangles.forEach(function (t) {
+                            visualisation_triangles_temp.forEach(function (t) {
                               var tri = t['geometry']['coordinates'];
                               var centroid = [(tri[0][0][0]+tri[0][1][0]+tri[0][2][0])/3, (tri[0][0][1]+tri[0][1][1]+tri[0][2][1])/3];
                               if (vis_type=='wavedirection') {
