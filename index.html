@@ -757,13 +757,13 @@
         }
 
         clearVisualisation = function(zid) {
-          if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
-          visualisation_triangles = [];
-          bathymetry_triangles = [];        
-          // legend
-          $('.legend-box')[0].innerHTML = legend_default;
-          // slider off
-          if (zid!=visualisation_zid) {
+	  if (zid!=visualisation_zid) {
+	    if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
+	    visualisation_triangles = [];
+	    bathymetry_triangles = [];        
+	    // legend
+	    $('.legend-box')[0].innerHTML = legend_default;
+            // slider off
             vis_slider.style.display = 'none';
             visualisation_zid = undefined;
           }          
