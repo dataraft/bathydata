@@ -399,7 +399,7 @@
 	      var slashes = protocol.concat("//");
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
-	      //var host = 'http://10.24.1.151'
+	      var host = 'http://10.24.1.151'
         //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
@@ -437,7 +437,7 @@
         var order_api = host+'/download/order/?';
         var logout_api = host+'/download/logout/';
         var upload_api = host+'/download/upload/';
-        var triangular_api = host+'/download/zonedata?zid=';
+        var triangular_api = host+'/download/zonedata/?zid=';
         var shoreline_api = host+'/download/shoreline/?year='
         var user_details;
         var login_flag = false;
@@ -756,11 +756,18 @@
             document.getElementById('dateto').reset();
         }
 
-        clearVisualisation = function(zid) {
-	        if (zid!=visualisation_zid) {
-            if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
+        clearVisualisation = function(zid, onlylayers) {
+	        if (visualisation_zid && zid!=visualisation_zid) {
+            console.log('clear all ...')
+            if (triangulation_layers.length) {
+              triangulation_layers.forEach(function (l) {
+                var index = triangulation_layers.indexOf(l);
+                if(index !== -1) {triangulation_layers.splice(index, 1);}
+                map.removeLayer(l)
+              });
+            }
 	          visualisation_triangles = [];
-	          bathymetry_triangles = [];        
+	          bathymetry_triangles = [];     
 
 	          // legend
 	          $('.legend-box')[0].innerHTML = legend_default;
@@ -768,13 +775,19 @@
             // slider off
             vis_slider.style.display = 'none';
             visualisation_zid = undefined;
-          } else { // clear only layers
-            console.log('clear layers ...')
-            if (triangulation_layers.length) {triangulation_layers.forEach(function (l) {map.removeLayer(l)});};
-            visualisation_triangles = [];
-            bathymetry_triangles = [];
-          }
+          } 
 
+          if (onlylayers) { // clear only layers
+            console.log('clear layers ...')
+            console.log(triangulation_layers)
+            if (triangulation_layers.length) {
+              triangulation_layers.forEach(function (l) {
+                var index = triangulation_layers.indexOf(l);
+                if(index !== -1) {triangulation_layers.splice(index, 1);}
+                map.removeLayer(l)
+              });
+            }
+          }
         }
         
         var doubleclicked = false;
@@ -848,7 +861,11 @@
                               if (vis_type=='waveperiod') {vis_style = waveperiod_Style;}
                               if (vis_type=='tide') {vis_style = tide_Style;}
                               if (vis_type=='bathymetry') {vis_style = bathymetry_Style;}
-                              
+
+                              // clear only layer
+                              clearVisualisation(layer.feature.properties.zid, true);
+                              console.log('ok');
+                              // add layer
                               triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles}, {style: vis_style}).addTo(map,true);
                               triangulation_layers.push(triangulation_layer);
                               // clear layer
@@ -940,6 +957,8 @@
                                 }
                               }
                             });
+                            // clear only layer
+                            clearVisualisation(layer.feature.properties.zid, true);
                             // add layer
                             triangulation_layer = L.layerGroup(polylines).addTo(map,true);
                             triangulation_layers.push(triangulation_layer);
