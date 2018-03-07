@@ -399,7 +399,7 @@
 	      var slashes = protocol.concat("//");
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
-	      var host = 'http://10.24.1.151'
+	      //var host = 'http://10.24.1.151'
         //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
@@ -883,7 +883,7 @@
                                 $('.legend-box')[0].innerHTML = legend_html;
                               } else if (vis_type=='tide') {
                                 var legend_html = '';
-                                [0.01, 0.03, 0.05, 0.075, 0.1, 0.125, 'rest'].forEach(function(d) {
+                                [0.2, 0.4, 0.6, 0.8, 1, 1.2, 'rest'].forEach(function(d) {
                                   legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getTideColor(d)+';background-color:'+getTideColor(d)+'""></figure>';
                                   legend_html += '<span style="font-size: 10px;position: relative;top: -5px;"><= '+d+' m</span> <br>';
                                 });
@@ -1637,12 +1637,12 @@ function waveperiod_Style (feature) {
 
 function getTideColor (d) {
   return d == null ? '':
-         d <= 0.01 ?  '#8B71FA' :
-         d <= 0.03 ?  '#7CACFF' :
-         d <= 0.05 ? '#55EAFF' :
-         d <= 0.075  ?   '#35FCE1' :
-         d <= 0.1 ? '#4DEEB8' :
-         d <= 0.125  ? '#55E08A' :
+         d <= 0.2 ?  '#8B71FA' :
+         d <= 0.4 ?  '#7CACFF' :
+         d <= 0.6 ? '#55EAFF' :
+         d <= 0.8  ?   '#35FCE1' :
+         d <= 1 ? '#4DEEB8' :
+         d <= 1.2  ? '#55E08A' :
                     '#008000';
 }
 
