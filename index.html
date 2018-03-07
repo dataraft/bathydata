@@ -904,7 +904,7 @@
                                 $('.legend-box')[0].innerHTML = legend_html;
                               }
                             }
-                          } else if(vis_type=='wavedirection' || vis_type=='current') {
+                          } else if(vis_type=='wavedirection' || vis_type=='currentdirection') {
                             var polylines = [];
                             visualisation_triangles_temp.forEach(function (t) {
                               var tri = t['geometry']['coordinates'];
@@ -935,7 +935,7 @@
                                   polylines.push(arrow);
                                   polylines.push(arrowHead);
                                 }
-                              } else if(vis_type=='current') {
+                              } else if(vis_type=='currentdirection') {
                                 var max_speed = 0.5;
                                 var speed = t['properties']['current_speed'];
                                 var currentdirection = t['properties']['current_direction'];
