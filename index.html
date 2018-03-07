@@ -939,8 +939,7 @@
                                 var max_speed = 0.5;
                                 var speed = t['properties']['current_speed'];
                                 var currentdirection = t['properties']['current_direction'];
-                                if currentdirection<0:
-                                  currentdirection = 360+currentdirection
+                                if (currentdirection<0) currentdirection = 360+currentdirection
 
                                 if (speed && currentdirection) { // draw arrow
                                   var m = Math.abs(Math.tan(currentdirection * Math.PI/180));
