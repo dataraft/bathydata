@@ -399,7 +399,7 @@
 	      var slashes = protocol.concat("//");
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
-	      var host = 'http://10.24.1.151'
+	      //var host = 'http://10.24.1.151'
         //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
@@ -913,14 +913,20 @@
                                 var max_waveheight = 0.5;
                                 var waveheight = t['properties']['wave_height'];
                                 var wavedirection = t['properties']['wave_direction'];
+                                // transform to EAST
+                                if (wavedirection>=0 && wavedirection<90) wavedirection = 270-wavedirection; // Q1
+                                else if(wavedirection>=90 && wavedirection<180) wavedirection = 270-wavedirection; // Q2
+                                else if(wavedirection>=180 && wavedirection<270) wavedirection = 270-wavedirection; // Q3
+                                else if(wavedirection>=270 && wavedirection<360) wavedirection = 630-wavedirection; // Q4
+
                                 if (waveheight && wavedirection) { // draw arrow
                                   var m = Math.abs(Math.tan(wavedirection * Math.PI/180));
                                   var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
                                   var new_point;
                                   if (wavedirection>=0 && wavedirection<90) {new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];} // Q1
-                                  else if(wavedirection>=90 && wavedirection<180) {new_point = [centroid[0]+(k*1), centroid[1]-(k*m)];} // Q2
+                                  else if(wavedirection>=90 && wavedirection<180) {new_point = [centroid[0]-(k*1), centroid[1]+(k*m)];} // Q2
                                   else if(wavedirection>=180 && wavedirection<270) {new_point = [centroid[0]-(k*1), centroid[1]-(k*m)];} // Q3
-                                  else if(wavedirection>=270 && wavedirection<360) {new_point = [centroid[0]-(k*1), centroid[1]+(k*m)];} // Q4
+                                  else if(wavedirection>=270 && wavedirection<360) {new_point = [centroid[0]+(k*1), centroid[1]-(k*m)];} // Q4
 
                                   var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
                                   var arrowHead = L.polylineDecorator(arrow, {
