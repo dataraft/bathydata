@@ -939,16 +939,15 @@
                                 var max_speed = 0.5;
                                 var speed = t['properties']['current_speed'];
                                 var currentdirection = t['properties']['current_direction'];
-                                if (currentdirection<0) currentdirection = 360+currentdirection
 
                                 if (speed && currentdirection) { // draw arrow
                                   var m = Math.abs(Math.tan(currentdirection * Math.PI/180));
                                   var k = 0.1*(speed/max_speed)/Math.sqrt(1+m*m);
                                   var new_point;
                                   if (currentdirection>=0 && currentdirection<90) {new_point = [centroid[0]+(k*m), centroid[1]+(k*1)];} // Q1
-                                  else if(currentdirection>=90 && currentdirection<180) {new_point = [centroid[0]+(k*m), centroid[1]-(k*1)];} // Q2
+                                  else if(currentdirection>=90 && currentdirection<180) {new_point = [centroid[0]-(k*m), centroid[1]+(k*1)];} // Q2
                                   else if(currentdirection>=180 && currentdirection<270) {new_point = [centroid[0]-(k*m), centroid[1]-(k*1)];} // Q3
-                                  else if(currentdirection>=270 && currentdirection<360) {new_point = [centroid[0]-(k*m), centroid[1]+(k*1)];} // Q4
+                                  else if(currentdirection>=270 && currentdirection<360) {new_point = [centroid[0]+(k*m), centroid[1]-(k*1)];} // Q4
 
                                   var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
                                   var arrowHead = L.polylineDecorator(arrow, {
