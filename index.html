@@ -819,10 +819,10 @@
                 console.log(layer.feature.properties);
                 layer.on('dblclick',function(){
                   console.log('dbclick');
-                  // loading bar
-                  loader.style.display = '';
                   //prevent second dbclick
                   if (doubleclicked) return;
+                  // loading bar
+                  loader.style.display = '';                  
                   //prevent click event for 1 sec
                   doubleclicked = true;
                   setTimeout(function(){doubleclicked=false;}, 1000);
