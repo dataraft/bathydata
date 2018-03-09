@@ -399,7 +399,7 @@
 	      var slashes = protocol.concat("//");
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
-	      //var host = 'http://10.24.1.151'
+	      var host = 'http://10.24.1.151'
         //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
@@ -416,7 +416,8 @@
         var bathymetry_zones = []; // bathymetry zone features
         var bathymetry_triangles = []; // color coding features  //bathy zone 
         var visualisation_triangles = []; // color coding features  //subscribed zone 
-        var visualisation_zid;
+        var visualisation_zid;   // slider reset
+        var visualisation_month; // slider reset
         var visualisation_day = 1;
         var user_zones_layer;
         var user_zones = []; // user zone features
@@ -832,7 +833,14 @@
                   // clear layer
                   clearVisualisation(layer.feature.properties.zid);
 
-                  month = $('#sel-month')[0].value;
+                  var month = $('#sel-month')[0].value;
+                  var day = visualisation_day;
+
+                  if (month!=visualisation_month) { // month change during vis
+                    visualisation_month = null;
+                    visualisation_day = 1;
+                    day = visualisation_day;
+                  }
 
                   $.ajax({
                      type : 'GET',
@@ -982,9 +990,10 @@
                             });    
                           }
                           // slider update
-                          if (layer.feature.properties.zid!=visualisation_zid) {
-                            // current vis zid
+                          if (layer.feature.properties.zid!=visualisation_zid || visualisation_month==null) {
+                            // current vis zid and month
                             visualisation_zid = layer.feature.properties.zid;
+                            visualisation_month = month;
 
                             console.log('updating slider');
                             vis_today = new Date();
@@ -999,7 +1008,13 @@
                             });
 
                             vis_slider.style.display = 'block';
+                          } else { // update slider day
+                            var year = new Date().getFullYear();
+                            var day_timestamp = new Date(year, parseInt(month)-1, parseInt(day)).getTime(); 
+                            vis_slider.noUiSlider.set(day_timestamp);
                           }
+                          
+
                         } else{
                         alert(response.msg);
                          }
@@ -1882,6 +1897,14 @@ handle.addEventListener('keydown', function( e ) {
 
  vis_slider.noUiSlider.on('end', function(values, handle) {
   visualisation_day = new Date(parseInt(values[0])).getDate();
+  // dblclick
+  subscribed_layer.eachLayer(function (layer) {
+    if (layer.feature.properties.zid==visualisation_zid) layer.fire('dblclick');
+  });
+ });
+ // tapped slider 
+ vis_slider.noUiSlider.on('change', function(values, handle) {
+   visualisation_day = new Date(parseInt(values[0])).getDate();
   // dblclick
   subscribed_layer.eachLayer(function (layer) {
     if (layer.feature.properties.zid==visualisation_zid) layer.fire('dblclick');
