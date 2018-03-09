@@ -924,10 +924,10 @@
                                   var m = Math.abs(Math.tan(wavedirection * Math.PI/180));
                                   var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
                                   var new_point;
-                                  if (wavedirection>=0 && wavedirection<90) {new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];} // Q1
-                                  else if(wavedirection>=90 && wavedirection<180) {new_point = [centroid[0]-(k*1), centroid[1]+(k*m)];} // Q2
-                                  else if(wavedirection>=180 && wavedirection<270) {new_point = [centroid[0]-(k*1), centroid[1]-(k*m)];} // Q3
-                                  else if(wavedirection>=270 && wavedirection<360) {new_point = [centroid[0]+(k*1), centroid[1]-(k*m)];} // Q4
+                                  if (wavedirection>0 && wavedirection<=90) {new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];} // Q1
+                                  else if(wavedirection>90 && wavedirection<=180) {new_point = [centroid[0]-(k*1), centroid[1]+(k*m)];} // Q2
+                                  else if(wavedirection>180 && wavedirection<=270) {new_point = [centroid[0]-(k*1), centroid[1]-(k*m)];} // Q3
+                                  else if(wavedirection>270 && wavedirection<=360) {new_point = [centroid[0]+(k*1), centroid[1]-(k*m)];} // Q4
 
                                   var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
                                   var arrowHead = L.polylineDecorator(arrow, {
