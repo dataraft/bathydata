@@ -837,6 +837,7 @@
                   $.ajax({
                      type : 'GET',
                      url : triangular_api+layer.feature.properties.zid+'&month='+month+'&day='+visualisation_day,
+                     timeout: 30000,
                      dataType: 'json',
                      cache: false,
                      xhrFields: {withCredentials: true},
@@ -1145,6 +1146,7 @@ function addTomap() {   //ADD zones and bathymetry to map
         $.ajax({
        type : 'GET',
        url : triangular_api+layer.feature.properties.zid,
+       timeout: 30000,
        dataType: 'json',
        cache: false,
        xhrFields: {
@@ -1245,6 +1247,7 @@ function addTomap() {   //ADD zones and bathymetry to map
     $.ajax({
        type : 'GET',
        url : point_api,
+       timeout: 30000,
        data : {'data': data, 'month': month, 'point': point},
        dataType: 'json',
        cache: false,
@@ -1752,6 +1755,7 @@ uploadData =  function() {
      type : 'POST',
      enctype: 'multipart/form-data',
      url : upload_api,
+     timeout: 30000,
      data : formData,
      processData: false,  // tell jQuery not to process the data
      contentType: false,  // tell jQuery not to set contentType
