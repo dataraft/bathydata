@@ -371,6 +371,7 @@
  <div style="display:none;" id="year-slider"></div>
  <div style="display:none;" id="year-slider-start"></div>
  <div id="visualisation-slider"></div> 
+ <div id="visualisation-close"><button onclick="clearVisualisation();" type="button" class="btn">CLOSE</button></div>
 
 
 <div class="preloader-wrapper active" id="loader">
@@ -776,6 +777,7 @@
             // slider off
             vis_slider.style.display = 'none';
             visualisation_zid = undefined;
+            vis_close.style.display = 'none';
           } 
 
           if (onlylayers) { // clear only layers
@@ -1008,6 +1010,7 @@
                             });
 
                             vis_slider.style.display = 'block';
+                            vis_close.style.display = 'block';
                           } else { // update slider day
                             var year = new Date().getFullYear();
                             var day_timestamp = new Date(year, parseInt(month)-1, parseInt(day)).getTime(); 
@@ -1878,6 +1881,8 @@ handle.addEventListener('keydown', function( e ) {
  // visualisation slider
  var vis_slider = document.getElementById('visualisation-slider');
  vis_slider.style.display = 'none';
+ var vis_close = document.getElementById('visualisation-close');
+ vis_close.style.display = 'none';
  var vis_today = new Date();
  var vis_from_date = new Date(vis_today.getFullYear(), 0, 1);
  var vis_to_date = new Date(vis_today.getFullYear(), 0, 31);
