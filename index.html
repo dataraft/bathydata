@@ -400,7 +400,7 @@
 	      var slashes = protocol.concat("//");
 	      var host = slashes.concat(window.location.hostname);
         host = host.concat(':'+window.location.port);
-	      var host = 'http://10.24.1.151'
+	      //var host = 'http://10.24.1.151'
         //var host = 'http://14.139.160.45:8080';
         var zone; //zones the user needs to update
         var zone_local=[]; // store the zone names and ids in local.
@@ -423,6 +423,7 @@
         var user_zones_layer;
         var user_zones = []; // user zone features
         var triangulation_layers = [];
+        var bathymetry_triangulation_layers = [];
         var s_first_load =0; //check if shoreline default layer is loaded.   
         var s_latest_year = 2017 //the shoreline display latest year on slider. Also the dfault location of slider. 
 
@@ -758,6 +759,19 @@
             document.getElementById('dateto').reset();
         }
 
+        clearBathymetryVisualisation = function() {
+          console.log('clear bathymetry vis.')
+          if (bathymetry_triangulation_layers.length) {
+              bathymetry_triangulation_layers.forEach(function (l) {
+                map.removeLayer(l)
+              });
+              bathymetry_triangulation_layers = [];
+            }
+            
+            // legend
+            $('.legend-box')[0].innerHTML = legend_default;
+        }
+
         clearVisualisation = function(zid, onlylayers) {
 	        if (visualisation_zid && zid!=visualisation_zid) {
             console.log('clear all ...')
@@ -768,8 +782,8 @@
                 map.removeLayer(l)
               });
             }
-	          visualisation_triangles = [];
-	          bathymetry_triangles = [];     
+	          // visualisation_triangles = [];
+	          // bathymetry_triangles = [];     
 
 	          // legend
 	          $('.legend-box')[0].innerHTML = legend_default;
@@ -884,6 +898,13 @@
                               triangulation_layer.on('dblclick', function () {
                                  clearVisualisation();
                               });
+                              // map point API
+                              triangulation_layer.on('click', function(e) {
+                                setTimeout(function() {
+                                  console.log('click doubleclicked:'+doubleclicked);
+                                  if (!doubleclicked) {pointData(e.latlng);}
+                                }, 500);
+                              });
                               // update legend
                               if (vis_type=='waveheight') {
                                 var legend_html = '';
@@ -989,7 +1010,14 @@
                             // clear layer
                             triangulation_layer.on('dblclick', function () {
                               clearVisualisation();
-                            });    
+                            });
+                            // map point API
+                            triangulation_layer.on('click', function(e) {
+                              setTimeout(function() {
+                                console.log('click doubleclicked:'+doubleclicked);
+                                if (!doubleclicked) {pointData(e.latlng);}
+                              }, 500);
+                            });
                           }
                           // slider update
                           if (layer.feature.properties.zid!=visualisation_zid || visualisation_month==null) {
@@ -1158,6 +1186,13 @@ function addTomap() {   //ADD zones and bathymetry to map
 
       console.log(layer.feature.properties);
       layer.on('dblclick',function(){
+        console.log('dbclick');
+        //prevent second dbclick
+        if (doubleclicked) return;
+        //prevent click event for 1 sec
+        doubleclicked = true;
+        setTimeout(function(){doubleclicked=false;}, 1000);
+
         // loader
         loader.style.display = '';
         console.log(layer.feature.properties.zid);
@@ -1174,21 +1209,22 @@ function addTomap() {   //ADD zones and bathymetry to map
        success : function(response) {
           if(response.status) {
             // display pop-up
-            
+            var bathymetry_triangles_temp = []; 
+
             console.log(response);
             var data = response;
             if (data.triangles && data.triangles.length) {
                 data.triangles.forEach(function (t) {
-                  bathymetry_triangles.push({'type':'Feature','properties':{'depth':t[1]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
+                  bathymetry_triangles_temp.push({'type':'Feature','properties':{'depth':t[1]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
                 });
             }
 
-            if (bathymetry_triangles.length) {
-                triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles}, {style: hdbathymetry_Style}).addTo(map,true);
-                triangulation_layers.push(triangulation_layer);
+            if (bathymetry_triangles_temp.length) {
+                var triangulation_layer_temp = L.mapbox.featureLayer({type:"FeatureCollection", features:bathymetry_triangles_temp}, {style: hdbathymetry_Style}).addTo(map,true);
+                bathymetry_triangulation_layers.push(triangulation_layer_temp);
                 // clear layer
-                triangulation_layer.on('dblclick', function () {
-                   clearVisualisation();
+                triangulation_layer_temp.on('dblclick', function () {
+                   clearBathymetryVisualisation();
                 });
                 var legend_html = '';
                 [-2, -4, -6, -8, -10, 'rest'].forEach(function(d) {
