@@ -436,7 +436,6 @@
         var zone_local=[]; // store the zone names and ids in local.
         var zone_array=[];  
         
-        var satellite_layer; // tiles
         var boundary_layer;
         var boundary_zones = []; // boundary zone features
         var boundary_triangles = []; // color coding features
@@ -1283,7 +1282,9 @@ function addTomap() {   //ADD zones and bathymetry to map
 
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
  map.doubleClickZoom.disable();
- satellite_layer = L.mapbox.tileLayer('mapbox.streets-satellite'); 
+ 
+ // current layer
+ L.tileLayer('http://10.24.1.151/tiles/{z}/{x}/{y}.png?{foo}', {foo: 'bar', maxZoom: 18}).addTo(map);
 
  map.on('ready', updateAttribution);
  map.on('mousemove', latlngDisplay);
