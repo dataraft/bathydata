@@ -27,7 +27,8 @@
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-polylinedecorator/1.1.0/leaflet.polylineDecorator.min.js"></script>
-<script type="text/javascript" src="browser_detect.js"></script>
+  <script src="https://rawgithub.com/mylen/leaflet.TileLayer.WMTS/master/leaflet-tilelayer-wmts.js"></script>
+  <script type="text/javascript" src="browser_detect.js"></script>
    
    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
@@ -1284,8 +1285,34 @@ function addTomap() {   //ADD zones and bathymetry to map
  map.doubleClickZoom.disable();
  
  // current layer
- L.tileLayer('http://10.24.1.151/tiles/{z}/{x}/{y}.png?{foo}', {foo: 'bar', maxZoom: 18}).addTo(map);
+ //test_layer = L.tileLayer('http://10.24.1.151/tiles/{z}/{x}/{y}.png?{foo}', {foo: 'bar', maxZoom: 18}).addTo(map);
+ var tide_url = 'http://10.24.1.151:8080/geoserver/gwc/service/wmts';
+ var tide_layer;
+ function tide(t) {
+  if (tide_layer) {
+    map.removeLayer(tide_layer);
+  }
+  var start_time = new Date(Date.UTC(2018, 0, t)).toISOString()
+  tide_layer = new L.TileLayer.WMTS( tide_url ,
+                                       {
+                                           TIME: start_time,
+                                           layer: "dataraft:tide_visualisation",
+                                           style: "",
+                                           tilematrixSet: "EPSG:900913",
+                                           format: "image/png8",
+                                        }
+                                      );
+  map.addLayer(tide_layer);
+ };
 
+ setInterval(function () {
+  setTimeout(function () {tide(8)}, 0);
+  setTimeout(function () {tide(9)}, 2000);
+  setTimeout(function () {tide(10)}, 4000);
+  setTimeout(function () {tide(11)}, 6000);
+  setTimeout(function () {tide(12)}, 8000);
+ }, 10000)
+ 
  map.on('ready', updateAttribution);
  map.on('mousemove', latlngDisplay);
 
