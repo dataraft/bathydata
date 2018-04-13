@@ -296,6 +296,7 @@
             <option value="tide">Tide </option>
             <option value="current">Current </option>
             <option value="currentdirection">Current Direction</option>
+            <option value="sediment">Sediment Transport</option>
           </select>
         </div>
         <div id="div-sel-month">
@@ -1517,6 +1518,8 @@ var drawControl = new L.Control.Draw({
  
 var button_draw = document.getElementById('draw');
 button_draw.onclick = function(){
+  var datatype = $('#sel-data-type')[0].value; 
+  if(datatype=='sediment') {alert('Double click on a subscibed zone to view sediment data.'); return;}
 	new L.Draw.Polygon(map,drawControl.options.polygon).enable();
 }
 	
@@ -1681,7 +1684,10 @@ check_intersect = function() {
 
 var orderButton = document.getElementById('submit');
 orderButton.onclick = function(){
-    if(!login_flag){$('#login').modal('open'); return;}
+  if(!login_flag){$('#login').modal('open'); return;}
+  var datatype = $('#sel-data-type')[0].value; 
+  if(datatype=='sediment') {alert('Double click on a subscibed zone to view sediment data.'); return;}
+
 	if(polygon_check ) {
         if(intersect) { alert('Unable to send request. Please redraw your area.'); return;}
         console.log('clicked');
