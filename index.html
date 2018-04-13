@@ -472,6 +472,7 @@
         var logout_api = host+'/download/logout/';
         var upload_api = host+'/download/upload/';
         var triangular_api = host+'/download/zonedata/?zid=';
+        var sediment_api = host+'/download/sedimentdata/?zid=';
         var shoreline_api = host+'/download/shoreline/?year='
         var user_details;
         var login_flag = false;
@@ -880,6 +881,7 @@
                   // clear layer
                   clearVisualisation(layer.feature.properties.zid);
 
+                  var vis_type = $('#sel-data-type')[0].value;
                   var month = $('#sel-month')[0].value;
                   var day = visualisation_day;
 
@@ -889,7 +891,74 @@
                     day = visualisation_day;
                   }
 
-                  $.ajax({
+                  if (vis_type=='sediment') {
+                    $.ajax({
+                      type : 'GET',
+                      url : sediment_api+layer.feature.properties.zid+'&month='+month,
+                      timeout: 30000,
+                      dataType: 'json',
+                      cache: false,
+                      xhrFields: {withCredentials: true},
+                      crossDomain: true,
+                      success: function(xhr) {
+                        if(response.status) {
+                          var data = response.data;
+                          var sediment_arrows = []; 
+
+                          if (data && data.length) {
+                            data.forEach(function (s) {
+                              var point = s[0]['coordinates'];
+                              var angle = s[1];
+                              var quantity = s[2];
+                              var m = Math.abs(Math.tan(angle * Math.PI/180));
+                              var k = 0.1*/Math.sqrt(1+m*m);
+                              var new_point;
+                              if (angle>=0 && angle<90) {new_point = [point[0]+(k*1), point[1]+(k*m)];} // Q1
+                              else if(angle>=90 && angle<180) {new_point = [point[0]-(k*1), point[1]+(k*m)];} // Q2
+                              else if(angle>=180 && angle<270) {new_point = [point[0]-(k*1), point[1]-(k*m)];} // Q3
+                              else if(angle>=270 && angle<360) {new_point = [point[0]+(k*1), point[1]-(k*m)];} // Q4
+
+                              if (quantity>0) {
+                                var arrow = L.polyline([L.latLng(point[1], point[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
+                              } else {
+                                var arrow = L.polyline([L.latLng(new_point[1], new_point[0]), L.latLng(point[1], point[0])], {smoothFactor: 0, noClip: true});
+                              }
+
+                              var arrowHead = L.polylineDecorator(arrow, {
+                                      patterns: [
+                                          {
+                                              offset: '100%',
+                                              repeat: 0,
+                                              symbol: L.Symbol.arrowHead({pixelSize: 8, polygon: false, pathOptions: {fillOpacity: 1, weight: 1}})
+                                          }
+                                      ]
+                                  });
+                              sediment_arrows.push(arrow);
+                              sediment_arrows.push(arrowHead);
+                            });
+
+                            // clear only layer
+                            clearVisualisation(layer.feature.properties.zid, true);
+                            // add layer
+                            triangulation_layer = L.layerGroup(sediment_arrows).addTo(map,true);
+                            triangulation_layers.push(triangulation_layer);
+                            // clear layer
+                            triangulation_layer.on('dblclick', function () {
+                              clearVisualisation();
+                            });
+                          }
+                        } else{
+                          alert(response.msg);
+                        }
+                        loader.style.display = 'none';
+                      },
+                      error : function(xhr) {
+                        loader.style.display = 'none';
+                        alert('Unable to reach server. Please try after sometime.');
+                      },
+                    });
+                  } else {
+                    $.ajax({
                      type : 'GET',
                      url : triangular_api+layer.feature.properties.zid+'&month='+month+'&day='+visualisation_day,
                      timeout: 30000,
@@ -901,8 +970,7 @@
                         if(response.status) {
                            // display pop-up
                            //console.log(response);
-                           var vis_type = $('#sel-data-type')[0].value;
-
+                           
                            var data = response;
                            var visualisation_triangles_temp = [];
 
@@ -1087,6 +1155,7 @@
                         alert('Unable to reach server. Please try after sometime.');
                       },
                     });
+                  }
                 });
             });
 
