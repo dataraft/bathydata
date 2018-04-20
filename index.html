@@ -446,7 +446,8 @@
         var bathymetry_layer;
         var shoreline_layer=[];  // all shorelines 
         var bathymetry_zones = []; // bathymetry zone features
-        var bathymetry_triangles = []; // color coding features  //bathy zone 
+        var bathymetry_triangles = []; // color coding features  //bathy zone
+        var visualisation_layer;
         var visualisation_triangles = []; // color coding features  //subscribed zone 
         var visualisation_zid;   // slider reset
         var visualisation_month; // slider reset
@@ -472,6 +473,7 @@
         var logout_api = host+'/download/logout/';
         var upload_api = host+'/download/upload/';
         var triangular_api = host+'/download/zonedata/?zid=';
+        var wms_api = host+'/geoserver/gwc/service/wms?SERVICE=WMS&amp;';
         var sediment_api = host+'/download/sedimentdata/?zid=';
         var shoreline_api = host+'/download/shoreline/?year='
         var user_details;
@@ -805,7 +807,7 @@
         }
 
         clearVisualisation = function(zid, onlylayers) {
-	        if (visualisation_zid && zid!=visualisation_zid) {
+          if (visualisation_zid && zid!=visualisation_zid) {
             console.log('clear all ...')
             if (triangulation_layers.length) {
               triangulation_layers.forEach(function (l) {
@@ -814,6 +816,12 @@
                 map.removeLayer(l)
               });
             }
+
+            // clear visualisation layer
+            if (visualisation_layer) {
+              map.removeLayer(visualisation_layer);
+            }
+
 	          // visualisation_triangles = [];
 	          // bathymetry_triangles = [];     
 
@@ -835,6 +843,10 @@
                 if(index !== -1) {triangulation_layers.splice(index, 1);}
                 map.removeLayer(l)
               });
+            }
+            // clear visualisation layer
+            if (visualisation_layer) {
+              map.removeLayer(visualisation_layer);
             }
           }
         }
@@ -963,203 +975,118 @@
                       },
                     });
                   } else {
-                    $.ajax({
-                     type : 'GET',
-                     url : triangular_api+layer.feature.properties.zid+'&month='+month+'&day='+visualisation_day,
-                     timeout: 30000,
-                     dataType: 'json',
-                     cache: false,
-                     xhrFields: {withCredentials: true},
-                     crossDomain: true,
-                      success : function(response) {
-                        if(response.status) {
-                           // display pop-up
-                           //console.log(response);
-                           
-                           var data = response;
-                           var visualisation_triangles_temp = [];
+                    // add layer
+                    var zid = layer.feature.properties.zid;
+                    var vlayer;
+                    switch (vis_type) {
+                      case 'waveheight':
+                        vlayer = 'dataraft:wave_visualisation_'+zid; 
+                        break;
+                      case 'wavedirection':
+                        vlayer = 'dataraft:wavedirection_visualisation_'+zid; 
+                        break;
+                      case 'bathymetry':
+                        vlayer = 'dataraft:bathymetry_visualisation_'+zid; 
+                        break;
+                      case 'tide':
+                        vlayer = 'dataraft:tide_visualisation_'+zid; 
+                        break;
+                      case 'current':
+                        vlayer = 'dataraft:current_visualisation_'+zid; 
+                        break;
+                      case 'currentdirection':
+                        vlayer = 'dataraft:current_visualisation_'+zid; 
+                        break;
 
-                           if (data.triangles && data.triangles.length) {
-                              data.triangles.forEach(function (t) {
-                                visualisation_triangles_temp.push({'type':'Feature','properties':{'wave_height':t[1], 'wave_direction':t[2], 'wave_period':t[3], 'bathymetry':t[4], 'tide':t[5], 'current_speed':t[6], 'current_direction':t[7]}, 'geometry': {'type': 'Polygon', 'coordinates': [t[0]]}});
-                              });
-                           }
-
-                          if (vis_type=='waveheight' || vis_type=='waveperiod' || vis_type=='bathymetry' || vis_type=='tide') {
-                            if (visualisation_triangles_temp.length) {
-                              // add layer
-                              var vis_style = waveheight_Style;
-                              if (vis_type=='waveperiod') {vis_style = waveperiod_Style;}
-                              if (vis_type=='tide') {vis_style = tide_Style;}
-                              if (vis_type=='bathymetry') {vis_style = bathymetry_Style;}
-
-                              // clear only layer
-                              clearVisualisation(layer.feature.properties.zid, true);
-                              // add layer
-                              triangulation_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: visualisation_triangles_temp}, {style: vis_style}).addTo(map,true);
-                              triangulation_layers.push(triangulation_layer);
-                              // clear layer
-                              triangulation_layer.on('dblclick', function () {
-                                 clearVisualisation();
-                              });
-                              // map point API
-                              triangulation_layer.on('click', function(e) {
-                                setTimeout(function() {
-                                  console.log('click doubleclicked:'+doubleclicked);
-                                  if (!doubleclicked) {pointData(e.latlng);}
-                                }, 500);
-                              });
-                              // update legend
-                              if (vis_type=='waveheight') {
-                                var legend_html = '';
-                                [0.2, 0.4, 0.6, 0.8, 1, 1.5, 'rest'].forEach(function(d) {
-                                  legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getWaveColor(d)+';background-color:'+getWaveColor(d)+'""></figure>';
-                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;"><= '+d+' m</span> <br>';
-                                });
-                                $('.legend-box')[0].innerHTML = legend_html;
-                              } else if (vis_type=='tide') {
-                                var legend_html = '';
-                                [0.2, 0.4, 0.6, 0.8, 1, 1.2, 'rest'].forEach(function(d) {
-                                  legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getTideColor(d)+';background-color:'+getTideColor(d)+'""></figure>';
-                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;"><= '+d+' m</span> <br>';
-                                });
-                                $('.legend-box')[0].innerHTML = legend_html;
-                              } else if (vis_type=='waveperiod'){
-                                var legend_html = '';
-                                [4, 4.5, 5, 5.5, 6, 8, 'rest'].forEach(function(d) {
-                                  legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getWavePeriodColor(d)+';background-color:'+getWavePeriodColor(d)+'""></figure>';
-                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;"><= '+d+' sec</span> <br>';
-                                });
-                                $('.legend-box')[0].innerHTML = legend_html;
-                              } else {
-                                var legend_html = '';
-                                [-10, -20, -50, -100, -500, -1000, -5000, 'rest'].forEach(function(d) {
-                                  legend_html += '<figure class="map-leg-d-1"'+' style="color:'+getBathymetryColor(d)+';background-color:'+getBathymetryColor(d)+'""></figure>';
-                                  legend_html += '<span style="font-size: 10px;position: relative;top: -5px;">>= '+d+' m</span> <br>';
-                                });
-                                $('.legend-box')[0].innerHTML = legend_html;
-                              }
-                            }
-                          } else if(vis_type=='wavedirection' || vis_type=='currentdirection') {
-                            var polylines = [];
-                            visualisation_triangles_temp.forEach(function (t) {
-                              var tri = t['geometry']['coordinates'];
-                              var centroid = [(tri[0][0][0]+tri[0][1][0]+tri[0][2][0])/3, (tri[0][0][1]+tri[0][1][1]+tri[0][2][1])/3];
-                              if (vis_type=='wavedirection') {
-                                var max_waveheight = 0.5;
-                                var waveheight = t['properties']['wave_height'];
-                                var wavedirection = t['properties']['wave_direction'];
-                                // transform to EAST
-                                if (wavedirection>=0 && wavedirection<90) wavedirection = 270-wavedirection; // Q1
-                                else if(wavedirection>=90 && wavedirection<180) wavedirection = 270-wavedirection; // Q2
-                                else if(wavedirection>=180 && wavedirection<270) wavedirection = 270-wavedirection; // Q3
-                                else if(wavedirection>=270 && wavedirection<360) wavedirection = 630-wavedirection; // Q4
-
-                                if (waveheight && wavedirection) { // draw arrow
-                                  var m = Math.abs(Math.tan(wavedirection * Math.PI/180));
-                                  var k = 0.1*(waveheight/max_waveheight)/Math.sqrt(1+m*m);
-                                  var new_point;
-                                  if (wavedirection>0 && wavedirection<=90) {new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];} // Q1
-                                  else if(wavedirection>90 && wavedirection<=180) {new_point = [centroid[0]-(k*1), centroid[1]+(k*m)];} // Q2
-                                  else if(wavedirection>180 && wavedirection<=270) {new_point = [centroid[0]-(k*1), centroid[1]-(k*m)];} // Q3
-                                  else if(wavedirection>270 && wavedirection<=360) {new_point = [centroid[0]+(k*1), centroid[1]-(k*m)];} // Q4
-
-                                  var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
-                                  var arrowHead = L.polylineDecorator(arrow, {
-                                      patterns: [
-                                          {
-                                              offset: '100%',
-                                              repeat: 0,
-                                              symbol: L.Symbol.arrowHead({pixelSize: 8, polygon: false, pathOptions: {fillOpacity: 1, weight: 1}})
-                                          }
-                                      ]
-                                  });
-                                  polylines.push(arrow);
-                                  polylines.push(arrowHead);
-                                }
-                              } else if(vis_type=='currentdirection') {
-                                var max_speed = 0.5;
-                                var speed = t['properties']['current_speed'];
-                                var currentdirection = t['properties']['current_direction'];
-
-                                if (speed && currentdirection) { // draw arrow
-                                  var m = Math.abs(Math.tan(currentdirection * Math.PI/180));
-                                  var k = 0.1*(speed/max_speed)/Math.sqrt(1+m*m);
-                                  var new_point;
-                                  if (currentdirection>=0 && currentdirection<90) {new_point = [centroid[0]+(k*1), centroid[1]+(k*m)];} // Q1
-                                  else if(currentdirection>=90 && currentdirection<180) {new_point = [centroid[0]-(k*1), centroid[1]+(k*m)];} // Q2
-                                  else if(currentdirection>=-180 && currentdirection<-90) {new_point = [centroid[0]-(k*1), centroid[1]-(k*m)];} // Q3
-                                  else if(currentdirection>=-90 && currentdirection<0) {new_point = [centroid[0]+(k*1), centroid[1]-(k*m)];} // Q4
-
-                                  var arrow = L.polyline([L.latLng(centroid[1], centroid[0]), L.latLng(new_point[1], new_point[0])], {smoothFactor: 0, noClip: true});
-                                  var arrowHead = L.polylineDecorator(arrow, {
-                                      patterns: [
-                                          {
-                                              offset: '100%',
-                                              repeat: 0,
-                                              symbol: L.Symbol.arrowHead({pixelSize: 8, polygon: false, pathOptions: {fillOpacity: 1, weight: 1}})
-                                          }
-                                      ]
-                                  });
-                                  polylines.push(arrow);
-                                  polylines.push(arrowHead);
-                                }
-                              }
-                            });
-                            // clear only layer
-                            clearVisualisation(layer.feature.properties.zid, true);
-                            // add layer
-                            triangulation_layer = L.layerGroup(polylines).addTo(map,true);
-                            triangulation_layers.push(triangulation_layer);
-                            // clear layer
-                            triangulation_layer.on('dblclick', function () {
-                              clearVisualisation();
-                            });
-                            // map point API
-                            triangulation_layer.on('click', function(e) {
-                              setTimeout(function() {
-                                console.log('click doubleclicked:'+doubleclicked);
-                                if (!doubleclicked) {pointData(e.latlng);}
-                              }, 500);
-                            });
-                          }
-                          // slider update
-                          if (layer.feature.properties.zid!=visualisation_zid || visualisation_month==null) {
-                            // current vis zid and month
-                            visualisation_zid = layer.feature.properties.zid;
-                            visualisation_month = month;
-
-                            console.log('updating slider');
-                            vis_today = new Date();
-                            vis_from_date = new Date(vis_today.getFullYear(), parseInt(month)-1, 1);
-                            vis_to_date = new Date(vis_today.getFullYear(), parseInt(month), 0);
-                            vis_slider.noUiSlider.updateOptions({
-                              start: timestamp(vis_from_date.toString()),
-                              range: {
-                                'min': timestamp(vis_from_date.toString()),
-                                'max': timestamp(vis_to_date.toString())
-                              }
-                            });
-
-                            vis_slider.style.display = 'block';
-                            vis_close.style.display = 'block';
-                          } else { // update slider day
-                            var year = new Date().getFullYear();
-                            var day_timestamp = new Date(year, parseInt(month)-1, parseInt(day)).getTime(); 
-                            vis_slider.noUiSlider.set(day_timestamp);
-                          }
-                          
-
-                        } else{
-                        alert(response.msg);
-                         }
-                        loader.style.display = 'none';
-                      },
-                      error : function(xhr) {
-                        loader.style.display = 'none';
-                        alert('Unable to reach server. Please try after sometime.');
-                      },
+                    }
+                    var timestep = new Date(Date.UTC(2018, parseInt(month)-1, parseInt(visualisation_day))).toISOString();
+                    var wms_layer = L.tileLayer.wms(wms_api, {layers: vlayer, transparent: true, format: "image/png8", TIME: timestep}).addTo(map);
+                    
+                    wms_layer.on('loading', function() {
+                      console.log('loading tiles...');
+                      loader.style.display = '';
                     });
+                    
+                    wms_layer.on('load', function() {
+                      console.log('loaded tiles...');
+                      loader.style.display = 'none';
+
+                      if (visualisation_layer!=wms_layer) {
+                        // clear only layer
+                        clearVisualisation(layer.feature.properties.zid, true); 
+
+                        visualisation_layer = wms_layer;                     
+
+                        // clear layer
+                        visualisation_layer.on('dblclick', function () {
+                          clearVisualisation();
+                        });
+
+                        // map point API
+                        visualisation_layer.on('click', function(e) {
+                          setTimeout(function() {
+                            console.log('click doubleclicked:'+doubleclicked);
+                            if (!doubleclicked) {pointData(e.latlng);}
+                          }, 500);
+                        });
+
+                        // slider update
+                        if (layer.feature.properties.zid!=visualisation_zid || visualisation_month==null) {
+                          // current vis zid and month
+                          visualisation_zid = layer.feature.properties.zid;
+                          visualisation_month = month;
+
+                          console.log('updating slider');
+                          vis_today = new Date();
+                          vis_from_date = new Date(vis_today.getFullYear(), parseInt(month)-1, 1);
+                          vis_to_date = new Date(vis_today.getFullYear(), parseInt(month), 0);
+                          vis_slider.noUiSlider.updateOptions({
+                            start: timestamp(vis_from_date.toString()),
+                            range: {
+                              'min': timestamp(vis_from_date.toString()),
+                              'max': timestamp(vis_to_date.toString())
+                            }
+                          });
+
+                          vis_slider.style.display = 'block';
+                          vis_close.style.display = 'block';
+                        } else { // update slider day
+                          var year = new Date().getFullYear();
+                          var day_timestamp = new Date(year, parseInt(month)-1, parseInt(day)).getTime(); 
+                          vis_slider.noUiSlider.set(day_timestamp);
+                        }
+
+                        // update legend
+                        if (vis_type=='waveheight' || vis_type=='wavedirection') {
+                          var legend_html = '';
+                          grades = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4];
+                          for (var i = 0; i < grades.length; i++) {
+                              legend_html +=
+                                  '<i style="background:' + getWaveColor(grades[i] + 0) + '"></i> ' +
+                                  grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                          }
+                          $('.legend-box')[0].innerHTML = legend_html;
+                        } else if (vis_type=='tide') {
+                          var legend_html = '';
+                          grades = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4];
+                          for (var i = 0; i < grades.length; i++) {
+                              legend_html +=
+                                  '<i style="background:' + getTideColor(grades[i] + 0) + '"></i> ' +
+                                  grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                          }
+                          $('.legend-box')[0].innerHTML = legend_html;
+                        } else if (vis_type=='current' || vis_type=='currentdirection') {
+                          var legend_html = '';
+                          grades = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4];
+                          for (var i = 0; i < grades.length; i++) {
+                              legend_html +=
+                                  '<i style="background:' + getTideColor(grades[i] + 0) + '"></i> ' +
+                                  grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                          }
+                          $('.legend-box')[0].innerHTML = legend_html;
+                        }
+                      }
+                    });                 
                   }
                 });
             });
@@ -1359,6 +1286,7 @@ function addTomap() {   //ADD zones and bathymetry to map
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
  map.doubleClickZoom.disable();
  
+ 
  // current layer
  //test_layer = L.tileLayer('http://10.24.1.151/tiles/{z}/{x}/{y}.png?{foo}', {foo: 'bar', maxZoom: 18}).addTo(map);
  var tide_url = 'http://10.24.1.151:8080/geoserver/gwc/service/wmts';
@@ -1388,6 +1316,7 @@ function addTomap() {   //ADD zones and bathymetry to map
   setTimeout(function () {tide(12)}, 8000);
  }, 10000)
  
+
  map.on('ready', updateAttribution);
  map.on('mousemove', latlngDisplay);
 
@@ -1798,16 +1727,15 @@ else {
 // *******************************************************************************************//
 
 //*******************************************************Visualisation****************************************//
-
-function getWaveColor (d) {
-  return d == null ? '':
-         d <= 0.2 ?  '#8B71FA' :
-         d <= 0.4 ?  '#7CACFF' :
-         d <= 0.6 ? '#55EAFF' :
-         d <= 0.8  ?   '#35FCE1' :
-         d <= 1 ? '#4DEEB8' :
-         d <= 1.5  ? '#55E08A' :
-                    '#008000';
+function getWaveColor(d) {
+    return d > 1.4 ? '#800000' :
+           d > 1.2  ? '#ff2000' :
+           d > 1  ? '#ff9f00' :
+           d > 0.8  ? '#ffff00' :
+           d > 0.6   ? '#9fff60' :
+           d > 0.4   ? '#00ffff' :
+           d > 0.2   ? '#0050ff' :
+                      '#00008f';
 }
 
 function waveheight_Style (feature) {
@@ -1843,15 +1771,15 @@ function waveperiod_Style (feature) {
     };
 }
 
-function getTideColor (d) {
-  return d == null ? '':
-         d <= 0.2 ?  '#8B71FA' :
-         d <= 0.4 ?  '#7CACFF' :
-         d <= 0.6 ? '#55EAFF' :
-         d <= 0.8  ?   '#35FCE1' :
-         d <= 1 ? '#4DEEB8' :
-         d <= 1.2  ? '#55E08A' :
-                    '#008000';
+function getTideColor(d) {
+    return d > 1.4 ? '#800000' :
+           d > 1.2  ? '#ff2000' :
+           d > 1  ? '#ff9f00' :
+           d > 0.8  ? '#ffff00' :
+           d > 0.6   ? '#9fff60' :
+           d > 0.4   ? '#00ffff' :
+           d > 0.2   ? '#0050ff' :
+                      '#00008f';
 }
 
 function tide_Style (feature) {
