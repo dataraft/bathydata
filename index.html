@@ -863,7 +863,8 @@
             var zids = user_details.subscription_zones;   
             for(var i=0;i<zids.length;i++) {
                 var ind = boundary_zones.findIndex(x => x.properties.zid == zids[i]);
-                if (ind) {
+                console.log(ind)
+                if (ind != -1) {
                   subscribed_zones.push(boundary_zones[ind]);
                 }
             }         
