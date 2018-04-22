@@ -863,7 +863,9 @@
             var zids = user_details.subscription_zones;   
             for(var i=0;i<zids.length;i++) {
                 var ind = boundary_zones.findIndex(x => x.properties.zid == zids[i]);
-                subscribed_zones.push(boundary_zones[ind]);
+                if (ind) {
+                  subscribed_zones.push(boundary_zones[ind]);
+                }
             }         
               subscribed_layer = L.mapbox.featureLayer({type:"FeatureCollection", features: subscribed_zones}, {style: function() {return {color: "#00ff00",weight: 3,fillOpacity:0.05};}}).addTo(map);
 
