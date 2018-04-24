@@ -365,7 +365,7 @@
      		<figure class="map-leg-d-1" style="color:#cecccc"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> zones </span> </br>
         <figure class="map-leg-d-1" style="color:#00ff00"> </figure>  <span style="font-size: 10px;position: relative;top: -5px;"> subscribed zones </span> </br>
         <figure class="map-leg-d-1" style="color:#ff0000"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> hd bathymetry </span> </br>
-        <figure class="map-leg-d-1" style="color:#0000ff"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> user bathymetry </span> </br>
+        <figure class="map-leg-d-1" style="color:#0000ff"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> project </span> </br>
         <!--<figure class="map-leg-d-2" style="color:#FFF700"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> current shoreline </span> </br>
         <figure class="map-leg-d-2" style="color:#FFAA1D"> </figure> <span style="font-size: 10px;position: relative;top: -5px;"> past shoreline </span> </br>-->
     </div>
@@ -454,6 +454,7 @@
         var visualisation_day = 1;
         var user_zones_layer;
         var user_zones = []; // user zone features
+        var projects_layer;
         var triangulation_layers = [];
         var bathymetry_triangulation_layers = [];
         var s_first_load =0; //check if shoreline default layer is loaded.   
@@ -822,7 +823,7 @@
               map.removeLayer(visualisation_layer);
             }
 
-	          // visualisation_triangles = [];
+            // visualisation_triangles = [];
 	          // bathymetry_triangles = [];     
 
 	          // legend
@@ -847,7 +848,7 @@
             // clear visualisation layer
             if (visualisation_layer) {
               map.removeLayer(visualisation_layer);
-            }
+            }            
           }
         }
         
@@ -1104,6 +1105,163 @@
             }
             user_zones_layer = L.mapbox.featureLayer({type: "FeatureCollection", features: user_zones}, {style: function() {return {color: "#0000ff",weight: 3,fillOpacity:0.05};}}).addTo(map);
 
+            // add projects layer
+            var projects = user_details.projects;
+            var project_zones = []
+            for(var i=0;i<projects.length;i++) {
+              var z = {};
+              z.geometry = projects[i][1];
+              z.type = 'Feature';
+              z.properties = {'zid': projects[i][0]};
+              project_zones.push(z);
+            }
+            projects_layer = L.mapbox.featureLayer({type: "FeatureCollection", features: project_zones}, {style: function() {return {color: "#0000ff",weight: 3,fillOpacity:0.05};}}).addTo(map);
+
+            // visualisation
+            projects_layer.eachLayer(function(layer){
+              console.log(layer.feature.properties);
+              layer.on('dblclick',function(){
+                console.log('dbclick');
+                //prevent second dbclick
+                if (doubleclicked) return;
+                // loading bar
+                loader.style.display = '';                  
+                //prevent click event for 1 sec
+                doubleclicked = true;
+                setTimeout(function(){doubleclicked=false;}, 1000);
+
+                console.log(layer.feature.properties.zid);
+                                  
+                // clear layer
+                clearVisualisation(layer.feature.properties.zid);
+
+                var vis_type = $('#sel-data-type')[0].value;
+                var month = $('#sel-month')[0].value;
+                var day = visualisation_day;
+
+                if (month!=visualisation_month) { // month change during vis
+                  visualisation_month = null;
+                  visualisation_day = 1;
+                  day = visualisation_day;
+                }
+
+
+                // add layer
+                var zid = layer.feature.properties.zid;
+                var vlayer;
+                switch (vis_type) {
+                  case 'waveheight':
+                    vlayer = 'dataraft:wave_visualisation_'+zid; 
+                    break;
+                  case 'wavedirection':
+                    vlayer = 'dataraft:wavedirection_visualisation_'+zid; 
+                    break;
+                  case 'bathymetry':
+                    vlayer = 'dataraft:bathymetry_visualisation_'+zid; 
+                    break;
+                  case 'tide':
+                    vlayer = 'dataraft:tide_visualisation_'+zid; 
+                    break;
+                  case 'current':
+                    vlayer = 'dataraft:current_visualisation_'+zid; 
+                    break;
+                  case 'currentdirection':
+                    vlayer = 'dataraft:current_visualisation_'+zid; 
+                    break;
+
+                }
+                var timestep = new Date(Date.UTC(2018, parseInt(month)-1, parseInt(visualisation_day))).toISOString();
+                var wms_layer = L.tileLayer.wms(wms_api, {layers: vlayer, transparent: true, format: "image/png8", TIME: timestep}).addTo(map);
+                
+                wms_layer.on('loading', function() {
+                  console.log('loading tiles...');
+                  loader.style.display = '';
+                });
+                
+                wms_layer.on('load', function() {
+                  console.log('loaded tiles...');
+                  loader.style.display = 'none';
+
+                  if (visualisation_layer!=wms_layer) {
+                    // clear only layer
+                    clearVisualisation(layer.feature.properties.zid, true); 
+
+                    visualisation_layer = wms_layer;                     
+
+                    // clear layer
+                    visualisation_layer.on('dblclick', function () {
+                      clearVisualisation();
+                    });
+
+                    // map point API
+                    visualisation_layer.on('click', function(e) {
+                      setTimeout(function() {
+                        console.log('click doubleclicked:'+doubleclicked);
+                        if (!doubleclicked) {pointData(e.latlng);}
+                      }, 500);
+                    });
+
+                    // slider update
+                    if (layer.feature.properties.zid!=visualisation_zid || visualisation_month==null) {
+                      // current vis zid and month
+                      visualisation_zid = layer.feature.properties.zid;
+                      visualisation_month = month;
+
+                      console.log('updating slider');
+                      vis_today = new Date();
+                      vis_from_date = new Date(vis_today.getFullYear(), parseInt(month)-1, 1);
+                      vis_to_date = new Date(vis_today.getFullYear(), parseInt(month), 0);
+                      vis_slider.noUiSlider.updateOptions({
+                        start: timestamp(vis_from_date.toString()),
+                        range: {
+                          'min': timestamp(vis_from_date.toString()),
+                          'max': timestamp(vis_to_date.toString())
+                        }
+                      });
+
+                      vis_slider.style.display = 'block';
+                      vis_close.style.display = 'block';
+                    } else { // update slider day
+                      var year = new Date().getFullYear();
+                      var day_timestamp = new Date(year, parseInt(month)-1, parseInt(day)).getTime(); 
+                      vis_slider.noUiSlider.set(day_timestamp);
+                    }
+
+                    // update legend
+                    if (vis_type=='waveheight' || vis_type=='wavedirection') {
+                      var legend_html = '';
+                      grades = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4];
+                      for (var i = 0; i < grades.length; i++) {
+                          legend_html +=
+                              '<i style="background:' + getWaveColor(grades[i] + 0) + '"></i> ' +
+                              grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                      }
+                      $('.legend-box')[0].innerHTML = legend_html;
+                    } else if (vis_type=='tide') {
+                      var legend_html = '';
+                      grades = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4];
+                      for (var i = 0; i < grades.length; i++) {
+                          legend_html +=
+                              '<i style="background:' + getTideColor(grades[i] + 0) + '"></i> ' +
+                              grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                      }
+                      $('.legend-box')[0].innerHTML = legend_html;
+                    } else if (vis_type=='current' || vis_type=='currentdirection') {
+                      var legend_html = '';
+                      grades = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4];
+                      for (var i = 0; i < grades.length; i++) {
+                          legend_html +=
+                              '<i style="background:' + getTideColor(grades[i] + 0) + '"></i> ' +
+                              grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                      }
+                      $('.legend-box')[0].innerHTML = legend_html;
+                    }
+                  }
+                });                 
+                  
+              });
+            });
+
           }
         };
 // login js
@@ -1288,7 +1446,7 @@ function addTomap() {   //ADD zones and bathymetry to map
  map = L.mapbox.map('map','mapbox.streets-satellite', {attributionControl: false}).setView([22,78],5);
  map.doubleClickZoom.disable();
  
- 
+ /**
  // current layer
  //test_layer = L.tileLayer('http://10.24.1.151/tiles/{z}/{x}/{y}.png?{foo}', {foo: 'bar', maxZoom: 18}).addTo(map);
  var tide_url = 'http://10.24.1.151:8080/geoserver/gwc/service/wmts';
@@ -1317,7 +1475,7 @@ function addTomap() {   //ADD zones and bathymetry to map
   setTimeout(function () {tide(11)}, 6000);
   setTimeout(function () {tide(12)}, 8000);
  }, 10000)
- 
+ **/
 
  map.on('ready', updateAttribution);
  map.on('mousemove', latlngDisplay);
@@ -2010,12 +2168,20 @@ handle.addEventListener('keydown', function( e ) {
   subscribed_layer.eachLayer(function (layer) {
     if (layer.feature.properties.zid==visualisation_zid) layer.fire('dblclick');
   });
+  // dblclick
+  projects_layer.eachLayer(function (layer) {
+    if (layer.feature.properties.zid==visualisation_zid) layer.fire('dblclick');
+  });
  });
  // tapped slider 
  vis_slider.noUiSlider.on('change', function(values, handle) {
    visualisation_day = new Date(parseInt(values[0])).getDate();
   // dblclick
   subscribed_layer.eachLayer(function (layer) {
+    if (layer.feature.properties.zid==visualisation_zid) layer.fire('dblclick');
+  });
+  // dblclick
+  projects_layer.eachLayer(function (layer) {
     if (layer.feature.properties.zid==visualisation_zid) layer.fire('dblclick');
   });
  });
