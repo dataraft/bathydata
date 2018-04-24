@@ -1117,6 +1117,17 @@
             }
             projects_layer = L.mapbox.featureLayer({type: "FeatureCollection", features: project_zones}, {style: function() {return {color: "#0000ff",weight: 3,fillOpacity:0.05};}}).addTo(map);
 
+             // map point API
+            projects_layer.on('click', function(e) {
+              var vis_type = $('#sel-data-type')[0].value;
+              if (vis_type=='sediment') return;
+
+              setTimeout(function() {
+                console.log('click doubleclicked:'+doubleclicked);
+                if (!doubleclicked) {pointData(e.latlng);}
+              }, 500);
+            });
+
             // visualisation
             projects_layer.eachLayer(function(layer){
               console.log(layer.feature.properties);
