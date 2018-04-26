@@ -925,9 +925,9 @@
 
                           if (data && data.length) {
                             data.forEach(function (s) {
-                              var point = s[0]['coordinates'];
+                              var point = s[0];
                               var angle = s[1];
-                              var quantity = s[2];
+                              var quantity = s[2][parseInt(month)];
                               var m = Math.abs(Math.tan(angle * Math.PI/180));
                               var k = 0.1/Math.sqrt(1+m*m);
                               var new_point;
@@ -942,8 +942,91 @@
                                 var arrow = L.polyline([L.latLng(new_point[1], new_point[0]), L.latLng(point[1], point[0])], {color: '#FFD700', smoothFactor: 0, noClip: true});
                               }
 
-                              arrow.bindTooltip(quantity.toString()+' m3/month');
+                              arrow.on('mouseover', function() {
+                                // histogram
+                                var margin = {
+                                      top: 30,
+                                      right: 20,
+                                      bottom: 30,
+                                      left: 70
+                                  };
+                                  var width = 530;
+                                  var height = 210;
 
+                                  var parseDate = d3.timeParse("%Y-%m-%d-%H-%M");
+
+                                  var x = d3.scaleTime().range([0, width]);
+                                  var y = d3.scaleLinear().range([height, 0]);
+                                  
+                                  var xAxis = d3.axisBottom(x)
+                                  var yAxis = d3.axisLeft(y)
+                                                
+                                  var valueline = d3.line()
+                                  .x(function (d) {return x(d.d);})
+                                  .y(function (d) {return y(d.v);});
+
+                                  var div = $('<div id="chart" style="width:650px;height:300px;"><svg/></div>')[0];
+                                  var popup = L.popup({maxWidth : 750}).setLatLng([point[1], point[0]]).setContent(div).openOn(map);
+                                  var svg = d3.select('#chart svg')
+                                  .attr("width", width + margin.left + margin.right)
+                                  .attr("height", height + margin.top + margin.bottom)
+                                  .append("g")
+                                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                                  var sediment_values = [];
+                                  var today = new Date();
+                                  for (var i=1; i<=12; i++) {
+                                    var date = new Date(today.getFullYear(), i-1, 1);
+                                    date = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()+'-0-0';
+                                    sediment_values.push({'d': date, 'v': s[2][i]});
+                                  }
+                                  console.log(sediment_values);
+                                  
+                                  sediment_values.forEach(function (d) {
+                                    d.d = parseDate(d.d);
+                                    d.v = +d.v;
+                                  });
+
+                                  // Scale the range of the data
+                                  x.domain(d3.extent(sediment_values, function (d) {return d.d;}));
+                                  y.domain([d3.min(sediment_values, function (d) {return d.v;}), d3.max(sediment_values, function (d) {return d.v;})]);
+
+                                  // Add the valueline path.
+                                  svg.append("path") 
+                                  .data([sediment_values])
+                                  .attr("class", "line")
+                                  .attr("d", valueline);
+
+                                  // Add the X Axis
+                                  svg.append("g") 
+                                    .attr("class", "x axis")
+                                    .attr("transform", "translate(0," + height + ")")
+                                    .call(xAxis.tickFormat(d3.timeFormat("%b %d")));
+
+                                  // xLabel
+                                  svg.append("text")
+                                    .attr("transform", "translate(" + (width/2) + " ," +(height+margin.top) + ")")
+                                    .style("text-anchor", "middle")
+                                    .text("Date");
+
+                                  // Add the Y Axis
+                                  svg.append("g") 
+                                    .attr("class", "y axis")
+                                    .call(yAxis);
+
+                                  // yLabel
+                                  var yLabel = 'Sediment Quantity (m3/month)';
+                                  
+                                  svg.append("text")
+                                    .attr("transform", "rotate(-90)")
+                                    .attr("y", 0 - margin.left)
+                                    .attr("x", 0 - (height / 2))
+                                    .attr("dy", "1em")
+                                    .style("text-anchor", "middle")
+                                    .text(yLabel);
+                              });                              
+                              
+                              // arrows
                               var arrowHead = L.polylineDecorator(arrow, {
                                       patterns: [
                                           {
