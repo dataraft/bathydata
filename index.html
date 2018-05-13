@@ -479,7 +479,7 @@
         var shoreline_api = host+'/download/shoreline/?year='
         var user_details;
         var login_flag = false;
-        var data_type = 'wave';
+        var data_type = 'waveheight';
         var intersect = false;
         var dates;      //datatype.from_date/to_date
         var d_chose_from = '2017-10-10';      //download data date range
@@ -1905,7 +1905,7 @@ getprice = function(layer) {
             if(data.status) {
 			answer.innerHTML += '<p> Datapoints '+ data.datapoints + '</p>'+ '</br> <p> Size '+ data.size + '</p>' ;
 		    }
-            else { alert('Hi, Please ensure you select the dates')}  
+            else { alert(data.msg)}  
         }
 
 
